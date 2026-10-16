@@ -1,414 +1,260 @@
-/* Top HUD Bar - Streamlined, Divine, Luxury Vedic Glassmorphism */
-.top-hud {
-    width: 100%;
-    min-height: 54px;
-    height: 54px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    background: linear-gradient(180deg, rgba(8, 14, 28, 0.96) 0%, rgba(13, 20, 38, 0.92) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(250, 204, 21, 0.32);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55), 0 0 15px rgba(250, 204, 21, 0.12);
-    z-index: 40;
-    gap: 12px;
-    flex-wrap: nowrap;
+/* ==========================================================================
+   SHYAM SAKHA - RESPONSIVE HUD & FLOATING SYSTEM
+   Flawless adaptability across all screen sizes, ratios (16:9, 16:10, 4:3, 21:9),
+   and browser zooms (including 80% screen zoom and high-DPI displays).
+   ========================================================================== */
+
+/* Universal HUD Reset & Variables */
+:root {
+    --hud-gap: 8px;
+    --hud-top: 14px;
+    --hud-side: 14px;
 }
 
-/* Left Brand & Sacred Dham Section */
-.brand-section {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
+/* Guard: Ensure no legacy full top bar ever appears or takes space */
+.top-hud, #topHud {
+    display: none !important;
 }
 
-.game-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1.15rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #fffbeb 0%, #facc15 50%, #f59e0b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: 0.04em;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0;
-    white-space: nowrap;
-    text-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
+/* Base safe bounds for all floating HUD elements */
+#minimapContainer,
+#reopenMinimapBtn,
+.floating-dham-badge,
+.floating-hud-tray,
+.floating-stamina-widget,
+#interactionPrompt,
+.ram-dialogue-container {
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
 }
 
-.peacock-icon {
-    font-size: 1.25rem;
-    -webkit-text-fill-color: initial;
-    filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.5));
-}
-
-.title-sub {
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.76rem;
-    color: #fde047;
-    opacity: 0.85;
-    -webkit-text-fill-color: initial;
-    font-weight: 500;
-    letter-spacing: normal;
-}
-
-.location-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(56, 189, 248, 0.45);
-    padding: 4px 12px;
-    border-radius: 9999px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: #38bdf8;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    white-space: nowrap;
-}
-
-.location-badge:hover {
-    background: rgba(56, 189, 248, 0.2);
-    border-color: #38bdf8;
-    transform: translateY(-1px);
-    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
-    color: #e0f2fe;
-}
-
-.badge-arrow {
-    font-size: 0.65rem;
-    opacity: 0.8;
-    margin-left: 2px;
-}
-
-.tag-badge {
-    padding: 3px 10px;
-    border-radius: 9999px;
-    font-weight: 700;
-    font-size: 0.74rem;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.tag-resting {
-    background: rgba(34, 197, 94, 0.15);
-    color: #4ade80;
-    border: 1px solid rgba(34, 197, 94, 0.4);
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.15);
-}
-
-.tag-playing {
-    background: rgba(56, 189, 248, 0.18);
-    color: #38bdf8;
-    border: 1px solid rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
-}
-
-.tag-volleyball {
-    background: rgba(234, 179, 8, 0.22);
-    color: #facc15;
-    border: 1px solid rgba(234, 179, 8, 0.6);
-    box-shadow: 0 0 12px rgba(250, 204, 21, 0.35);
-    animation: divinePulse 2s infinite;
-}
-
-/* Center HUD: Quick Pastimes & Compact Visual Inventory */
-.center-hud {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quick-pastimes-bar {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(15, 23, 42, 0.75);
-    padding: 3px 5px;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-.play-action-btn {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: #f1f5f9;
-    padding: 5px 11px;
-    border-radius: 7px;
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    white-space: nowrap;
-}
-
-.play-action-btn:hover {
-    background: rgba(51, 65, 85, 0.95);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
-
-.btn-volleyball-cta {
-    background: linear-gradient(135deg, #ea580c 0%, #d97706 50%, #b45309 100%);
-    border-color: rgba(253, 224, 71, 0.75);
-    color: #ffffff;
-    box-shadow: 0 0 12px rgba(234, 88, 12, 0.4);
-}
-
-.btn-volleyball-cta:hover {
-    background: linear-gradient(135deg, #f97316 0%, #f59e0b 50%, #d97706 100%);
-    box-shadow: 0 0 18px rgba(250, 204, 21, 0.6);
-    transform: translateY(-1px) scale(1.02);
-}
-
-.btn-hub-return {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    border-color: rgba(74, 222, 128, 0.6);
-    color: #ffffff;
-}
-
-.btn-hub-return:hover {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 0 14px rgba(34, 197, 94, 0.5);
-}
-
-/* Compact Visual Inventory Bar */
-.inventory-bar {
-    display: flex;
-    gap: 9px;
-    align-items: center;
-    background: rgba(15, 23, 42, 0.85);
-    padding: 4px 13px;
-    border-radius: 9999px;
-    border: 1px solid rgba(250, 204, 21, 0.35);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-}
-
-.inv-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #e2e8f0;
-    cursor: default;
-}
-
-.inv-num {
-    font-family: 'Outfit', monospace;
-    font-size: 0.88rem;
-    font-weight: 800;
-}
-
-.inv-divider {
-    width: 1px;
-    height: 13px;
-    background: rgba(255, 255, 255, 0.16);
-}
-
-/* Right HUD: Bhajan Music Player, Stamina, Utility Buttons */
-.right-hud {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-}
-
-/* Bhajan Music Player Widget */
-.bhajan-bar {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(250, 204, 21, 0.45);
-    padding: 3px 10px;
-    border-radius: 9999px;
-    box-shadow: 0 0 12px rgba(250, 204, 21, 0.15);
-    transition: all 0.25s ease;
-}
-
-.bhajan-bar.playing {
-    border-color: #facc15;
-    box-shadow: 0 0 18px rgba(250, 204, 21, 0.4);
-    background: rgba(20, 28, 48, 0.95);
-}
-
-.music-ctrl-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.85rem;
-    padding: 2px 4px;
-    border-radius: 4px;
-    color: #e2e8f0;
-    transition: transform 0.15s ease, color 0.15s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.music-ctrl-btn:hover {
-    transform: scale(1.22);
-    color: #facc15;
-}
-
-.music-info {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: 3px;
-    font-size: 0.76rem;
-    font-weight: 700;
-    color: #facc15;
-    max-width: 110px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: default;
-}
-
-.music-icon {
-    animation: divinePulse 2s infinite;
-    font-size: 0.85rem;
-}
-
-/* Sleek Stamina Bar */
-.stamina-group {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(15, 23, 42, 0.7);
-    padding: 4px 9px;
-    border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.stamina-meter {
-    width: 50px;
-    height: 6px;
-    background: #334155;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.stamina-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #22c55e, #4ade80);
-    transition: width 0.1s ease-out;
-}
-
-.stamina-key-text {
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: #94a3b8;
-    letter-spacing: 0.05em;
-}
-
-/* Quick Action Utility Buttons */
-.hud-btn-group {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-}
-
-.icon-btn {
-    background: rgba(30, 41, 59, 0.85);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: #e2e8f0;
-    padding: 5px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.78rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    white-space: nowrap;
-}
-
-.icon-btn:hover {
-    background: rgba(51, 65, 85, 0.95);
-    border-color: rgba(250, 204, 21, 0.5);
-    color: #ffffff;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.btn-flute:hover {
-    border-color: #38bdf8;
-    background: rgba(56, 189, 248, 0.2);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.35);
-}
-
-/* Responsive Media Queries for Top HUD */
-@media (max-width: 1350px) {
-    .top-hud {
-        padding: 0 12px;
-        gap: 8px;
+/* --------------------------------------------------------------------------
+   Wide / High-Resolution / 80% Screen Zoom (>= 1600px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 1600px) {
+    .floating-dham-badge {
+        font-size: 0.95rem;
+        padding: 8px 22px;
     }
-    .game-title {
-        font-size: 1.05rem;
+    .floating-hud-pill {
+        font-size: 0.88rem;
+        padding: 7px 16px;
     }
-    .music-info {
-        max-width: 85px;
-    }
-    .stamina-meter {
-        width: 40px;
+    #minimapContainer {
+        width: 195px;
+        height: 195px;
     }
 }
 
-@media (max-width: 1150px) {
-    .title-sub {
+/* --------------------------------------------------------------------------
+   Standard Laptops & Desktops (1024px - 1599px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1280px) {
+    .floating-hud-pill {
+        padding: 6px 11px;
+        font-size: 0.78rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tablets & Medium Screens (768px - 1023px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+    .floating-dham-badge {
+        font-size: 0.78rem;
+        padding: 5px 12px;
+    }
+    #minimapContainer {
+        width: 145px;
+        height: 145px;
+    }
+    .floating-hud-pill {
+        padding: 5px 9px;
+        font-size: 0.76rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Small Tablets & Mobile Landscape (580px - 767px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+    :root {
+        --hud-top: 10px;
+        --hud-side: 10px;
+    }
+    #minimapContainer {
+        top: 10px;
+        left: 10px;
+        width: 130px;
+        height: 130px;
+    }
+    #reopenMinimapBtn {
+        top: 10px;
+        left: 10px;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+    }
+    .floating-dham-badge {
+        top: 10px;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        gap: 6px;
+    }
+    .floating-hud-tray {
+        top: 10px;
+        right: 10px;
+        gap: 6px;
+    }
+    /* Hide pill text labels on small screens so pills stay compact */
+    .floating-hud-pill .pill-label {
         display: none;
     }
-    .stamina-key-text {
-        display: none;
-    }
-    .btn-text {
-        display: none;
-    }
-    .icon-btn {
-        padding: 5px 8px;
+    .floating-hud-pill {
+        padding: 6px 9px;
         font-size: 0.85rem;
     }
+    .dialogue-portrait-wrap {
+        width: 130px;
+        height: 190px;
+        right: 14px;
+    }
+    #volleyballScoreboard {
+        top: 60px;
+        padding: 6px 16px;
+        gap: 12px;
+    }
+    .team-score {
+        font-size: 1.4rem;
+    }
 }
 
-@media (max-width: 950px) {
-    .pastime-btn-text {
-        display: none;
+/* --------------------------------------------------------------------------
+   Mobile Phones (< 580px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 579px) {
+    :root {
+        --hud-top: 8px;
+        --hud-side: 8px;
     }
-    .location-badge {
-        font-size: 0.74rem;
+    #minimapContainer {
+        top: 8px;
+        left: 8px;
+        width: 110px;
+        height: 110px;
+        border-radius: 12px;
+    }
+    #reopenMinimapBtn {
+        top: 8px;
+        left: 8px;
+        padding: 3px 6px;
+        font-size: 0.7rem;
+    }
+    .floating-dham-badge {
+        top: 8px;
+        font-size: 0.7rem;
         padding: 3px 8px;
+        gap: 4px;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-    .tag-badge {
+    .floating-state-pill {
+        display: none; /* Hide state pill to ensure no overlap on small screens */
+    }
+    .floating-hud-tray {
+        top: 8px;
+        right: 8px;
+        gap: 4px;
+    }
+    .floating-hud-pill {
+        padding: 5px 7px;
+        font-size: 0.8rem;
+    }
+    .floating-hud-pill .pill-label {
         display: none;
+    }
+    .hud-count-badge {
+        padding: 1px 4px;
+        font-size: 0.65rem;
+    }
+    .floating-stamina-widget {
+        bottom: 68px;
+        padding: 4px 10px;
+    }
+    .stamina-track {
+        width: 90px;
+        height: 6px;
+    }
+    #interactionPrompt {
+        bottom: 14px;
+        padding: 8px 16px;
+        font-size: 0.8rem;
+    }
+    /* Mobile Dialogue System */
+    .ram-dialogue-container {
+        width: calc(100% - 16px);
+        bottom: 10px;
+    }
+    .dialogue-portrait-wrap {
+        width: 100px;
+        height: 145px;
+        right: 8px;
+        bottom: calc(100% - 14px);
+    }
+    .dialogue-top-bar {
+        padding: 0 4px;
+    }
+    .dialogue-speaker-title {
+        font-size: 0.82rem;
+    }
+    .dialogue-cancel-pill {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+    .ram-dialogue-card {
+        padding: 14px;
+    }
+    .ram-dialogue-text {
+        font-size: 0.88rem;
+        margin-bottom: 12px;
+        line-height: 1.45;
+    }
+    .dialogue-action-btn {
+        font-size: 0.78rem;
+        padding: 5px 10px;
     }
 }
 
-@media (max-width: 768px) {
-    .top-hud {
-        overflow-x: auto;
-        scrollbar-width: none;
-        flex-wrap: nowrap;
+/* --------------------------------------------------------------------------
+   Short Landscape Displays (height <= 500px)
+   -------------------------------------------------------------------------- */
+@media (max-height: 500px) {
+    #minimapContainer {
+        width: 95px;
+        height: 95px;
     }
-    .top-hud::-webkit-scrollbar {
-        display: none;
+    .floating-dham-badge {
+        top: 6px;
+        padding: 2px 8px;
+    }
+    .floating-hud-tray {
+        top: 6px;
+    }
+    .dialogue-portrait-wrap {
+        display: none !important;
+    }
+    .ram-dialogue-container {
+        bottom: 6px;
+    }
+    .ram-dialogue-card {
+        padding: 10px 14px;
+    }
+    .ram-dialogue-text {
+        font-size: 0.85rem;
+        min-height: 1.5em;
+        margin-bottom: 8px;
     }
 }
 
