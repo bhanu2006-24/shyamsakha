@@ -492,7 +492,7 @@ export class HoliGame {
                 let sy = dy / dist;
 
                 for (const obs of obstacles) {
-                    if (obs.shape === 'circle') {
+                    if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
                         const odx = s.x - obs.x;
                         const ody = s.y - obs.y;
                         const oDist = Math.hypot(odx, ody);
@@ -502,6 +502,21 @@ export class HoliGame {
                         }
                     }
                 }
+
+                // Mutual Sakha separation force (prevents clumping / stacking!)
+                for (let j = 0; j < sakhas.length; j++) {
+                    if (j === idx) continue;
+                    const other = sakhas[j];
+                    const osdx = s.x - other.x;
+                    const osdy = s.y - other.y;
+                    const osDist = Math.hypot(osdx, osdy);
+                    if (osDist < 54 && osDist > 0) {
+                        const push = ((54 - osDist) / 54) * 2.8;
+                        sx += (osdx / osDist) * push;
+                        sy += (osdy / osDist) * push;
+                    }
+                }
+
                 const sLen = Math.hypot(sx, sy);
                 if (sLen > 0) { sx /= sLen; sy /= sLen; }
                 s.applyTerrain(obstacles);

@@ -360,7 +360,7 @@ export class TagGame {
                 let sy = fdy;
 
                 for (const obs of obstacles) {
-                    if (obs.shape === 'circle') {
+                    if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
                         const odx = s.x - obs.x;
                         const ody = s.y - obs.y;
                         const oDist = Math.hypot(odx, ody);
@@ -371,25 +371,41 @@ export class TagGame {
                     }
                 }
 
+                // Mutual Sakha separation force (prevents clumping / stacking!)
+                for (let j = 0; j < sakhas.length; j++) {
+                    if (j === idx) continue;
+                    const other = sakhas[j];
+                    const osdx = s.x - other.x;
+                    const osdy = s.y - other.y;
+                    const osDist = Math.hypot(osdx, osdy);
+                    if (osDist < 54 && osDist > 0) {
+                        const push = ((54 - osDist) / 54) * 3.2;
+                        sx += (osdx / osDist) * push;
+                        sy += (osdy / osDist) * push;
+                    }
+                }
+
                 const sLen = Math.hypot(sx, sy);
                 if (sLen > 0) { sx /= sLen; sy /= sLen; }
 
                 s.applyTerrain(obstacles);
                 s.moveWithAnim(sx * s.currentSpeed * s.terrainModifier * dt, sy * s.currentSpeed * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
 
-                // When Sakha reaches target: Krishna & Balram do an acrobatic Divine Evasion Leap!
+                // When Sakha reaches target: Krishna & Balram do an acrobatic Divine Evasion Leap (with cooldown)!
                 // Sakha does NOT prematurely end the game!
                 if (canSee && dist < s.radius + activeTarget.radius + 18) {
-                    activeTarget.vz = 340; // Leap into air over Sakha!
-                    this.game.particles.createSparkle(activeTarget.x, activeTarget.y, activeTarget === krishna ? '#38bdf8' : '#facc15');
-                    s.moveWithAnim(-fdx * 25, -fdy * 25, obstacles, mapW, mapH, dt);
-
-                    if (Math.random() < 0.15) {
-                        const quotes = activeTarget === krishna
-                            ? [`Aha ${s.name || 'Sudama'}! Almost had me! 🦚`, "You'll have to leap higher, Sakha! 🦚"]
-                            : [`Ho ho, nice try ${s.name || 'Subal'}! 🌾`, "Catch me if you can! 🌾"];
-                        this.game.ui.showToast(quotes[Math.floor(Math.random() * quotes.length)]);
+                    if ((activeTarget.evasionCooldown || 0) <= 0) {
+                        activeTarget.vz = 340; // Leap into air over Sakha!
+                        activeTarget.evasionCooldown = 3.8;
+                        this.game.particles.createSparkle(activeTarget.x, activeTarget.y, activeTarget === krishna ? '#38bdf8' : '#facc15');
+                        if (Math.random() < 0.25) {
+                            const quotes = activeTarget === krishna
+                                ? [`Aha ${s.name || 'Sudama'}! Almost had me! 🦚`, "You'll have to leap higher, Sakha! 🦚"]
+                                : [`Ho ho, nice try ${s.name || 'Subal'}! 🌾`, "Catch me if you can! 🌾"];
+                            this.game.ui.showToast(quotes[Math.floor(Math.random() * quotes.length)], 2500);
+                        }
                     }
+                    s.moveWithAnim(-fdx * 30, -fdy * 30, obstacles, mapW, mapH, dt);
                 }
             }
         });

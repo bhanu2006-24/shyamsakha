@@ -69,17 +69,13 @@ export class AssetLoader {
         const img = this.getImage(imgKey);
         if (!img) return false;
 
-        // Determine Quadrant based on facing direction
+        // Determine Quadrant based on facing direction (dx, dy)
         let sx = 0;
         let sy = 0;
         const sw = 1024;
         const sh = 1024;
 
-        if (!isMoving) {
-            // Idle / Resting pose: always face FRONT (Top-Left quadrant)
-            sx = 0;
-            sy = 0;
-        } else if (Math.abs(dx) > Math.abs(dy)) {
+        if (Math.abs(dx) > Math.abs(dy)) {
             if (dx < 0) {
                 // Facing LEFT -> Bottom-Left quadrant
                 sx = 0;
