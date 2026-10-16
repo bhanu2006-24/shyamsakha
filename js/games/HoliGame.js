@@ -1,3 +1,5 @@
+import { checkLineOfSight } from '../entities/ParticleSystem.js';
+
 /**
  * HoliGame (होली उत्सव - Rangotsav Pichkari & Color Fight)
  * Grand Vrindavan Color Battle: Agile, powerful Krishna & Dao Balram vs Player & Sakhas
@@ -329,60 +331,107 @@ export class HoliGame {
             return;
         }
 
+        // 1. Divine Border Escape Vault & Massive Speed Boost
+        if (ai.escapeCooldown > 0) ai.escapeCooldown -= dt;
+        if (ai.borderBoostTimer > 0) ai.borderBoostTimer -= dt;
+        if (ai.smokeCooldown > 0) ai.smokeCooldown -= dt;
+
+        const curMap = this.game.mapManager.currentMap;
+        const cx = curMap ? curMap.centerX : mapW / 2;
+        const cy = curMap ? curMap.centerY : mapH / 2;
+
+        const isNearBorder = (target.x < 360 || target.x > mapW - 780 || target.y < 360 || target.y > mapH - 360);
+        const isCornered = isNearBorder && (distToPlayer < 260 || ai.stuckTimer > 0.16);
+
+        if (isCornered && (ai.escapeCooldown || 0) <= 0) {
+            target.vz = 580; // Massive leap high above obstacles!
+            target.z = 5;
+            ai.borderBoostTimer = 2.4;
+            ai.escapeCooldown = 5.5;
+            ai.stuckTimer = 0;
+
+            this.game.particles.createSmokescreen(target.x, target.y, type === 'krishna' ? '#38bdf8' : '#fde047', 150, 4.0);
+            this.game.sound.playFluteNote(type === 'krishna' ? 783.99 : 523.25, 0.4);
+            this.game.particles.createSparkle(target.x, target.y, type === 'krishna' ? '#38bdf8' : '#facc15', 35);
+
+            if (type === 'krishna') {
+                this.game.ui.showToast("🦚 Kanha kicks up a Godhuli Gulal whirlwind and vaults high over the groves back into the pastures!");
+            } else {
+                this.game.ui.showToast("🌾 Dao Balram strikes the earth, raising a dust whirlwind and surging back to the glades!");
+            }
+        }
+
+        // 2. Sneak Godhuli Dust Smokescreen during open-field battles
+        if (distToPlayer < 140 && (ai.smokeCooldown || 0) <= 0) {
+            ai.smokeCooldown = 12.0 + Math.random() * 4.0;
+            this.game.particles.createSmokescreen(target.x, target.y, type === 'krishna' ? '#38bdf8' : '#fde047', 135, 3.5);
+            const quotes = type === 'krishna'
+                ? ["Haha! Blinded in the sacred Godhuli cloud! 🦚💨", "Can you find Kanha in the colors? 🦚"]
+                : ["Stay alert in the Rangotsav mist! 🌾💨", "Swift as the summer wind! 🌾"];
+            this.game.ui.showToast(quotes[Math.floor(Math.random() * quotes.length)], 3000);
+        }
+
         // Agile Fleeing
         let fx = 0;
         let fy = 0;
 
-        const pdx = target.x - player.x;
-        const pdy = target.y - player.y;
-        const pDist = Math.hypot(pdx, pdy) || 1;
-        fx += (pdx / pDist) * 1.8;
-        fy += (pdy / pDist) * 1.8;
-
-        if (Math.random() < 0.05) {
-            target.wanderAngle = (target.wanderAngle || 0) + (Math.random() - 0.5) * 1.2;
-        }
-        fx += Math.cos(target.wanderAngle || 0) * 0.8;
-        fy += Math.sin(target.wanderAngle || 0) * 0.8;
-
-        // Smooth obstacle gliding
-        for (const obs of obstacles) {
-            if (obs.shape === 'circle') {
-                const odx = target.x - obs.x;
-                const ody = target.y - obs.y;
-                const oDist = Math.hypot(odx, ody);
-                const safeZone = (obs.radius || 30) + target.radius + 65;
-
-                if (oDist < safeZone && oDist > 0) {
-                    const normX = odx / oDist;
-                    const normY = ody / oDist;
-                    const tan1X = -normY, tan1Y = normX;
-                    const tan2X = normY, tan2Y = -normX;
-                    const dot1 = fx * tan1X + fy * tan1Y;
-                    const dot2 = fx * tan2X + fy * tan2Y;
-                    const bestTanX = dot1 >= dot2 ? tan1X : tan2X;
-                    const bestTanY = dot1 >= dot2 ? tan1Y : tan2Y;
-
-                    const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 5.0;
-                    fx += (normX * 1.5 + bestTanX * 2.8) * pushFactor;
-                    fy += (normY * 1.5 + bestTanY * 2.8) * pushFactor;
-                }
-            } else if (obs.type === 'river') {
-                if (target.x > obs.x - 80) fx -= 6.0;
-            }
-        }
-
-        // Smooth Sacred Parikrama loop around borders (zero edge sticking!)
-        const curMap = this.game.mapManager.currentMap;
-        if (curMap && curMap.getBoundaryFlowVector) {
-            const bFlow = curMap.getBoundaryFlowVector(target.x, target.y);
-            fx += bFlow.x;
-            fy += bFlow.y;
+        if (ai.borderBoostTimer > 0) {
+            const toCx = cx - target.x;
+            const toCy = cy - target.y;
+            const cLen = Math.hypot(toCx, toCy) || 1;
+            fx = toCx / cLen;
+            fy = toCy / cLen;
         } else {
-            if (target.x < 240) fx += 4.5;
-            if (target.x > mapW - 750) fx -= 4.5;
-            if (target.y < 240) fy += 4.5;
-            if (target.y > mapH - 320) fy -= 4.5;
+            const pdx = target.x - player.x;
+            const pdy = target.y - player.y;
+            const pDist = Math.hypot(pdx, pdy) || 1;
+            fx += (pdx / pDist) * 1.8;
+            fy += (pdy / pDist) * 1.8;
+
+            if (Math.random() < 0.05) {
+                target.wanderAngle = (target.wanderAngle || 0) + (Math.random() - 0.5) * 1.2;
+            }
+            fx += Math.cos(target.wanderAngle || 0) * 0.8;
+            fy += Math.sin(target.wanderAngle || 0) * 0.8;
+
+            // Smooth obstacle gliding
+            for (const obs of obstacles) {
+                if (obs.shape === 'circle') {
+                    const odx = target.x - obs.x;
+                    const ody = target.y - obs.y;
+                    const oDist = Math.hypot(odx, ody);
+                    const safeZone = (obs.radius || 30) + target.radius + 65;
+
+                    if (oDist < safeZone && oDist > 0) {
+                        const normX = odx / oDist;
+                        const normY = ody / oDist;
+                        const tan1X = -normY, tan1Y = normX;
+                        const tan2X = normY, tan2Y = -normX;
+                        const dot1 = fx * tan1X + fy * tan1Y;
+                        const dot2 = fx * tan2X + fy * tan2Y;
+                        const bestTanX = dot1 >= dot2 ? tan1X : tan2X;
+                        const bestTanY = dot1 >= dot2 ? tan1Y : tan2Y;
+
+                        const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 5.0;
+                        fx += (normX * 1.5 + bestTanX * 2.8) * pushFactor;
+                        fy += (normY * 1.5 + bestTanY * 2.8) * pushFactor;
+                    }
+                } else if (obs.type === 'river') {
+                    if (target.x > obs.x - 80) fx -= 6.0;
+                }
+            }
+
+            // Smooth Sacred Parikrama loop around borders (zero edge sticking!)
+            if (curMap && curMap.getBoundaryFlowVector) {
+                const bFlow = curMap.getBoundaryFlowVector(target.x, target.y);
+                fx += bFlow.x;
+                fy += bFlow.y;
+            } else {
+                if (target.x < 240) fx += 4.5;
+                if (target.x > mapW - 750) fx -= 4.5;
+                if (target.y < 240) fy += 4.5;
+                if (target.y > mapH - 320) fy -= 4.5;
+            }
         }
 
         const fLen = Math.hypot(fx, fy);
@@ -394,7 +443,8 @@ export class HoliGame {
         // Dynamic Second-by-Second Speed (Unpredictable, lively stride cadences!)
         target.updateDynamicSpeed(dt);
         target.applyTerrain(obstacles);
-        const actualSpeed = target.currentSpeed * target.terrainModifier;
+        const boostMult = ai.borderBoostTimer > 0 ? 2.15 : 1.0;
+        const actualSpeed = target.currentSpeed * target.terrainModifier * boostMult;
         target.moveWithAnim(fx * actualSpeed * dt, fy * actualSpeed * dt, obstacles, mapW, mapH, dt);
     }
 
@@ -404,8 +454,36 @@ export class HoliGame {
         sakhas.forEach((s, idx) => {
             s.updateDynamicSpeed(dt);
             const preferredTarget = activeTargets[idx % activeTargets.length];
-            const dx = preferredTarget.x - s.x;
-            const dy = preferredTarget.y - s.y;
+
+            // 1. Check if Sakha is caught inside an active Godhuli dust cloud
+            if (this.game.particles.isPointInsideSmoke(s.x, s.y)) {
+                s.blindedTimer = 2.2;
+            }
+
+            if (s.blindedTimer > 0) {
+                s.blindedTimer -= dt;
+                s.wanderAngle = (s.wanderAngle || 0) + (Math.random() - 0.5) * 1.8;
+                s.applyTerrain(obstacles);
+                s.moveWithAnim(Math.cos(s.wanderAngle) * 35 * dt, Math.sin(s.wanderAngle) * 35 * dt, obstacles, mapW, mapH, dt);
+                return; // Blinded by dust! Cannot track or aim!
+            }
+
+            // 2. Line of sight check (blocked by trees, bushes, and dust clouds)
+            const canSee = checkLineOfSight(s.x, s.y, preferredTarget.x, preferredTarget.y, obstacles, this.game.particles, 580);
+
+            let destX = preferredTarget.x;
+            let destY = preferredTarget.y;
+
+            if (canSee) {
+                s.lastSeenX = preferredTarget.x;
+                s.lastSeenY = preferredTarget.y;
+            } else {
+                destX = s.lastSeenX || preferredTarget.x;
+                destY = s.lastSeenY || preferredTarget.y;
+            }
+
+            const dx = destX - s.x;
+            const dy = destY - s.y;
             const dist = Math.hypot(dx, dy);
 
             // Follow target at comfortable perimeter
@@ -431,9 +509,9 @@ export class HoliGame {
                 s.moveWithAnim(sx * sSpeed * s.terrainModifier * dt, sy * sSpeed * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
             }
 
-            // Shoot Pichkari colors occasionally
+            // Shoot Pichkari colors ONLY if Sakha has clear line of sight! (No psychic wall-hacking!)
             this.sakhaShootCooldowns[idx] -= dt;
-            if (this.sakhaShootCooldowns[idx] <= 0 && dist < 500) {
+            if (canSee && this.sakhaShootCooldowns[idx] <= 0 && dist < 500) {
                 const colors = ['#a855f7', '#ec4899', '#10b981', '#3b82f6'];
                 const color = colors[idx % colors.length];
                 this.shoot(s.x, s.y, preferredTarget.x + (Math.random() - 0.5) * 50, preferredTarget.y + (Math.random() - 0.5) * 50, color, false, 'player');
