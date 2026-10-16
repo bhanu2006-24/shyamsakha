@@ -16,6 +16,7 @@ import { Minimap } from '../ui/Minimap.js';
 import { VolleyballGame } from '../games/VolleyballGame.js';
 import { TagGame } from '../games/TagGame.js';
 import { HoliGame } from '../games/HoliGame.js';
+import { assetLoader } from './AssetLoader.js';
 
 export class Game {
     constructor() {
@@ -63,6 +64,11 @@ export class Game {
     init() {
         this.resize();
         window.addEventListener('resize', () => this.resize());
+
+        // Preload character sprite sheets
+        assetLoader.loadAll().then(() => {
+            this.ui.showToast("All divine character sprites loaded! 🦚");
+        });
 
         // Load Default Map
         this.loadMap('vrindavan');
@@ -116,11 +122,11 @@ export class Game {
         this.krishna = new Krishna(cx + 30, cy - 20);
         this.balram = new Balram(cx - 40, cy - 10);
 
-        // Sakha Friends
+        // 8 Sakha Friends
         this.sakhas = [];
-        for (let i = 0; i < 5; i++) {
-            const sx = cx + (Math.random() - 0.5) * 450;
-            const sy = cy + (Math.random() - 0.5) * 450;
+        for (let i = 0; i < 8; i++) {
+            const sx = cx + (Math.random() - 0.5) * 500;
+            const sy = cy + (Math.random() - 0.5) * 500;
             this.sakhas.push(new Sakha(sx, sy, i));
         }
 
@@ -189,6 +195,31 @@ export class Game {
         const fluteBtn = document.getElementById('fluteCallBtn');
         if (fluteBtn) {
             fluteBtn.addEventListener('click', () => this.playFluteMelody());
+        }
+
+        // Bhajan Player Controls
+        const bhajanPlayBtn = document.getElementById('bhajanPlayBtn');
+        if (bhajanPlayBtn) {
+            bhajanPlayBtn.addEventListener('click', () => {
+                const isPlaying = this.sound.toggleBhajan();
+                if (isPlaying) {
+                    this.ui.showToast("🎶 Playing Vrindavan Bhajan! Haribol!");
+                }
+            });
+        }
+
+        const bhajanNextBtn = document.getElementById('bhajanNextBtn');
+        if (bhajanNextBtn) {
+            bhajanNextBtn.addEventListener('click', () => {
+                this.sound.nextBhajan();
+            });
+        }
+
+        const bhajanPrevBtn = document.getElementById('bhajanPrevBtn');
+        if (bhajanPrevBtn) {
+            bhajanPrevBtn.addEventListener('click', () => {
+                this.sound.prevBhajan();
+            });
         }
     }
 
@@ -401,7 +432,7 @@ export class Game {
                 if (Math.random() < 0.02) s.wanderAngle += (Math.random() - 0.5);
                 const sx = Math.cos(s.wanderAngle) * 50;
                 const sy = Math.sin(s.wanderAngle) * 50;
-                s.move(sx * dt, sy * dt, obstacles, mapW, mapH);
+                s.moveWithAnim(sx * dt, sy * dt, obstacles, mapW, mapH, dt);
             }
         } else if (this.state === 'volleyball') {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);

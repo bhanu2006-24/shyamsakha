@@ -1,4 +1,5 @@
 import { Entity } from './Entity.js';
+import { assetLoader } from '../core/AssetLoader.js';
 
 export class Player extends Entity {
     constructor(x, y) {
@@ -9,6 +10,8 @@ export class Player extends Entity {
         this.isSpiking = false;
         this.spikeCooldown = 0;
         this.name = "Sakha (You)";
+        this.walkTimer = 0;
+        this.isMoving = false;
     }
 
     update(dt, input, obstacles, mapWidth, mapHeight, particles) {
@@ -27,7 +30,10 @@ export class Player extends Entity {
             }
         }
 
-        if (this.isCaught) return;
+        if (this.isCaught) {
+            this.isMoving = false;
+            return;
+        }
 
         const move = input.getMovementVector();
         let speedMult = 1.0;
@@ -38,7 +44,7 @@ export class Player extends Entity {
             speedMult = 1.65;
             this.isSprinting = true;
             if (Math.random() < 0.35 && particles) {
-                particles.createDust(this.x, this.y + this.radius, '#e2e8f0');
+                particles.createDust(this.x, this.y + 4, '#e2e8f0');
             }
         } else {
             this.stamina = Math.min(this.maxStamina, this.stamina + dt * 18);
@@ -47,71 +53,64 @@ export class Player extends Entity {
 
         // Jump / Spike action
         if (input.wasJustPressed(' ') && this.z === 0) {
-            this.vz = 400; // Jump up!
+            this.vz = 420; // Jump up!
             this.isSpiking = true;
         }
 
+        this.isMoving = move.isMoving;
         if (move.isMoving) {
+            this.walkTimer += dt * (this.isSprinting ? 1.6 : 1.0);
             this.applyTerrain(obstacles);
             const speed = this.currentSpeed * speedMult * this.terrainModifier;
             this.move(move.x * speed * dt, move.y * speed * dt, obstacles, mapWidth, mapHeight);
 
             if (Math.random() < 0.25 && particles) {
-                particles.createDust(this.x, this.y + this.radius, '#86efac');
+                particles.createDust(this.x, this.y + 4, '#86efac');
             }
         }
     }
 
     draw(ctx) {
-        const drawY = this.y - this.z;
+        // Draw using user-provided sprite from assets/images/sakha.png
+        const drawn = assetLoader.drawCharacter(
+            ctx,
+            'player',
+            this.x,
+            this.y,
+            this.z,
+            this.dx,
+            this.dy,
+            this.isMoving,
+            this.walkTimer,
+            72,
+            88
+        );
 
-        ctx.save();
-
-        // Shadow on the ground
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-        ctx.beginPath();
-        const shadowScale = Math.max(0.4, 1 - this.z / 300);
-        ctx.ellipse(this.x, this.y + 4, (this.radius + 4) * shadowScale, (this.radius - 4) * shadowScale, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Aura glow
-        ctx.beginPath();
-        ctx.arc(this.x, drawY, this.radius + 6, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(239, 68, 68, 0.25)';
-        ctx.fill();
-
-        // Player Body (Cowherd Attire)
-        ctx.beginPath();
-        ctx.arc(this.x, drawY, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.isCaught ? '#64748b' : '#f97316'; // Saffron Orange
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-
-        // Direction Indicator
-        const angle = Math.atan2(this.dy, this.dx);
-        ctx.beginPath();
-        ctx.moveTo(this.x, drawY);
-        ctx.lineTo(this.x + Math.cos(angle) * (this.radius + 5), drawY + Math.sin(angle) * (this.radius + 5));
-        ctx.strokeStyle = '#1e293b';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Cowherd Headband / Angavastra
-        ctx.fillStyle = '#facc15';
-        ctx.beginPath();
-        ctx.arc(this.x, drawY - 2, 7, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Jump / Spike indicator
-        if (this.z > 10) {
-            ctx.fillStyle = '#facc15';
-            ctx.font = 'bold 11px Outfit, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText("⚡ SPIKE!", this.x, drawY - this.radius - 8);
+        if (!drawn) {
+            // Procedural fallback if image is still loading
+            super.draw(ctx);
         }
 
-        ctx.restore();
+        // Spike / Jump Banner Indicator
+        if (this.z > 15) {
+            ctx.save();
+            ctx.fillStyle = '#facc15';
+            ctx.font = 'bold 12px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.shadowColor = 'rgba(0,0,0,0.8)';
+            ctx.shadowBlur = 4;
+            ctx.fillText("⚡ SPIKE!", this.x, this.y - this.z - 85);
+            ctx.restore();
+        }
+
+        // Holi splat tint if caught
+        if (this.isCaught) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(236, 72, 153, 0.45)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y - this.z - 40, 26, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
     }
 }

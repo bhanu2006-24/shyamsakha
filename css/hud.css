@@ -82,6 +82,52 @@
     font-weight: 600;
 }
 
+/* Bhajan Music Player Widget */
+.bhajan-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(30, 41, 59, 0.88);
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    padding: 4px 14px;
+    border-radius: 9999px;
+    box-shadow: 0 0 14px rgba(250, 204, 21, 0.2);
+}
+
+.music-ctrl-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+    border-radius: 6px;
+    color: #e2e8f0;
+    transition: all 0.15s ease;
+}
+
+.music-ctrl-btn:hover {
+    transform: scale(1.2);
+    color: #facc15;
+}
+
+.music-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #facc15;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.music-icon {
+    animation: divinePulse 2s infinite;
+}
+
 .inv-dot {
     width: 10px;
     height: 10px;

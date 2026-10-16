@@ -162,7 +162,7 @@ export class VolleyballGame {
             const dist = Math.hypot(dx, dy);
 
             if (dist > 25) {
-                sakha.move((dx / dist) * sakha.currentSpeed * 0.85 * dt, (dy / dist) * sakha.currentSpeed * 0.85 * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight());
+                sakha.moveWithAnim((dx / dist) * sakha.currentSpeed * 0.85 * dt, (dy / dist) * sakha.currentSpeed * 0.85 * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight(), dt);
             } else if (ball.z <= 50 && ball.lastHitter !== sakha) {
                 // Pass ball to opponent court or to player
                 const targetX = c.x + c.w * 0.75;
@@ -188,7 +188,7 @@ export class VolleyballGame {
             const dist = Math.hypot(dx, dy);
 
             if (dist > 25) {
-                receiver.move((dx / dist) * receiver.currentSpeed * 0.9 * dt, (dy / dist) * receiver.currentSpeed * 0.9 * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight());
+                receiver.moveWithAnim((dx / dist) * receiver.currentSpeed * 0.9 * dt, (dy / dist) * receiver.currentSpeed * 0.9 * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight(), dt);
             } else if (ball.z <= 60 && ball.lastHitter !== receiver) {
                 // Krishna or Balram hit!
                 const isSpike = (receiver === balram && Math.random() < 0.6) || (receiver === krishna && Math.random() < 0.4);

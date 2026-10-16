@@ -93,7 +93,7 @@ export class TagGame {
             }
 
             target.applyTerrain(obstacles);
-            target.move(tx * target.currentSpeed * target.terrainModifier * dt, ty * target.currentSpeed * target.terrainModifier * dt, obstacles, mapW, mapH);
+            target.moveWithAnim(tx * target.currentSpeed * target.terrainModifier * dt, ty * target.currentSpeed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
         }
 
         // AI Chasing for Sakhas
@@ -112,7 +112,7 @@ export class TagGame {
                 if (aLen > 0) { ax /= aLen; ay /= aLen; }
 
                 s.applyTerrain(obstacles);
-                s.move(ax * s.currentSpeed * s.terrainModifier * dt, ay * s.currentSpeed * s.terrainModifier * dt, obstacles, mapW, mapH);
+                s.moveWithAnim(ax * s.currentSpeed * s.terrainModifier * dt, ay * s.currentSpeed * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
             }
         }
 
