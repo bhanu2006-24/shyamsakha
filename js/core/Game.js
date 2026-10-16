@@ -27,6 +27,7 @@ export class Game {
         this.camera = new Camera();
         this.input = new Input(this.canvas, this.container);
         this.sound = soundManager;
+        this.assetLoader = assetLoader;
         this.particles = new ParticleSystem();
         this.ui = new UIManager(this);
         this.minimap = new Minimap(document.getElementById('minimapCanvas'));
@@ -124,16 +125,16 @@ export class Game {
         this.krishna = new Krishna(cx + 40, cy + 30);
         this.balram = new Balram(cx - 50, cy + 25);
 
-        // 8 Sakha Friends gathered in a natural, friendly arc in the pastoral clearing
+        // 8 Sakha Friends arranged in a wide, spacious pastoral circle around the meadow (no overlapping)
         const sakhaPlacements = [
-            { dx: -125, dy: 50 },  // Sudama (left side)
-            { dx: 125, dy: 45 },   // Subala (right side)
-            { dx: -90, dy: 125 },  // Mansukh
-            { dx: 95, dy: 120 },   // Sridama
-            { dx: -160, dy: 95 },  // Stoka-Krishna
-            { dx: 160, dy: 100 },  // Dama
-            { dx: -50, dy: 185 },  // Arjuna
-            { dx: 50, dy: 185 }    // Gandharva
+            { dx: -135, dy: 40 },  // Sudama (left side)
+            { dx: 135, dy: 40 },   // Subal (right side)
+            { dx: -165, dy: 90 },  // Madhumangal
+            { dx: 165, dy: 90 },   // Rishabh
+            { dx: -135, dy: 155 }, // Vishal
+            { dx: 135, dy: 155 },  // Dama
+            { dx: -75, dy: 205 },  // Vasant
+            { dx: 75, dy: 205 }    // Arjun
         ];
 
         this.sakhas = [];
@@ -177,8 +178,30 @@ export class Game {
     bindEvents() {
         // Keyboard shortcuts
         window.addEventListener('keydown', (e) => {
-            if (e.key === ' ' && this.state === 'hub' && this.interactableTarget) {
-                this.handleInteraction();
+            // Dialogue hotkeys: [1] to [9] or Escape/Enter/Space when dialogue is open
+            if (this.ui && this.ui.isDialogueOpen()) {
+                if (e.key >= '1' && e.key <= '9') {
+                    const idx = parseInt(e.key, 10) - 1;
+                    if (this.ui.dialogueActions && this.ui.dialogueActions.children[idx]) {
+                        e.preventDefault();
+                        this.ui.dialogueActions.children[idx].click();
+                        return;
+                    }
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.ui.closeDialogue();
+                    return;
+                }
+            }
+
+            // Interaction keys: SPACE, E, e, or Enter
+            if ((e.key === ' ' || e.key === 'e' || e.key === 'E' || e.key === 'Enter') && this.state === 'hub') {
+                if (this.interactableTarget) {
+                    e.preventDefault();
+                    this.handleInteraction();
+                    return;
+                }
             }
 
             // 'F' key: Play Krishna's Flute / Call the Cows
@@ -271,6 +294,63 @@ export class Game {
                 reopenMinimapBtn.classList.add('hidden');
             });
         }
+
+        // Direct Click Interaction on Canvas (Click directly on Krishna, Balram, Sakhas, Cows, Resources)
+        this.container.addEventListener('click', (e) => {
+            if (e.target !== this.canvas) return;
+            if (this.state !== 'hub' || !this.player) return;
+
+            const wx = this.input.mouse.worldX;
+            const wy = this.input.mouse.worldY;
+
+            // Click on Krishna
+            if (this.krishna && Math.hypot(wx - this.krishna.x, wy - (this.krishna.y - 30)) < 65) {
+                const dist = Math.hypot(this.player.x - this.krishna.x, this.player.y - this.krishna.y);
+                if (dist < 180) {
+                    this.ui.startDialogueWithKrishna();
+                } else {
+                    this.ui.showToast("Walk closer to Shree Krishna to talk! 🦚");
+                }
+                return;
+            }
+
+            // Click on Balram
+            if (this.balram && Math.hypot(wx - this.balram.x, wy - (this.balram.y - 30)) < 65) {
+                const dist = Math.hypot(this.player.x - this.balram.x, this.player.y - this.balram.y);
+                if (dist < 180) {
+                    this.ui.startDialogueWithBalram();
+                } else {
+                    this.ui.showToast("Walk closer to Dao Balaram to talk! 🌾");
+                }
+                return;
+            }
+
+            // Click on Sakhas
+            for (const s of this.sakhas) {
+                if (Math.hypot(wx - s.x, wy - (s.y - 25)) < 55) {
+                    const dist = Math.hypot(this.player.x - s.x, this.player.y - s.y);
+                    if (dist < 170) {
+                        this.ui.startDialogueWithSakha(s);
+                    } else {
+                        this.ui.showToast(`Walk closer to ${s.name} to talk! 💬`);
+                    }
+                    return;
+                }
+            }
+
+            // Click on Gau Mata
+            for (const cow of this.cows) {
+                if (Math.hypot(wx - cow.x, wy - (cow.y - 15)) < 55) {
+                    const dist = Math.hypot(this.player.x - cow.x, this.player.y - cow.y);
+                    if (dist < 160) {
+                        this.ui.startDialogueWithCow(cow);
+                    } else {
+                        this.ui.showToast("Walk closer to Gau Mata to pet & feed! 🐮");
+                    }
+                    return;
+                }
+            }
+        });
     }
 
     playFluteMelody() {
@@ -283,20 +363,59 @@ export class Game {
 
     checkInteractions() {
         this.interactableTarget = null;
-        const obstacles = this.mapManager.getObstacles();
+        if (!this.player) return;
 
-        // 1. Check Resources (Bushes for Forest Flowers, Pond for Sacred Lotus, Trees for Mangoes, River for Jal)
+        // 1. Check Shree Krishna (Pastimes & Offerings - Highest Priority!)
+        if (this.krishna) {
+            const dK = Math.hypot(this.player.x - this.krishna.x, this.player.y - this.krishna.y);
+            if (dK < 105) {
+                this.interactableTarget = { type: 'krishna' };
+                this.ui.showPrompt('🦚', 'Press SPACE / E to Talk with Shree Krishna (Pastimes)');
+                return;
+            }
+        }
+
+        // 2. Check Dao Balaram (Sacred Map Travel & Offerings)
+        if (this.balram) {
+            const dB = Math.hypot(this.player.x - this.balram.x, this.player.y - this.balram.y);
+            if (dB < 105) {
+                this.interactableTarget = { type: 'balram' };
+                this.ui.showPrompt('🌾', 'Press SPACE / E to Talk with Dao Balaram (Travel to Dhams)');
+                return;
+            }
+        }
+
+        // 3. Check Sakhas (Cowherd Friends)
+        for (const s of this.sakhas) {
+            if (Math.hypot(this.player.x - s.x, this.player.y - s.y) < 90) {
+                this.interactableTarget = { type: 'sakha', obj: s };
+                this.ui.showPrompt('💬', `Press SPACE / E to Talk with ${s.name}`);
+                return;
+            }
+        }
+
+        // 4. Check Gau Mata (Cows)
+        for (const cow of this.cows) {
+            if (Math.hypot(this.player.x - cow.x, this.player.y - cow.y) < 85) {
+                this.interactableTarget = { type: 'cow', obj: cow };
+                this.ui.showPrompt('🐮', 'Press SPACE / E to Pet & Feed Gau Mata');
+                return;
+            }
+        }
+
+        // 5. Check Gatherable Resources (Bushes, Ponds, Trees, River)
+        const obstacles = this.mapManager.getObstacles();
         for (const obs of obstacles) {
             if (obs.hasResource && (obs.type === 'bush' || obs.type === 'pond' || obs.type === 'tree')) {
                 const d = Math.hypot(this.player.x - obs.x, this.player.y - obs.y);
-                if (d < (obs.radius || 30) + 70) {
+                if (d < (obs.radius || 30) + 75) {
                     this.interactableTarget = { type: obs.type, obj: obs };
                     if (obs.type === 'bush') {
-                        this.ui.showPrompt('🌸', 'Press SPACE to Gather Forest Flowers');
+                        this.ui.showPrompt('🌸', 'Press SPACE / E to Gather Forest Flowers');
                     } else if (obs.type === 'pond') {
-                        this.ui.showPrompt('🪷', 'Press SPACE to Gather Sacred Lotus');
+                        this.ui.showPrompt('🪷', 'Press SPACE / E to Gather Sacred Lotus');
                     } else {
-                        this.ui.showPrompt('🥭', 'Press SPACE to Pick Ripe Mango');
+                        this.ui.showPrompt('🥭', 'Press SPACE / E to Pick Ripe Mango');
                     }
                     return;
                 }
@@ -305,43 +424,9 @@ export class Game {
                 const d = Math.abs(this.player.x - testX);
                 if (d < 70) {
                     this.interactableTarget = { type: 'river', obj: obs };
-                    this.ui.showPrompt('💧', 'Press SPACE to Fill Yamuna Jal');
+                    this.ui.showPrompt('💧', 'Press SPACE / E to Fill Yamuna Jal');
                     return;
                 }
-            }
-        }
-
-        // 2. Check Shree Krishna (Pastimes & Offerings)
-        const dK = Math.hypot(this.player.x - this.krishna.x, this.player.y - this.krishna.y);
-        if (dK < 95) {
-            this.interactableTarget = { type: 'krishna' };
-            this.ui.showPrompt('🦚', 'Press SPACE to Talk with Shree Krishna (Pastimes)');
-            return;
-        }
-
-        // 3. Check Dao Balaram (Sacred Map Travel & Offerings)
-        const dB = Math.hypot(this.player.x - this.balram.x, this.player.y - this.balram.y);
-        if (dB < 95) {
-            this.interactableTarget = { type: 'balram' };
-            this.ui.showPrompt('🌾', 'Press SPACE to Talk with Dao Balaram (Travel to Dhams)');
-            return;
-        }
-
-        // 4. Check Sakhas
-        for (const s of this.sakhas) {
-            if (Math.hypot(this.player.x - s.x, this.player.y - s.y) < 85) {
-                this.interactableTarget = { type: 'sakha', obj: s };
-                this.ui.showPrompt('💬', `Press SPACE to Talk with ${s.name}`);
-                return;
-            }
-        }
-
-        // 5. Check Gau Mata (Cows)
-        for (const cow of this.cows) {
-            if (Math.hypot(this.player.x - cow.x, this.player.y - cow.y) < 80) {
-                this.interactableTarget = { type: 'cow', obj: cow };
-                this.ui.showPrompt('🐮', 'Press SPACE to Pet & Feed Gau Mata');
-                return;
             }
         }
 

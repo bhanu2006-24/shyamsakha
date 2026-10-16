@@ -2,6 +2,7 @@
  * UIManager - Coordinates all overlays, dialogues, Sakha Potli (Inventory),
  * Options & Audio settings, and Character pastimes/travel modals
  */
+import { assetLoader } from '../core/AssetLoader.js';
 
 export const POTLI_ITEMS = {
     butter: {
@@ -131,7 +132,7 @@ export class UIManager {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         if (key === 'krishna') {
-            const img = this.game.assetLoader.getImage('krishna');
+            const img = assetLoader.getImage('krishna');
             if (img) {
                 ctx.save();
                 ctx.shadowColor = '#facc15';
@@ -141,7 +142,7 @@ export class UIManager {
                 return;
             }
         } else if (key === 'balram') {
-            const img = this.game.assetLoader.getImage('balram');
+            const img = assetLoader.getImage('balram');
             if (img) {
                 ctx.save();
                 ctx.shadowColor = '#38bdf8';
@@ -151,7 +152,7 @@ export class UIManager {
                 return;
             }
         } else if (key && (key.startsWith('sakha') || key === 'player')) {
-            const img = this.game.assetLoader.getImage(key) || this.game.assetLoader.getImage('player');
+            const img = assetLoader.getImage(key) || assetLoader.getImage('player');
             if (img) {
                 ctx.save();
                 ctx.shadowColor = '#fbbf24';
@@ -239,10 +240,11 @@ export class UIManager {
         if (this.dialogueActions) {
             this.dialogueActions.innerHTML = '';
             if (actions.length > 0) {
-                actions.forEach(act => {
+                actions.forEach((act, idx) => {
                     const btn = document.createElement('button');
                     btn.className = `dialogue-action-btn ${act.isCancel ? 'btn-cancel' : ''}`;
-                    btn.innerText = act.label;
+                    const numTag = idx < 9 ? `[${idx + 1}] ` : '';
+                    btn.innerText = `${numTag}${act.label}`;
                     btn.onclick = (e) => {
                         e.stopPropagation();
                         if (act.onClick) act.onClick();
@@ -260,6 +262,10 @@ export class UIManager {
                 this.closeDialogue();
             }, duration);
         }
+    }
+
+    isDialogueOpen() {
+        return !!(this.dialogueBox && this.dialogueBox.classList.contains('active'));
     }
 
     closeDialogue() {

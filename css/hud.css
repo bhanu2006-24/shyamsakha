@@ -487,11 +487,11 @@
    ========================================================================== */
 .ram-dialogue-container {
     position: fixed;
-    bottom: 22px;
+    bottom: 14px;
     left: 50%;
     transform: translateX(-50%) translateY(30px);
-    width: calc(100% - 44px);
-    max-width: 860px;
+    width: calc(100% - 36px);
+    max-width: 820px;
     z-index: 55;
     opacity: 0;
     pointer-events: none;
@@ -504,13 +504,13 @@
     pointer-events: auto;
 }
 
-/* Big Standing Portrait on the Right */
+/* Big Standing Portrait on the Right (Rests gracefully on top edge of dialogue box) */
 .dialogue-portrait-wrap {
     position: absolute;
-    bottom: calc(100% - 22px);
+    bottom: calc(100% - 12px);
     right: 28px;
-    width: 170px;
-    height: 250px;
+    width: 140px;
+    height: 195px;
     pointer-events: none;
     z-index: 54;
     filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.75)) drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
@@ -533,7 +533,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    margin-bottom: -4px;
+    margin-bottom: -3px;
     padding: 0 10px;
     position: relative;
     z-index: 56;
@@ -547,27 +547,27 @@
     border: 2.5px solid #00f0ff;
     border-bottom: none;
     border-radius: 12px 12px 0 0;
-    padding: 6px 16px 8px 8px;
+    padding: 5px 14px 7px 8px;
     box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.4), 0 0 14px rgba(0, 240, 255, 0.3);
 }
 
 .dialogue-avatar-badge {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: 1.5px solid #00f0ff;
     background: #001e22;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.95rem;
     overflow: hidden;
     flex-shrink: 0;
 }
 
 .dialogue-speaker-title {
     font-family: 'Courier New', monospace;
-    font-size: 0.96rem;
+    font-size: 0.9rem;
     font-weight: 800;
     color: #ffffff;
     letter-spacing: 0.04em;
@@ -580,9 +580,9 @@
     border: 1.5px solid #ef4444;
     color: #ffffff;
     font-family: 'Courier New', monospace;
-    font-size: 0.78rem;
+    font-size: 0.74rem;
     font-weight: 800;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 6px;
     cursor: pointer;
     display: flex;
@@ -605,7 +605,7 @@
     border: 3.5px solid #00f0ff;
     border-radius: 12px;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(0, 240, 255, 0.4);
-    padding: 20px 26px 18px 24px;
+    padding: 14px 20px 14px 20px;
     position: relative;
     z-index: 55;
 }
@@ -613,37 +613,37 @@
 .ram-dialogue-text {
     color: #0f172a;
     font-family: 'Courier New', monospace;
-    font-size: 1.05rem;
+    font-size: 0.92rem;
     font-weight: 700;
-    line-height: 1.58;
-    margin: 0 0 16px 0;
-    min-height: 2.6em;
+    line-height: 1.45;
+    margin: 0 0 10px 0;
+    min-height: 1.8em;
     white-space: pre-wrap;
 }
 
-/* Interactive Action Buttons inside the box */
+/* Compact Grid Action Buttons inside the box */
 .dialogue-actions-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 6px;
+    align-items: stretch;
 }
 
 .dialogue-action-btn {
     background: #ffffff;
-    border: 2px solid #0284c7;
+    border: 1.5px solid #0284c7;
     color: #0f172a;
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
-    font-size: 0.85rem;
-    padding: 7px 14px;
-    border-radius: 8px;
+    font-size: 0.78rem;
+    padding: 6px 10px;
+    border-radius: 6px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
 .dialogue-action-btn:hover {
