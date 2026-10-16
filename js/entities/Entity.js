@@ -129,13 +129,26 @@ export class Entity {
     draw(ctx) {
         // Base placeholder draw
         ctx.save();
+        // Ground shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.beginPath();
+        ctx.ellipse(this.x, this.y + 2, this.radius + 2, (this.radius - 2) * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y - this.z, this.radius, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y - this.z - 12, this.radius, 0, Math.PI * 2);
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        // Head/Face indicator
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - this.z - 22, 6, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
     }
 }

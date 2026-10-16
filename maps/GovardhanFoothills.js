@@ -131,10 +131,18 @@ export class GovardhanFoothills {
         }
     }
 
-    drawCanopy(ctx, camera) {
+    drawCanopy(ctx, camera, player = null) {
         for (const obs of this.obstacles) {
             if (obs.type === 'tree' && camera.isInView(obs.x, obs.y, obs.visualRadius)) {
+                let isPlayerNear = false;
+                if (player) {
+                    const distToPlayer = Math.hypot(player.x - obs.x, player.y - obs.y);
+                    if (distToPlayer < obs.visualRadius + 30) {
+                        isPlayerNear = true;
+                    }
+                }
                 ctx.save();
+                ctx.globalAlpha = isPlayerNear ? 0.35 : 0.94;
                 ctx.fillStyle = '#166534';
                 ctx.beginPath();
                 ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);

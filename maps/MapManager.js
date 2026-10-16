@@ -42,9 +42,9 @@ export class MapManager {
         }
     }
 
-    drawCanopy(ctx, camera) {
+    drawCanopy(ctx, camera, player = null) {
         if (this.currentMap) {
-            this.currentMap.drawCanopy(ctx, camera);
+            this.currentMap.drawCanopy(ctx, camera, player);
         }
     }
 

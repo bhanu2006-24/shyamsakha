@@ -221,6 +221,27 @@ export class Game {
                 this.sound.prevBhajan();
             });
         }
+
+        // Minimap Collapse / Reopen
+        const minimapContainer = document.getElementById('minimapContainer');
+        const minimapToggleBtn = document.getElementById('minimapToggleBtn');
+        const reopenMinimapBtn = document.getElementById('reopenMinimapBtn');
+
+        if (minimapToggleBtn && minimapContainer) {
+            minimapToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                minimapContainer.classList.add('collapsed');
+                if (reopenMinimapBtn) reopenMinimapBtn.classList.remove('hidden');
+            });
+        }
+
+        if (reopenMinimapBtn && minimapContainer) {
+            reopenMinimapBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                minimapContainer.classList.remove('collapsed');
+                reopenMinimapBtn.classList.add('hidden');
+            });
+        }
     }
 
     playFluteMelody() {
@@ -275,6 +296,15 @@ export class Game {
             }
         }
 
+        // 4. Check Gau Mata (Cows)
+        for (const cow of this.cows) {
+            if (Math.hypot(this.player.x - cow.x, this.player.y - cow.y) < 80) {
+                this.interactableTarget = { type: 'cow', obj: cow };
+                this.ui.showPrompt('🐮', 'Press SPACE to Pet & Feed Gau Mata');
+                return;
+            }
+        }
+
         this.ui.hidePrompt();
     }
 
@@ -289,19 +319,29 @@ export class Game {
             target.obj.resourceRegenTimer = 18;
             this.particles.createPetals(this.player.x, this.player.y, '#f472b6', 15);
             this.sound.playFluteNote(587.33, 0.25);
-            this.ui.showToast("+1 Fragrant Flower added to inventory!");
+            this.ui.showToast("+1 Fragrant Lotus Flower gathered! 🌸");
         } else if (target.type === 'tree' && target.obj.hasResource) {
             this.inventory.fruits++;
             target.obj.hasResource = null;
             target.obj.resourceRegenTimer = 18;
-            this.particles.createPetals(this.player.x, this.player.y, '#facc15', 15);
+            this.particles.createPetals(this.player.x, this.player.y, '#facc15', 18);
             this.sound.playFluteNote(659.25, 0.25);
-            this.ui.showToast("+1 Sweet Vrindavan Fruit gathered!");
+            this.ui.showToast("+1 Sweet Ripe Mango picked from tree! 🥭");
         } else if (target.type === 'river') {
             this.inventory.water++;
             this.particles.createDust(this.player.x, this.player.y, '#38bdf8', 15);
             this.sound.playSplash();
-            this.ui.showToast("+1 Cool Yamuna Jal collected in pot!");
+            this.ui.showToast("+1 Cool Yamuna Jal collected in pot! 💧");
+        } else if (target.type === 'cow') {
+            this.sound.playCowBell();
+            this.particles.createSparkle(target.obj.x, target.obj.y - 15, '#f472b6', 20);
+            if (this.inventory.fruits > 0) {
+                this.inventory.fruits--;
+                this.inventory.butter++;
+                this.ui.showToast("🐮 You fed Gau Mata a sweet mango! She gifted you fresh Makhan! 🍯");
+            } else {
+                this.ui.showToast("🐮 Gau Mata nuzzles you gently with divine affection! ❤️");
+            }
         } else if (target.type === 'krishna') {
             this.ui.openInteractionMenu();
         } else if (target.type === 'sakha') {
@@ -474,8 +514,8 @@ export class Game {
         if (this.state === 'volleyball') this.volleyballGame.draw(ctx);
         if (this.state === 'holi') this.holiGame.draw(ctx);
 
-        // 6. Tree Canopy Layer (Leaves above heads)
-        this.mapManager.drawCanopy(ctx, this.camera);
+        // 6. Tree Canopy Layer (Leaves above heads with see-through transparency)
+        this.mapManager.drawCanopy(ctx, this.camera, this.player);
 
         ctx.restore();
 

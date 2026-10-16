@@ -5,7 +5,7 @@ export class Minimap {
     constructor(canvas) {
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.size = 190;
+        this.size = 165;
         this.canvas.width = this.size;
         this.canvas.height = this.size;
     }

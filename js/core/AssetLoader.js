@@ -49,7 +49,7 @@ export class AssetLoader {
                         resolve(this.images);
                     }
                 };
-                img.src = imagePaths[key];
+                img.src = encodeURI(imagePaths[key]);
             });
         });
     }
@@ -65,7 +65,7 @@ export class AssetLoader {
      * - Bottom-Left  (0, 1024, 1024, 1024):   Facing LEFT
      * - Bottom-Right (1024, 1024, 1024, 1024): Facing RIGHT
      */
-    drawCharacter(ctx, imgKey, x, y, z = 0, dx = 0, dy = 1, isMoving = false, walkTimer = 0, drawWidth = 70, drawHeight = 84) {
+    drawCharacter(ctx, imgKey, x, y, z = 0, dx = 0, dy = 1, isMoving = false, walkTimer = 0, drawWidth = 72, drawHeight = 88) {
         const img = this.getImage(imgKey);
         if (!img) return false;
 
@@ -99,19 +99,19 @@ export class AssetLoader {
 
         ctx.save();
 
-        // 1. Ground Shadow (stays on the ground at x, y)
+        // 1. Ground Shadow (Always stays on the ground at x, y)
         const shadowScale = Math.max(0.3, 1 - z / 300);
         ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
         ctx.beginPath();
-        ctx.ellipse(x, y + 4, 18 * shadowScale, 9 * shadowScale, 0, 0, Math.PI * 2);
+        ctx.ellipse(x, y, 18 * shadowScale, 8 * shadowScale, 0, 0, Math.PI * 2);
         ctx.fill();
 
         // 2. Character Position with Z-height and walking bob
         const walkBob = isMoving ? Math.sin(walkTimer * 12) * 2.5 : 0;
         const walkTilt = isMoving ? Math.sin(walkTimer * 6) * 0.04 : 0;
-        const charY = y - z - (drawHeight - 14) + walkBob;
 
-        ctx.translate(x, charY + drawHeight / 2);
+        // Feet touch ground at (x, y - z)
+        ctx.translate(x, y - z - drawHeight * 0.46 + walkBob);
         ctx.rotate(walkTilt);
 
         // Draw character sprite
