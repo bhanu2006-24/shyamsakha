@@ -3,7 +3,7 @@ import { assetLoader } from '../core/AssetLoader.js';
 
 export class Player extends Entity {
     constructor(x, y) {
-        super(x, y, 18, '#ef4444', 320, 420, 'player');
+        super(x, y, 18, '#ef4444', 280, 360, 'player');
         this.stamina = 100;
         this.maxStamina = 100;
         this.isSprinting = false;
@@ -15,6 +15,8 @@ export class Player extends Entity {
     }
 
     update(dt, input, obstacles, mapWidth, mapHeight, particles) {
+        this.updateDynamicSpeed(dt);
+
         if (this.spikeCooldown > 0) {
             this.spikeCooldown -= dt;
         }
@@ -41,7 +43,7 @@ export class Player extends Entity {
         // Sprinting with Shift
         if (input.isDown('Shift') && this.stamina > 0 && move.isMoving) {
             this.stamina = Math.max(0, this.stamina - dt * 38);
-            speedMult = 1.65;
+            speedMult = 1.62;
             this.isSprinting = true;
             if (Math.random() < 0.35 && particles) {
                 particles.createDust(this.x, this.y + 4, '#e2e8f0');
@@ -61,6 +63,12 @@ export class Player extends Entity {
         if (move.isMoving) {
             this.walkTimer += dt * (this.isSprinting ? 1.6 : 1.0);
             this.applyTerrain(obstacles);
+
+            // Extra floral sparkle when running over flower carpets
+            if (this.terrainModifier > 1.2 && particles && Math.random() < 0.4) {
+                particles.createPetals(this.x, this.y + 2, '#f472b6', 2);
+            }
+
             const speed = this.currentSpeed * speedMult * this.terrainModifier;
             this.move(move.x * speed * dt, move.y * speed * dt, obstacles, mapWidth, mapHeight);
 

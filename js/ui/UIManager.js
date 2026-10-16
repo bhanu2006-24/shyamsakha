@@ -504,6 +504,10 @@ export class UIManager {
 
         const actions = [
             {
+                label: "🏃‍♂️ Dhaavan Spardha (Footrace / दौड़)",
+                onClick: () => this.game.startPastimeFromKrishna('race')
+            },
+            {
                 label: "🏐 Kanduka Kridha (Volleyball)",
                 onClick: () => this.game.startPastimeFromKrishna('volleyball')
             },
@@ -628,7 +632,46 @@ export class UIManager {
     startDialogueWithSakha(sakha) {
         this.closeAllModals();
 
-        const actions = [
+        const actions = [];
+
+        // 1. Subal's Footrace Challenge!
+        if (sakha.name === "Subal") {
+            actions.push({
+                label: "🏃‍♂️ Accept Subal's Footrace Challenge (गोचारण दौड़)!",
+                onClick: () => {
+                    this.game.startPastimeFromKrishna('race');
+                }
+            });
+        }
+
+        // 2. Madhumangal's Mango Quest for Kanha!
+        if (sakha.name === "Madhumangal") {
+            actions.push({
+                label: `🥭 Give 2 Ripe Mangoes for Kanha (${this.game.inventory.fruits || 0}/2)`,
+                onClick: () => {
+                    if ((this.game.inventory.fruits || 0) >= 2) {
+                        this.game.inventory.fruits -= 2;
+                        this.game.inventory.butter = (this.game.inventory.butter || 0) + 1;
+                        this.game.particles.createSparkle(sakha.x, sakha.y - 20, '#facc15', 35);
+                        this.game.sound.playCheer();
+                        this.updateBagUI(this.game.inventory);
+                        this.showDialogue({
+                            title: "🥭 Madhumangal (मधुमंगल)",
+                            avatar: "🥭",
+                            portraitKey: "sakha3",
+                            text: "Madhumangal's face beams with sheer delight!\n\"Aha Sakha! Kanha will be so overjoyed with these ripe mangoes! Maiya always blesses us with plenty of Makhan, take this fresh pot of sweet butter in return!\" 🍯",
+                            actions: [
+                                { label: "↩ Done (सादर प्रणाम)", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Pick at least 2 ripe mangoes from the trees first! 🥭");
+                    }
+                }
+            });
+        }
+
+        actions.push(
             {
                 label: "💬 Talk & Laugh (वार्तालाप)",
                 onClick: () => {
@@ -663,7 +706,7 @@ export class UIManager {
                 isCancel: true,
                 onClick: () => this.closeDialogue()
             }
-        ];
+        );
 
         this.showDialogue({
             title: `🌿 ${sakha.name} (सखा)`,

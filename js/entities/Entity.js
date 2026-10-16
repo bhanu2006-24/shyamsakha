@@ -10,6 +10,10 @@ export class Entity {
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
         this.currentSpeed = (minSpeed + maxSpeed) / 2;
+        this.targetStrideSpeed = this.currentSpeed;
+        this.cadenceTimer = 0.4 + Math.random() * 0.6; // Changes pace every ~0.8-1.4s
+        this.surgeTimer = 0;
+        this.surgeMultiplier = 1.0;
         this.type = type;
         
         this.dx = 0;
@@ -25,8 +29,47 @@ export class Entity {
         this.vz = 0;
     }
 
+    /**
+     * Dynamic Second-by-Second Speed Fluctuation
+     * Stride cadence smoothly varies speed every second so chases remain lively,
+     * high-stakes, and unpredictable without feeling mechanical or robotic.
+     */
+    updateDynamicSpeed(dt) {
+        if (this.surgeTimer > 0) {
+            this.surgeTimer -= dt;
+            if (this.surgeTimer <= 0) {
+                this.surgeMultiplier = 1.0;
+            }
+        }
+
+        this.cadenceTimer -= dt;
+        if (this.cadenceTimer <= 0) {
+            this.cadenceTimer = 0.8 + Math.random() * 0.6; // New stride pace every ~1 second
+            
+            // Random stride speed between min and max
+            this.targetStrideSpeed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
+
+            // 15% chance of an agile sudden sprint surge
+            const roll = Math.random();
+            if (roll < 0.15) {
+                this.surgeMultiplier = 1.18;
+                this.surgeTimer = 0.75;
+            } else if (roll < 0.25) {
+                // 10% chance of a brief breath/tight turn cadence dip
+                this.surgeMultiplier = 0.88;
+                this.surgeTimer = 0.6;
+            } else {
+                this.surgeMultiplier = 1.0;
+            }
+        }
+
+        // Smooth continuous lerp towards current target speed
+        const target = this.targetStrideSpeed * this.surgeMultiplier;
+        this.currentSpeed += (target - this.currentSpeed) * Math.min(1.0, dt * 3.8);
+    }
+
     updateSpeed() {
-        this.currentSpeed = this.minSpeed + Math.random() * (this.maxSpeed - this.minSpeed);
+        this.updateDynamicSpeed(0.016);
     }
 
     applyTerrain(obstacles) {
@@ -34,11 +77,17 @@ export class Entity {
         if (this.isCaught) return;
         
         for (const obs of obstacles) {
-            if (obs.type === 'bush' && Math.hypot(this.x - obs.x, this.y - obs.y) < obs.visualRadius) {
-                this.terrainModifier = 0.55; // Slow in thick bushes
+            if (obs.type === 'flower_carpet') {
+                const dist = Math.hypot(this.x - obs.x, this.y - obs.y);
+                if (dist < (obs.radius || 110)) {
+                    this.terrainModifier = 1.35; // +35% Speed boost on sacred flower carpets!
+                    break;
+                }
+            } else if (obs.type === 'bush' && Math.hypot(this.x - obs.x, this.y - obs.y) < obs.visualRadius) {
+                this.terrainModifier = 0.65; // Slow in thick bushes
                 break;
             } else if (obs.type === 'rock' && Math.hypot(this.x - obs.x, this.y - obs.y) < obs.visualRadius) {
-                this.terrainModifier = 1.2; // Speed boost hopping rocks
+                this.terrainModifier = 1.15; // Speed boost hopping rocks
                 break;
             } else if (obs.type === 'sand' && Math.hypot(this.x - obs.x, this.y - obs.y) < obs.radius) {
                 this.terrainModifier = 0.9;

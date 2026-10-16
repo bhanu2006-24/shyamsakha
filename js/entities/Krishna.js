@@ -3,7 +3,7 @@ import { assetLoader } from '../core/AssetLoader.js';
 
 export class Krishna extends Entity {
     constructor(x, y) {
-        super(x, y, 18, '#0284c7', 360, 460, 'krishna');
+        super(x, y, 18, '#0284c7', 330, 440, 'krishna');
         this.name = "Shree Krishna";
         this.isFlutePlaying = false;
         this.fluteTimer = 0;
@@ -19,6 +19,7 @@ export class Krishna extends Entity {
     }
 
     update(dt, obstacles, mapWidth, mapHeight, particles) {
+        this.updateDynamicSpeed(dt);
         this.auraPhase += dt * 3;
 
         // Jump physics

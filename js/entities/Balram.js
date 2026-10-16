@@ -3,7 +3,7 @@ import { assetLoader } from '../core/AssetLoader.js';
 
 export class Balram extends Entity {
     constructor(x, y) {
-        super(x, y, 19, '#f8fafc', 340, 430, 'dao');
+        super(x, y, 19, '#f8fafc', 310, 410, 'dao');
         this.name = "Dao Balaram";
         this.isSpiking = false;
         this.walkTimer = 0;
@@ -12,6 +12,7 @@ export class Balram extends Entity {
     }
 
     update(dt, obstacles, mapWidth, mapHeight, particles) {
+        this.updateDynamicSpeed(dt);
         this.auraPhase += dt * 2.5;
 
         // Jump physics

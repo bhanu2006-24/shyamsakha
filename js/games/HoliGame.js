@@ -372,11 +372,18 @@ export class HoliGame {
             }
         }
 
-        // Map boundary repulsions
-        if (target.x < 240) fx += 4.5;
-        if (target.x > mapW - 750) fx -= 4.5;
-        if (target.y < 240) fy += 4.5;
-        if (target.y > mapH - 320) fy -= 4.5;
+        // Smooth Sacred Parikrama loop around borders (zero edge sticking!)
+        const curMap = this.game.mapManager.currentMap;
+        if (curMap && curMap.getBoundaryFlowVector) {
+            const bFlow = curMap.getBoundaryFlowVector(target.x, target.y);
+            fx += bFlow.x;
+            fy += bFlow.y;
+        } else {
+            if (target.x < 240) fx += 4.5;
+            if (target.x > mapW - 750) fx -= 4.5;
+            if (target.y < 240) fy += 4.5;
+            if (target.y > mapH - 320) fy -= 4.5;
+        }
 
         const fLen = Math.hypot(fx, fy);
         if (fLen > 0) {
@@ -384,15 +391,18 @@ export class HoliGame {
             fy /= fLen;
         }
 
-        const speed = type === 'krishna' ? 340 : 320;
+        // Dynamic Second-by-Second Speed (Unpredictable, lively stride cadences!)
+        target.updateDynamicSpeed(dt);
         target.applyTerrain(obstacles);
-        target.moveWithAnim(fx * speed * target.terrainModifier * dt, fy * speed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        const actualSpeed = target.currentSpeed * target.terrainModifier;
+        target.moveWithAnim(fx * actualSpeed * dt, fy * actualSpeed * dt, obstacles, mapW, mapH, dt);
     }
 
     updateSakhasHoliAi(sakhas, activeTargets, obstacles, mapW, mapH, dt) {
         if (activeTargets.length === 0) return;
 
         sakhas.forEach((s, idx) => {
+            s.updateDynamicSpeed(dt);
             const preferredTarget = activeTargets[idx % activeTargets.length];
             const dx = preferredTarget.x - s.x;
             const dy = preferredTarget.y - s.y;
@@ -417,7 +427,8 @@ export class HoliGame {
                 const sLen = Math.hypot(sx, sy);
                 if (sLen > 0) { sx /= sLen; sy /= sLen; }
                 s.applyTerrain(obstacles);
-                s.moveWithAnim(sx * 220 * s.terrainModifier * dt, sy * 220 * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
+                const sSpeed = s.currentSpeed * 0.72;
+                s.moveWithAnim(sx * sSpeed * s.terrainModifier * dt, sy * sSpeed * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
             }
 
             // Shoot Pichkari colors occasionally

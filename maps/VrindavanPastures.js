@@ -107,7 +107,27 @@ export class VrindavanPastures {
             resourceRegenTimer: 0
         });
 
-        // 4. Flower Bushes (Fragrant wild Jasmine / Malati / Parijat bush blossoms)
+        // 4. Sacred Speed-Boost Flower Carpets (पुष्प वाटिका - Speed Bursts!)
+        const carpets = [
+            { name: "North Kadamba Flower Carpet", x: this.centerX + 340, y: this.centerY - 320, r: 90 },
+            { name: "Lotus Meadow Flower Carpet", x: this.centerX - 390, y: this.centerY + 340, r: 90 },
+            { name: "Yamuna Shore Flower Carpet", x: this.width - this.riverWidth - 190, y: this.centerY + 160, r: 90 }
+        ];
+
+        carpets.forEach(c => {
+            this.obstacles.push({
+                shape: 'circle',
+                type: 'flower_carpet',
+                name: c.name,
+                x: c.x,
+                y: c.y,
+                radius: c.r,
+                visualRadius: c.r,
+                hasResource: null
+            });
+        });
+
+        // 5. Flower Bushes (Fragrant wild Jasmine / Malati / Parijat bush blossoms)
         const flowerBushLocations = [
             { x: this.centerX - 240, y: this.centerY + 10, r: 36 },
             { x: this.centerX + 240, y: this.centerY + 15, r: 36 },
@@ -131,7 +151,7 @@ export class VrindavanPastures {
             });
         });
 
-        // 5. Natural Rocks & Varied Trees scattered across outer pastures
+        // 6. Natural Rocks & Varied Trees scattered across outer pastures
         const natureCount = 65;
         const treeTypesPool = ['mango', 'banyan', 'parijat', 'palm', 'kadamba'];
         for (let i = 0; i < natureCount; i++) {
@@ -263,6 +283,58 @@ export class VrindavanPastures {
             TreeRenderer.drawDivineAsana(ctx, this.centerX, this.centerY + 40);
 
             ctx.restore();
+        }
+
+        // 3. Sacred Speed-Boost Flower Carpets (पुष्प वाटिका)
+        for (const obs of this.obstacles) {
+            if (obs.type === 'flower_carpet' && camera.isInView(obs.x, obs.y, obs.visualRadius + 40)) {
+                ctx.save();
+                const pulse = Math.sin(this.swayTime * 2.5) * 5;
+                const vR = obs.visualRadius + pulse;
+
+                // Glowing floral aura gradient
+                const grad = ctx.createRadialGradient(obs.x, obs.y, 10, obs.x, obs.y, vR);
+                grad.addColorStop(0, 'rgba(244, 114, 182, 0.45)');
+                grad.addColorStop(0.65, 'rgba(251, 191, 36, 0.28)');
+                grad.addColorStop(1, 'rgba(244, 114, 182, 0)');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, vR, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Concentric floral dashed ring
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 6]);
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.visualRadius * 0.75, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Floating blossom petals
+                ctx.fillStyle = '#f472b6';
+                for (let a = 0; a < 8; a++) {
+                    const ang = a * (Math.PI / 4) + this.swayTime * 0.6;
+                    const px = obs.x + Math.cos(ang) * (obs.visualRadius * 0.52);
+                    const py = obs.y + Math.sin(ang) * (obs.visualRadius * 0.52);
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Speed icon & label badge
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+                ctx.beginPath();
+                ctx.roundRect(obs.x - 70, obs.y - 10, 140, 20, 10);
+                ctx.fill();
+
+                ctx.fillStyle = '#fef08a';
+                ctx.font = 'bold 11px Outfit, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText("🌸 पुष्प वाटिका (+Speed)", obs.x, obs.y);
+                ctx.restore();
+            }
         }
 
         // Yamuna River on the East border
@@ -409,5 +481,40 @@ export class VrindavanPastures {
                 TreeRenderer.drawCanopy(ctx, obs, isPlayerNear, this.swayTime);
             }
         }
+    }
+
+    /**
+     * Sacred Parikrama Perimeter Loop
+     * Instead of running directly into flat boundary walls and getting stuck,
+     * entities near borders are smoothly swept along the perimeter trails
+     * back towards open glades, keeping chases flowing continuously.
+     */
+    getBoundaryFlowVector(x, y) {
+        let bx = 0;
+        let by = 0;
+        const pad = 340;
+        const riverEdge = this.width - this.riverWidth - 90;
+
+        if (x < pad) {
+            const factor = Math.pow((pad - x) / pad, 1.4);
+            bx += factor * 5.2;
+            by += (y < this.centerY ? 1 : -1) * factor * 3.4;
+        } else if (x > riverEdge - pad) {
+            const factor = Math.pow((x - (riverEdge - pad)) / pad, 1.4);
+            bx -= factor * 5.2;
+            by += (y < this.centerY ? 1 : -1) * factor * 3.4;
+        }
+
+        if (y < pad) {
+            const factor = Math.pow((pad - y) / pad, 1.4);
+            by += factor * 5.2;
+            bx += (x < this.centerX ? 1 : -1) * factor * 3.4;
+        } else if (y > this.height - pad) {
+            const factor = Math.pow((y - (this.height - pad)) / pad, 1.4);
+            by -= factor * 5.2;
+            bx += (x < this.centerX ? 1 : -1) * factor * 3.4;
+        }
+
+        return { x: bx, y: by };
     }
 }

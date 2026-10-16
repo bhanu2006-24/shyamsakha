@@ -16,6 +16,7 @@ import { Minimap } from '../ui/Minimap.js';
 import { VolleyballGame } from '../games/VolleyballGame.js';
 import { TagGame } from '../games/TagGame.js';
 import { HoliGame } from '../games/HoliGame.js';
+import { RaceGame } from '../games/RaceGame.js';
 import { assetLoader } from './AssetLoader.js';
 
 export class Game {
@@ -53,8 +54,9 @@ export class Game {
         this.volleyballGame = new VolleyballGame(this);
         this.tagGame = new TagGame(this);
         this.holiGame = new HoliGame(this);
+        this.raceGame = new RaceGame(this);
 
-        this.state = 'hub'; // 'hub', 'volleyball', 'tag', 'holi', 'gameover'
+        this.state = 'hub'; // 'hub', 'volleyball', 'tag', 'holi', 'race', 'gameover'
         this.inventory = { flowers: 0, lotus: 0, fruits: 0, water: 0, butter: 1, garlands: 0 };
         this.lastTime = 0;
         this.interactableTarget = null;
@@ -552,7 +554,8 @@ export class Game {
         const pastimesNames = {
             volleyball: "Kanduka Kridha (Volleyball)",
             tag: "Pakad Pakdai (Tag Chase)",
-            holi: "Rangotsav (Holi Pichkari)"
+            holi: "Rangotsav (Holi Pichkari)",
+            race: "Dhaavan Spardha (Footrace / दौड़)"
         };
         this.startGameMode(mode);
         this.ui.showToast(`✨ Started ${pastimesNames[mode] || mode}! (Press ESC or Return to Hub anytime)`);
@@ -584,6 +587,7 @@ export class Game {
 
     startGameMode(mode) {
         this.ui.closeAllModals();
+        this.ui.hidePrompt();
         this.state = mode;
 
         const hubBtn = document.getElementById('topHubReturnBtn');
@@ -600,6 +604,9 @@ export class Game {
         } else if (mode === 'holi') {
             this.ui.setPhase("💦 Holi Battle", "tag-playing");
             this.holiGame.start();
+        } else if (mode === 'race') {
+            this.ui.setPhase("🏃‍♂️ Footrace", "tag-playing");
+            this.raceGame.start();
         }
     }
 
@@ -615,6 +622,7 @@ export class Game {
         }
         if (this.tagGame) this.tagGame.isActive = false;
         if (this.holiGame) this.holiGame.isActive = false;
+        if (this.raceGame) this.raceGame.isActive = false;
 
         const hubBtn = document.getElementById('topHubReturnBtn');
         if (hubBtn) hubBtn.classList.add('hidden');
@@ -675,11 +683,8 @@ export class Game {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             for (const s of this.sakhas) {
-                // Gentle wandering
-                if (Math.random() < 0.02) s.wanderAngle += (Math.random() - 0.5);
-                const sx = Math.cos(s.wanderAngle) * 50;
-                const sy = Math.sin(s.wanderAngle) * 50;
-                s.moveWithAnim(sx * dt, sy * dt, obstacles, mapW, mapH, dt);
+                // Autonomous pastoral routines: gather sweet fruits, offer to Krishna/Dau, initiate polls
+                s.updateRoutine(dt, obstacles, mapW, mapH, this.krishna, this.balram, this);
             }
         } else if (this.state === 'volleyball') {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
@@ -693,6 +698,10 @@ export class Game {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             this.holiGame.update(dt);
+        } else if (this.state === 'race') {
+            if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
+            if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
+            this.raceGame.update(dt);
         }
 
         this.input.endFrame();
@@ -721,16 +730,22 @@ export class Game {
         if (this.krishna) this.krishna.draw(ctx);
         if (this.player) this.player.draw(ctx);
 
-        // 5. Mini-Game Projectiles / Volleyball Ball
+        // 5. Mini-Game Projectiles / Volleyball Ball / Race Checkpoints (World Space)
         if (this.state === 'volleyball') this.volleyballGame.draw(ctx);
         if (this.state === 'holi') this.holiGame.draw(ctx);
+        if (this.state === 'race') this.raceGame.drawWorld(ctx);
 
         // 6. Tree Canopy Layer (Leaves above heads with see-through transparency)
         this.mapManager.drawCanopy(ctx, this.camera, this.player);
 
         ctx.restore();
 
-        // 7. Continuous Target Directional Cursors for Krishna & Balram (Off-Screen Radar Tracker)
+        // 7. Mini-Game Screen-Space Overlays (Race Countdown, Standings Bar, Checkpoint Arrow)
+        if (this.state === 'race') {
+            this.raceGame.drawHud(ctx);
+        }
+
+        // 8. Continuous Target Directional Cursors for Krishna & Balram (Off-Screen Radar Tracker)
         if (this.sound && this.sound.compassEnabled) {
             this.drawDirectionalPointers(ctx);
         }
@@ -773,7 +788,7 @@ export class Game {
     }
 
     drawDirectionalPointers(ctx) {
-        if (!this.player) return;
+        if (!this.player || this.state === 'race') return;
 
         // Krishna and Balram continuous pointers
         // Active during Tag, Holi, or anytime they are off-screen

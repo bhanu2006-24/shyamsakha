@@ -194,11 +194,18 @@ export class TagGame {
             }
         }
 
-        // Map boundary repulsions
-        if (target.x < 240) fx += 4.5;
-        if (target.x > mapW - 750) fx -= 4.5;
-        if (target.y < 240) fy += 4.5;
-        if (target.y > mapH - 320) fy -= 4.5;
+        // Smooth Sacred Parikrama loop around borders (zero edge sticking!)
+        const curMap = this.game.mapManager.currentMap;
+        if (curMap && curMap.getBoundaryFlowVector) {
+            const bFlow = curMap.getBoundaryFlowVector(target.x, target.y);
+            fx += bFlow.x;
+            fy += bFlow.y;
+        } else {
+            if (target.x < 240) fx += 4.5;
+            if (target.x > mapW - 750) fx -= 4.5;
+            if (target.y < 240) fy += 4.5;
+            if (target.y > mapH - 320) fy -= 4.5;
+        }
 
         const fLen = Math.hypot(fx, fy);
         if (fLen > 0) {
@@ -206,10 +213,11 @@ export class TagGame {
             fy /= fLen;
         }
 
-        // Agile Speed (Player walks at 320, sprints at 528 with Shift)
-        const speed = type === 'krishna' ? 360 : 340;
+        // Dynamic Second-by-Second Speed (Unpredictable, lively stride cadences!)
+        target.updateDynamicSpeed(dt);
         target.applyTerrain(obstacles);
-        target.moveWithAnim(fx * speed * target.terrainModifier * dt, fy * speed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        const actualSpeed = target.currentSpeed * target.terrainModifier;
+        target.moveWithAnim(fx * actualSpeed * dt, fy * actualSpeed * dt, obstacles, mapW, mapH, dt);
     }
 
     updateSakhasAi(sakhas, krishna, balram, obstacles, mapW, mapH, dt) {
@@ -217,6 +225,7 @@ export class TagGame {
             const activeTarget = (idx % 2 === 0 && !krishna.isCaught) ? krishna : (!balram.isCaught ? balram : krishna);
             if (!activeTarget || activeTarget.isCaught) return;
 
+            s.updateDynamicSpeed(dt);
             const dx = activeTarget.x - s.x;
             const dy = activeTarget.y - s.y;
             const dist = Math.hypot(dx, dy);
