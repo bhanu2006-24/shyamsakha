@@ -1,3 +1,5 @@
+import { TreeRenderer } from './TreeRenderer.js';
+
 /**
  * Yamuna Sandbanks & Volleyball Arena Map (यमुना पुलिन व कन्दुक क्रीड़ांगन)
  */
@@ -72,9 +74,11 @@ export class YamunaBeach {
             );
 
             if (!insideCourt) {
+                const isTree = Math.random() > 0.5;
                 this.obstacles.push({
                     shape: 'circle',
-                    type: Math.random() > 0.5 ? 'tree' : 'bush',
+                    type: isTree ? 'tree' : 'bush',
+                    treeType: isTree ? (Math.random() > 0.4 ? 'palm' : 'kadamba') : null,
                     x: x,
                     y: y,
                     radius: rad * 0.5,
@@ -213,23 +217,16 @@ export class YamunaBeach {
             if (!camera.isInView(obs.x, obs.y, obs.visualRadius)) continue;
 
             if (obs.type === 'tree') {
-                ctx.save();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                ctx.beginPath();
-                ctx.arc(obs.x + 5, obs.y + 5, obs.visualRadius * 0.9, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#78350f';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                TreeRenderer.drawTrunk(ctx, obs);
             } else if (obs.type === 'bush') {
                 ctx.save();
                 ctx.fillStyle = '#65a30d';
                 ctx.beginPath();
                 ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
                 ctx.fill();
+                if (obs.hasResource === 'flower') {
+                    TreeRenderer.drawLotusFlower(ctx, obs.x, obs.y);
+                }
                 ctx.restore();
             }
         }
@@ -237,21 +234,16 @@ export class YamunaBeach {
 
     drawCanopy(ctx, camera, player = null) {
         for (const obs of this.obstacles) {
-            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y, obs.visualRadius)) {
+            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y - obs.visualRadius * 0.75, obs.visualRadius + 20)) {
+                const canopyY = obs.y - obs.visualRadius * 0.75;
                 let isPlayerNear = false;
                 if (player) {
-                    const distToPlayer = Math.hypot(player.x - obs.x, player.y - obs.y);
-                    if (distToPlayer < obs.visualRadius + 30) {
+                    const distToCanopy = Math.hypot(player.x - obs.x, player.y - canopyY);
+                    if (distToCanopy < obs.visualRadius * 0.85) {
                         isPlayerNear = true;
                     }
                 }
-                ctx.save();
-                ctx.globalAlpha = isPlayerNear ? 0.35 : 0.94;
-                ctx.fillStyle = '#15803d';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                TreeRenderer.drawCanopy(ctx, obs, isPlayerNear, this.waterWaveOffset * 0.05);
             }
         }
     }

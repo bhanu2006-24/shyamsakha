@@ -95,17 +95,17 @@ export class Game {
         const mapNameEl = document.getElementById('currentMapName');
         if (mapNameEl) mapNameEl.innerText = map.hindiName || map.name;
 
-        // Reposition camera & entities safely inside new map bounds
+        // Reposition camera & entities safely inside new map bounds (sunlit open clearing)
         if (this.player) {
-            this.player.x = map.centerX - 100;
-            this.player.y = map.centerY + 50;
+            this.player.x = map.centerX;
+            this.player.y = map.centerY + 130;
             if (this.krishna) {
-                this.krishna.x = map.centerX + 30;
-                this.krishna.y = map.centerY - 20;
+                this.krishna.x = map.centerX + 40;
+                this.krishna.y = map.centerY + 30;
             }
             if (this.balram) {
-                this.balram.x = map.centerX - 40;
-                this.balram.y = map.centerY - 10;
+                this.balram.x = map.centerX - 50;
+                this.balram.y = map.centerY + 25;
             }
         }
         this.ui.showToast(`Arrived at ${map.name}! 🌿`);
@@ -116,24 +116,49 @@ export class Game {
         const cx = map.centerX;
         const cy = map.centerY;
 
-        this.player = new Player(cx - 120, cy + 80);
+        // Position player in the sunlit clearing facing north towards Krishna & Balram
+        this.player = new Player(cx, cy + 130);
         this.camera.setTarget(this.player);
 
-        this.krishna = new Krishna(cx + 30, cy - 20);
-        this.balram = new Balram(cx - 40, cy - 10);
+        // Krishna and Balram standing in clear daylight in the open glade (outside tree canopy)
+        this.krishna = new Krishna(cx + 40, cy + 30);
+        this.balram = new Balram(cx - 50, cy + 25);
 
-        // 8 Sakha Friends
+        // 8 Sakha Friends gathered in a natural, friendly arc in the pastoral clearing
+        const sakhaPlacements = [
+            { dx: -125, dy: 50 },  // Sudama (left side)
+            { dx: 125, dy: 45 },   // Subala (right side)
+            { dx: -90, dy: 125 },  // Mansukh
+            { dx: 95, dy: 120 },   // Sridama
+            { dx: -160, dy: 95 },  // Stoka-Krishna
+            { dx: 160, dy: 100 },  // Dama
+            { dx: -50, dy: 185 },  // Arjuna
+            { dx: 50, dy: 185 }    // Gandharva
+        ];
+
         this.sakhas = [];
         for (let i = 0; i < 8; i++) {
-            const sx = cx + (Math.random() - 0.5) * 500;
-            const sy = cy + (Math.random() - 0.5) * 500;
-            this.sakhas.push(new Sakha(sx, sy, i));
+            const sp = sakhaPlacements[i];
+            this.sakhas.push(new Sakha(cx + sp.dx, cy + sp.dy, i));
         }
 
-        // Gau Mata (Vedic Indigenous Cows)
+        // Gau Mata (Vedic Indigenous Cows) grazing peacefully around the clearing & outer meadows
         this.cows = [];
         const cowColors = ['#fffdd0', '#fef3c7', '#d2b48c', '#b45309', '#f8fafc'];
-        for (let i = 0; i < 16; i++) {
+        const clearingCowOffsets = [
+            { dx: -240, dy: -30 }, { dx: 240, dy: -25 },
+            { dx: -260, dy: 160 }, { dx: 260, dy: 150 },
+            { dx: -180, dy: 240 }, { dx: 170, dy: 230 }
+        ];
+
+        for (let i = 0; i < clearingCowOffsets.length; i++) {
+            const co = clearingCowOffsets[i];
+            const cColor = cowColors[i % cowColors.length];
+            this.cows.push(new GauMata(cx + co.dx, cy + co.dy, cColor));
+        }
+
+        // Additional cows across the wider pastoral meadows
+        for (let i = 0; i < 10; i++) {
             const rx = 150 + Math.random() * (map.width - 700);
             const ry = 150 + Math.random() * (map.height - 300);
             const cColor = cowColors[Math.floor(Math.random() * cowColors.length)];
@@ -141,7 +166,7 @@ export class Game {
         }
 
         this.state = 'hub';
-        this.ui.setPhase("Phase: Resting under the Kadamba Tree", "tag-resting");
+        this.ui.setPhase("🌿 Resting", "tag-resting");
         this.ui.updateInventory(this.inventory);
 
         // Hide specific game HUDs
@@ -175,10 +200,13 @@ export class Game {
 
         // Top HUD buttons
         const soundBtn = document.getElementById('soundToggleBtn');
+        const soundIcon = document.getElementById('soundIcon');
+        const soundText = document.getElementById('soundText');
         if (soundBtn) {
             soundBtn.addEventListener('click', () => {
                 const isOn = this.sound.toggle();
-                soundBtn.innerText = isOn ? '🔊 Sound: On' : '🔇 Sound: Off';
+                if (soundIcon) soundIcon.innerText = isOn ? '🔊' : '🔇';
+                if (soundText) soundText.innerText = isOn ? 'Sound' : 'Muted';
             });
         }
 
@@ -410,16 +438,19 @@ export class Game {
         this.ui.closeGameChoice();
         this.state = mode;
 
+        const hubBtn = document.getElementById('topHubReturnBtn');
+        if (hubBtn) hubBtn.classList.remove('hidden');
+
         if (mode === 'volleyball') {
             // Switch to Yamuna Beach map where the volleyball court is set
             this.loadMap('yamuna');
-            this.ui.setPhase("Phase: Kanduka Kridha (Volleyball Match)", "tag-volleyball");
+            this.ui.setPhase("🏐 Volleyball", "tag-volleyball");
             this.volleyballGame.start(this.yamunaMap.court);
         } else if (mode === 'tag') {
-            this.ui.setPhase("Phase: Pakad Pakdai (Chase)", "tag-playing");
+            this.ui.setPhase("🏃 Tag Chase", "tag-playing");
             this.tagGame.start();
         } else if (mode === 'holi') {
-            this.ui.setPhase("Phase: Rangotsav (Holi Water Fight)", "tag-playing");
+            this.ui.setPhase("💦 Holi Battle", "tag-playing");
             this.holiGame.start();
         }
     }
@@ -430,9 +461,21 @@ export class Game {
     }
 
     returnToHub() {
+        if (this.volleyballGame) {
+            this.volleyballGame.isActive = false;
+            if (this.volleyballGame.scoreboardEl) this.volleyballGame.scoreboardEl.classList.add('hidden');
+        }
+        if (this.tagGame) this.tagGame.isActive = false;
+        if (this.holiGame) this.holiGame.isActive = false;
+
+        const hubBtn = document.getElementById('topHubReturnBtn');
+        if (hubBtn) hubBtn.classList.add('hidden');
+
+        this.state = 'hub';
         this.ui.hideGameOver();
         this.loadMap('vrindavan');
         this.initEntitiesHub();
+        this.ui.setPhase("🌿 Resting", "tag-resting");
     }
 
     update(dt) {

@@ -1,3 +1,5 @@
+import { TreeRenderer } from './TreeRenderer.js';
+
 /**
  * Govardhan Foothills Map (गोवर्धन तलहटी व गिरिराज परिक्रमा)
  */
@@ -44,12 +46,15 @@ export class GovardhanFoothills {
 
             // Avoid blocking stream bridge
             if (Math.abs(x - this.centerX) > 180) {
+                const isTree = Math.random() <= 0.4;
+                const treePool = ['kadamba', 'mango', 'banyan', 'parijat'];
                 this.obstacles.push({
                     shape: 'circle',
-                    type: Math.random() > 0.4 ? 'rock' : 'tree',
+                    type: isTree ? 'tree' : 'rock',
+                    treeType: isTree ? treePool[Math.floor(Math.random() * treePool.length)] : null,
                     x: x,
                     y: y,
-                    radius: rad * 0.7,
+                    radius: rad * 0.65,
                     visualRadius: rad,
                     hasResource: Math.random() > 0.5 ? 'flower' : null
                 });
@@ -121,33 +126,23 @@ export class GovardhanFoothills {
                 ctx.fill();
                 ctx.restore();
             } else if (obs.type === 'tree') {
-                ctx.save();
-                ctx.fillStyle = '#78350f';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                TreeRenderer.drawTrunk(ctx, obs);
             }
         }
     }
 
     drawCanopy(ctx, camera, player = null) {
         for (const obs of this.obstacles) {
-            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y, obs.visualRadius)) {
+            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y - obs.visualRadius * 0.75, obs.visualRadius + 20)) {
+                const canopyY = obs.y - obs.visualRadius * 0.75;
                 let isPlayerNear = false;
                 if (player) {
-                    const distToPlayer = Math.hypot(player.x - obs.x, player.y - obs.y);
-                    if (distToPlayer < obs.visualRadius + 30) {
+                    const distToCanopy = Math.hypot(player.x - obs.x, player.y - canopyY);
+                    if (distToCanopy < obs.visualRadius * 0.85) {
                         isPlayerNear = true;
                     }
                 }
-                ctx.save();
-                ctx.globalAlpha = isPlayerNear ? 0.35 : 0.94;
-                ctx.fillStyle = '#166534';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
+                TreeRenderer.drawCanopy(ctx, obs, isPlayerNear, this.streamOffset * 0.05);
             }
         }
     }

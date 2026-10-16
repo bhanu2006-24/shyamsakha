@@ -83,7 +83,7 @@ export class SoundManager {
         this.currentTrackIndex = (index + this.bhajanTracks.length) % this.bhajanTracks.length;
         const track = this.bhajanTracks[this.currentTrackIndex];
 
-        this.audioEl.src = track.file;
+        this.audioEl.src = encodeURI(track.file);
         this.audioEl.play()
             .then(() => {
                 this.isMusicPlaying = true;
@@ -92,6 +92,7 @@ export class SoundManager {
             .catch((err) => {
                 console.log("Audio play gesture required or playback note:", err.message);
                 this.isMusicPlaying = false;
+                this.notifyTrackChange(null);
             });
     }
 
@@ -112,11 +113,20 @@ export class SoundManager {
     notifyTrackChange(track) {
         const titleEl = document.getElementById('nowPlayingTitle');
         const playBtn = document.getElementById('bhajanPlayBtn');
+        const bhajanBar = document.getElementById('bhajanPlayerUI');
+
         if (titleEl) {
-            titleEl.innerText = track ? track.title : 'Paused';
+            titleEl.innerText = track ? track.title : 'Play Bhajan';
         }
         if (playBtn) {
             playBtn.innerHTML = this.isMusicPlaying ? '⏸️' : '▶️';
+        }
+        if (bhajanBar) {
+            if (this.isMusicPlaying) {
+                bhajanBar.classList.add('playing');
+            } else {
+                bhajanBar.classList.remove('playing');
+            }
         }
     }
 

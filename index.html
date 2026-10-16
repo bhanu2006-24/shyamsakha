@@ -13,74 +13,93 @@
 </head>
 <body class="flex flex-col">
 
-    <!-- Top Navigation HUD -->
+    <!-- Top Navigation HUD - Streamlined, Divine, and Useful -->
     <header class="top-hud">
+        <!-- Left: Brand, Sacred Location & Active Phase -->
         <div class="brand-section">
-            <h1 class="game-title">
-                <span>🦚</span> Shyam Sakha <span style="font-size: 0.95rem; opacity: 0.85; font-family: sans-serif;">(श्याम सखा)</span>
+            <h1 class="game-title" title="Shyam Sakha - Playful Pastimes with Shree Krishna">
+                <span class="peacock-icon">🦚</span> SHYAM SAKHA <span class="title-sub">(श्याम सखा)</span>
             </h1>
-            <div class="map-phase-badge">
-                <span id="currentMapName" class="tag-badge tag-playing">वृन्दावन गोचारण</span>
-                <span id="stateTextUI" class="tag-badge tag-resting">Phase: Resting under Kadamba Tree</span>
+            <button id="mapSelectBtn" class="location-badge" title="Click to travel between sacred maps (Key: M)">
+                <span>📍</span> <span id="currentMapName">वृन्दावन गोचारण</span> <span class="badge-arrow">▾</span>
+            </button>
+            <span id="stateTextUI" class="tag-badge tag-resting">🌿 Resting</span>
+        </div>
+
+        <!-- Center: Quick Pastimes & Compact Inventory -->
+        <div class="center-hud">
+            <!-- Quick Pastimes Launcher -->
+            <div class="quick-pastimes-bar">
+                <button onclick="startGameMode('volleyball')" class="play-action-btn btn-volleyball-cta" title="Play Kanduka Kridha (Volleyball) on Yamuna Beach!">
+                    <span>🏐</span> <span class="pastime-btn-text">Volleyball</span>
+                </button>
+                <button onclick="startGameMode('tag')" class="play-action-btn" title="Play Pakad Pakdai chase!">
+                    <span>🏃‍♂️</span> <span class="pastime-btn-text">Tag</span>
+                </button>
+                <button onclick="startGameMode('holi')" class="play-action-btn" title="Play Rangotsav Holi fight!">
+                    <span>💦</span> <span class="pastime-btn-text">Holi</span>
+                </button>
+                <button id="topHubReturnBtn" onclick="returnToHub()" class="play-action-btn btn-hub-return hidden" title="Return to peaceful grazing under Kadamba Tree">
+                    <span>🏡</span> <span class="pastime-btn-text">Hub</span>
+                </button>
+            </div>
+
+            <!-- Compact Visual Inventory -->
+            <div id="inventoryUI" class="inventory-bar">
+                <div class="inv-pill" title="Lotus Flowers for Garlands (Pick near ponds with Space)">
+                    <span>🌸</span>
+                    <span id="invFlowers" class="inv-num text-pink-400">0</span>
+                </div>
+                <div class="inv-divider"></div>
+                <div class="inv-pill" title="Sweet Vrindavan Mangoes (Pick near mango trees with Space)">
+                    <span>🥭</span>
+                    <span id="invFruits" class="inv-num text-yellow-400">0</span>
+                </div>
+                <div class="inv-divider"></div>
+                <div class="inv-pill" title="Sacred Yamuna Jal (Collect near riverbanks with Space)">
+                    <span>💧</span>
+                    <span id="invWater" class="inv-num text-blue-400">0</span>
+                </div>
+                <div class="inv-divider"></div>
+                <div class="inv-pill" title="Fresh Churned Makhan (Butter) for Shree Krishna">
+                    <span>🍯</span>
+                    <span id="invButter" class="inv-num text-amber-300">1</span>
+                </div>
             </div>
         </div>
 
-        <!-- Inventory Bar -->
-        <div id="inventoryUI" class="inventory-bar">
-            <div class="inv-pill" title="Lotus Flowers for Garlands">
-                <span class="inv-dot dot-flower"></span>
-                <span>Flowers:</span>
-                <span id="invFlowers" class="font-bold text-pink-400">0</span>
-            </div>
-            <div class="inv-pill" title="Sweet Vrindavan Forest Fruits">
-                <span class="inv-dot dot-fruit"></span>
-                <span>Fruits:</span>
-                <span id="invFruits" class="font-bold text-yellow-400">0</span>
-            </div>
-            <div class="inv-pill" title="Sacred Yamuna Jal">
-                <span class="inv-dot dot-water"></span>
-                <span>Yamuna Jal:</span>
-                <span id="invWater" class="font-bold text-blue-400">0</span>
-            </div>
-            <div class="inv-pill" title="Freshly Churned Makhan (Butter)">
-                <span class="inv-dot dot-butter"></span>
-                <span>Makhan:</span>
-                <span id="invButter" class="font-bold text-amber-200">1</span>
-            </div>
-        </div>
-
-        <!-- Bhajan Music Player -->
-        <div id="bhajanPlayerUI" class="bhajan-bar">
-            <button id="bhajanPrevBtn" class="music-ctrl-btn" title="Previous Bhajan">⏮️</button>
-            <button id="bhajanPlayBtn" class="music-ctrl-btn" title="Play / Pause Bhajan">▶️</button>
-            <button id="bhajanNextBtn" class="music-ctrl-btn" title="Next Bhajan">⏭️</button>
-            <div class="music-info" title="Vrindavan Bhajans">
-                <span class="music-icon">🎶</span>
-                <span id="nowPlayingTitle">Play Bhajan</span>
-            </div>
-        </div>
-
-        <!-- Stamina & Quick Action HUD -->
-        <div class="stats-bar">
-            <div class="stat-group">
-                <span class="stat-label">Stamina [Shift]</span>
-                <div class="stamina-meter">
-                    <div id="staminaFill" class="stamina-fill" style="width: 100%;"></div>
+        <!-- Right: Bhajan Player, Stamina, and Controls -->
+        <div class="right-hud">
+            <!-- Bhajan Music Player -->
+            <div id="bhajanPlayerUI" class="bhajan-bar">
+                <button id="bhajanPrevBtn" class="music-ctrl-btn" title="Previous Bhajan">⏮️</button>
+                <button id="bhajanPlayBtn" class="music-ctrl-btn" title="Play / Pause Bhajan">▶️</button>
+                <button id="bhajanNextBtn" class="music-ctrl-btn" title="Next Bhajan">⏭️</button>
+                <div class="music-info" title="Vrindavan Bhajans">
+                    <span class="music-icon" id="musicPulseIcon">🎶</span>
+                    <span id="nowPlayingTitle">Play Bhajan</span>
                 </div>
             </div>
 
+            <!-- Stamina Indicator -->
+            <div class="stamina-group" title="Sprint Stamina (Hold Shift)">
+                <span style="font-size: 0.85rem;">⚡</span>
+                <div class="stamina-meter">
+                    <div id="staminaFill" class="stamina-fill" style="width: 100%;"></div>
+                </div>
+                <span class="stamina-key-text">SHIFT</span>
+            </div>
+
+            <!-- Utility Action Buttons -->
             <div class="hud-btn-group">
-                <button id="fluteCallBtn" class="icon-btn" title="Call cows with Krishna's Flute (Key: F)">
-                    <span>🪈</span> Flute (F)
-                </button>
-                <button id="mapSelectBtn" class="icon-btn" title="Explore Maps (Key: M)">
-                    <span>🗺️</span> Maps (M)
+                <button id="fluteCallBtn" class="icon-btn btn-flute" title="Play Krishna's Flute (Key: F)">
+                    <span>🪈</span> <span class="btn-text">Flute (F)</span>
                 </button>
                 <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound">
-                    <span>🔊</span> Sound
+                    <span id="soundIcon">🔊</span> <span id="soundText" class="btn-text">Sound</span>
                 </button>
-                <button id="helpBtn" class="icon-btn" title="How to Play">
-                    <span>❓</span> Guide
+                <button id="helpBtn" class="icon-btn btn-help" title="Game Guide & Controls (Key: H / ?)">
+                    <span>❓</span> <span class="btn-text">Guide</span>
                 </button>
             </div>
         </div>
