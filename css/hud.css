@@ -699,42 +699,48 @@
     }
 }
 
-/* Floating Toast Notifications */
+/* Floating Toast Notifications - Positioned in bottom-right corner and compact per user request */
 #toastContainer {
-    position: absolute;
-    top: 75px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: fixed;
+    bottom: 22px;
+    right: 20px;
+    left: auto;
+    top: auto;
+    transform: none;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 6px;
     pointer-events: none;
-    z-index: 50;
+    z-index: 55;
+    max-width: 340px;
 }
 
 .toast {
-    background: rgba(15, 23, 42, 0.92);
-    border: 1px solid var(--gold);
+    background: rgba(15, 23, 42, 0.93);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(250, 204, 21, 0.55);
     color: #f8fafc;
-    padding: 8px 20px;
+    padding: 5px 12px;
     border-radius: 9999px;
-    font-size: 0.88rem;
+    font-size: 0.76rem;
     font-weight: 600;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 0 12px var(--gold-glow);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
     display: flex;
     align-items: center;
-    gap: 8px;
-    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.4s ease 2.6s forwards;
+    gap: 6px;
+    white-space: nowrap;
+    animation: toastInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1), toastOutRight 0.35s ease 2.2s forwards;
 }
 
-@keyframes toastIn {
-    from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes toastInRight {
+    from { opacity: 0; transform: translateX(20px) scale(0.95); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
 }
 
-@keyframes toastOut {
-    from { opacity: 1; transform: translateY(0); }
-    to { opacity: 0; transform: translateY(-12px); }
+@keyframes toastOutRight {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(20px); }
 }
 
 /* Minimal Vedic HUD Action Pills */
