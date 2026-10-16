@@ -132,7 +132,7 @@ shyamsakha/
 | **B** | Open Sakha Potli (Bag, Offerings & Items) |
 | **O / ESC** | Options & Audio Settings (Music Volume, BGM, Track cycle) |
 | **F** | Play Krishna's Flute (Cows & Sakhas gather joyfully) |
-| **M** | Toggle Tactical Radar Minimap |
+| **M** | Toggle Tactical Radar Minimap ON / OFF (or rely on edge Tracker Pointers) |
 | **H** | Open Game Guide & Controls |
 | **Left Click** | Shoot Pichkari in Holi / Click UI buttons |
 | **Touch Controls** | Mobile & tablet tap support for buttons and prompt |

@@ -89,14 +89,35 @@
             </div>
         </div>
 
-        <!-- Dialogue Box -->
-        <div id="dialogueBox">
-            <div class="dialogue-card">
-                <div id="dialogueAvatar" class="dialogue-avatar">🦚</div>
-                <div class="dialogue-content">
-                    <h3 id="dialogueName" class="dialogue-speaker">Krishna</h3>
-                    <p id="dialogueText" class="dialogue-text">Welcome to Vrindavan, my dear friend!</p>
+        <!-- RAMSENA RPG DIALOGUE SYSTEM (Big Portrait & Bottom Action Box) -->
+        <div id="dialogueBox" class="ram-dialogue-container">
+            <!-- Big Standing Character Portrait (Right side with radiant divine glow) -->
+            <div id="dialoguePortraitWrap" class="dialogue-portrait-wrap">
+                <canvas id="dialoguePortraitCanvas" width="180" height="260"></canvas>
+            </div>
+
+            <!-- Dialogue Top Bar: Left Speaker Tab & Right Cancel Button -->
+            <div class="dialogue-top-bar">
+                <div class="dialogue-speaker-tab">
+                    <div id="dialogueAvatarBadge" class="dialogue-avatar-badge">
+                        <span id="dialogueAvatarIcon">🦚</span>
+                    </div>
+                    <span id="dialogueSpeakerName" class="dialogue-speaker-title">Shree Krishna (श्री कृष्ण)</span>
                 </div>
+                <button id="dialogueCancelBtn" class="dialogue-cancel-pill" title="Close Dialogue (ESC)">✕ CANCEL</button>
+            </div>
+
+            <!-- Main White Card with Vibrant Cyan Glowing Border -->
+            <div class="ram-dialogue-card">
+                <p id="dialogueText" class="ram-dialogue-text">Welcome to Vrindavan, my dear friend!</p>
+
+                <!-- Interactive Action Buttons Row (Directly inside the dialogue box) -->
+                <div id="dialogueActions" class="dialogue-actions-row">
+                    <!-- Populated dynamically: [ 🏐 Volleyball ] [ 🏃‍♂️ Tag ] [ 🍯 Offer Makhan ] [ ↩ Leave ] -->
+                </div>
+
+                <!-- Downward Blinking Indicator Arrow -->
+                <span class="dialogue-down-arrow">▼</span>
             </div>
         </div>
 
@@ -213,137 +234,24 @@
                         </div>
                         <button id="optPortraitToggle" onclick="togglePortrait()" class="opt-toggle-btn on">ON</button>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- SHREE KRISHNA PASTIMES & OFFERINGS MODAL -->
-        <div id="krishnaMenuModal" class="modal-overlay hidden">
-            <div class="character-menu-card border-krishna">
-                <div class="char-menu-header">
-                    <span class="char-avatar-icon">🦚</span>
-                    <div>
-                        <h2 class="char-menu-title text-yellow-400">श्री कृष्ण (Shree Krishna)</h2>
-                        <p class="char-menu-subtitle">"Sakha! What pastime shall we play today in the sacred groves?"</p>
+                    <!-- 7. Radar Minimap Toggle -->
+                    <div class="opt-row">
+                        <div class="opt-row-label">
+                            <span class="opt-icon">🗺️</span>
+                            <span>RADAR MINIMAP (M)</span>
+                        </div>
+                        <button id="optMinimapToggle" onclick="toggleMinimapSetting()" class="opt-toggle-btn on">ON</button>
                     </div>
-                    <button onclick="closeKrishnaMenu()" class="opt-close-btn">✕</button>
-                </div>
 
-                <div class="char-options-grid">
-                    <button onclick="startPastimeFromKrishna('volleyball')" class="char-option-card">
-                        <span class="char-option-icon">🏐</span>
-                        <div class="char-option-info">
-                            <h4>Kanduka Kridha (Volleyball)</h4>
-                            <p>Play volleyball on the Yamuna sandbank court! Bump, pass, and jump spike!</p>
+                    <!-- 8. Directional Compass Pointers (Krishna & Balram Tracker) -->
+                    <div class="opt-row">
+                        <div class="opt-row-label">
+                            <span class="opt-icon">🧭</span>
+                            <span>TRACKER POINTERS</span>
                         </div>
-                    </button>
-
-                    <button onclick="startPastimeFromKrishna('tag')" class="char-option-card">
-                        <span class="char-option-icon">🏃‍♂️</span>
-                        <div class="char-option-info">
-                            <h4>Pakad Pakdai (Tag Chase)</h4>
-                            <p>Sprint through the pastures in friendly chase with Krishna & Dau Balram!</p>
-                        </div>
-                    </button>
-
-                    <button onclick="startPastimeFromKrishna('holi')" class="char-option-card">
-                        <span class="char-option-icon">💦</span>
-                        <div class="char-option-info">
-                            <h4>Rangotsav (Holi Pichkari)</h4>
-                            <p>Spray fragrant herbal water streams and celebrate joyous Holi!</p>
-                        </div>
-                    </button>
-
-                    <button onclick="offerToKrishna('butter')" class="char-option-card">
-                        <span class="char-option-icon">🍯</span>
-                        <div class="char-option-info">
-                            <h4>Offer Fresh Churned Makhan</h4>
-                            <p>Delight Kanhaiya with Mother Yashoda's sweet freshly churned butter!</p>
-                        </div>
-                    </button>
-
-                    <button onclick="offerToKrishna('garland')" class="char-option-card">
-                        <span class="char-option-icon">📿</span>
-                        <div class="char-option-info">
-                            <h4>Adorn with Vaijayanti Garland</h4>
-                            <p>Offer a hand-woven garland of fragrant flowers to Shree Krishna.</p>
-                        </div>
-                    </button>
-
-                    <button onclick="offerToKrishna('lotus')" class="char-option-card">
-                        <span class="char-option-icon">🪷</span>
-                        <div class="char-option-info">
-                            <h4>Offer Sacred Water Lotus</h4>
-                            <p>Offer fresh water lotus gathered from the Kamal Sarovar lily pads.</p>
-                        </div>
-                    </button>
-                </div>
-
-                <div class="char-menu-footer">
-                    <button onclick="playKrishnaFluteSong()" class="btn-flute-action">
-                        <span>🪈</span> Listen to Krishna's Flute Melody
-                    </button>
-                    <button onclick="closeKrishnaMenu()" class="modal-close-btn">Rest in Loving Remembrance</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- DAO BALARAM SACRED MAP TRAVEL & OFFERINGS MODAL -->
-        <div id="balramMenuModal" class="modal-overlay hidden">
-            <div class="character-menu-card border-balram">
-                <div class="char-menu-header">
-                    <span class="char-avatar-icon">🌾</span>
-                    <div>
-                        <h2 class="char-menu-title text-sky-400">दाऊ बलराम (Dao Balaram)</h2>
-                        <p class="char-menu-subtitle">"Chhote Sakha! Where shall we guide the cows and friends today?"</p>
+                        <button id="optCompassToggle" onclick="toggleCompassSetting()" class="opt-toggle-btn on">ON</button>
                     </div>
-                    <button onclick="closeBalramMenu()" class="opt-close-btn">✕</button>
-                </div>
-
-                <div class="char-options-grid">
-                    <button onclick="travelFromBalram('vrindavan')" class="char-option-card">
-                        <span class="char-option-icon">🌳</span>
-                        <div class="char-option-info">
-                            <h4>Vrindavan Pastures (वृन्दावन गोचारण)</h4>
-                            <p>Ancient Kadamba tree, Kamal Sarovar lotus pond, and peaceful cow grazing.</p>
-                        </div>
-                    </button>
-
-                    <button onclick="travelFromBalram('yamuna')" class="char-option-card">
-                        <span class="char-option-icon">🏐</span>
-                        <div class="char-option-info">
-                            <h4>Yamuna Sandbanks (यमुना तट)</h4>
-                            <p>Transcendental river sands, palms, and the Kanduka Kridha volleyball court.</p>
-                        </div>
-                    </button>
-
-                    <button onclick="travelFromBalram('govardhan')" class="char-option-card">
-                        <span class="char-option-icon">⛰️</span>
-                        <div class="char-option-info">
-                            <h4>Govardhan Foothills (गिरिराज गोवर्धन)</h4>
-                            <p>Sacred Govardhan hill, holy Mansi Ganga springs, and luscious mango groves.</p>
-                        </div>
-                    </button>
-
-                    <button onclick="offerToBalram('fruit')" class="char-option-card">
-                        <span class="char-option-icon">🥭</span>
-                        <div class="char-option-info">
-                            <h4>Share Sweet Mangoes with Dao Dada</h4>
-                            <p>Offer juicy sweet Vrindavan forest mangoes for nourishing strength.</p>
-                        </div>
-                    </button>
-
-                    <button onclick="offerToBalram('water')" class="char-option-card">
-                        <span class="char-option-icon">💧</span>
-                        <div class="char-option-info">
-                            <h4>Offer Pure Yamuna Jal</h4>
-                            <p>Offer cool refreshing sacred river water after tending the cows.</p>
-                        </div>
-                    </button>
-                </div>
-
-                <div class="char-menu-footer">
-                    <button onclick="closeBalramMenu()" class="modal-close-btn">Stay in Present Dham</button>
                 </div>
             </div>
         </div>

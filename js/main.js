@@ -53,8 +53,15 @@ window.addEventListener('DOMContentLoaded', () => {
         game.sound.togglePortrait();
         game.ui.updateOptionsUI();
     };
+    window.toggleMinimapSetting = () => {
+        game.toggleMinimap();
+    };
+    window.toggleCompassSetting = () => {
+        game.toggleCompass();
+    };
 
-    // Shree Krishna Pastimes Modal
+    // Shree Krishna Pastimes & Character Dialogues
+    window.closeDialogue = () => game.ui.closeDialogue();
     window.openKrishnaMenu = () => game.ui.openKrishnaMenu();
     window.closeKrishnaMenu = () => game.ui.closeKrishnaMenu();
     window.startPastimeFromKrishna = (mode) => game.startPastimeFromKrishna(mode);

@@ -9,15 +9,15 @@ export class SoundManager {
         this.ambientPlaying = false;
         this.ambientGain = null;
 
-        // Bhajan Playlist
+        // Bhajan Playlist - Clean numbered titles
         this.bhajanTracks = [
-            { id: 1, title: "Vrindavan Dhun 1", file: "assets/audio/bhajan 1.mp3" },
-            { id: 2, title: "Radhe Govinda 2", file: "assets/audio/bhajan 2.mp3" },
-            { id: 3, title: "Madhurashtakam 3", file: "assets/audio/bhajan 3.mp3" },
-            { id: 4, title: "Gopala Hari 4", file: "assets/audio/bhajan 4.mp3" },
-            { id: 5, title: "Yamuna Kinare 5", file: "assets/audio/bhajan 5.mp3" },
-            { id: 6, title: "Maha Mantra 6", file: "assets/audio/bhajan 6.mp3" },
-            { id: 7, title: "Shyam Sundar 7", file: "assets/audio/bhajan 7.mp3" }
+            { id: 1, title: "Bhajan 1", file: "assets/audio/bhajan 1.mp3" },
+            { id: 2, title: "Bhajan 2", file: "assets/audio/bhajan 2.mp3" },
+            { id: 3, title: "Bhajan 3", file: "assets/audio/bhajan 3.mp3" },
+            { id: 4, title: "Bhajan 4", file: "assets/audio/bhajan 4.mp3" },
+            { id: 5, title: "Bhajan 5", file: "assets/audio/bhajan 5.mp3" },
+            { id: 6, title: "Bhajan 6", file: "assets/audio/bhajan 6.mp3" },
+            { id: 7, title: "Bhajan 7", file: "assets/audio/bhajan 7.mp3" }
         ];
 
         this.currentTrackIndex = 0;
@@ -32,6 +32,8 @@ export class SoundManager {
         this.sfxEnabled = true;
         this.textSpeed = 'FAST';
         this.bigPortrait = true;
+        this.minimapEnabled = true;
+        this.compassEnabled = true;
 
         this.setupAudioListeners();
     }
@@ -171,11 +173,21 @@ export class SoundManager {
         const curTrack = track || this.bhajanTracks[this.currentTrackIndex];
 
         if (titleEl) {
-            titleEl.innerText = this.isMusicPlaying ? curTrack.title : 'Paused';
+            titleEl.innerText = this.isMusicPlaying ? `Bhajan ${curTrack.id}` : 'Paused';
         }
         if (optTrackBtn) {
-            optTrackBtn.innerText = `BHAJAN ${curTrack.id} - ${curTrack.title.toUpperCase()}`;
+            optTrackBtn.innerText = `BHAJAN ${curTrack.id}`;
         }
+    }
+
+    toggleMinimap() {
+        this.minimapEnabled = !this.minimapEnabled;
+        return this.minimapEnabled;
+    }
+
+    toggleCompass() {
+        this.compassEnabled = !this.compassEnabled;
+        return this.compassEnabled;
     }
 
     /**

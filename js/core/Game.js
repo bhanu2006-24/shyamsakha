@@ -220,17 +220,7 @@ export class Game {
 
             // 'M' key: Toggle Minimap Radar
             if (e.key === 'm' || e.key === 'M') {
-                const mmContainer = document.getElementById('minimapContainer');
-                const reopenBtn = document.getElementById('reopenMinimapBtn');
-                if (mmContainer) {
-                    if (mmContainer.classList.contains('collapsed')) {
-                        mmContainer.classList.remove('collapsed');
-                        if (reopenBtn) reopenBtn.classList.add('hidden');
-                    } else {
-                        mmContainer.classList.add('collapsed');
-                        if (reopenBtn) reopenBtn.classList.remove('hidden');
-                    }
-                }
+                this.toggleMinimap();
             }
         });
 
@@ -390,21 +380,13 @@ export class Game {
             this.sound.playSplash();
             this.ui.showToast("+1 Cool Yamuna Jal collected in pot! 💧");
         } else if (target.type === 'cow') {
-            this.sound.playCowBell();
-            this.particles.createSparkle(target.obj.x, target.obj.y - 15, '#f472b6', 20);
-            if (this.inventory.fruits > 0) {
-                this.inventory.fruits--;
-                this.inventory.butter++;
-                this.ui.showToast("🐮 You fed Gau Mata a sweet mango! She gifted you fresh Makhan! 🍯");
-            } else {
-                this.ui.showToast("🐮 Gau Mata nuzzles you gently with divine affection! ❤️");
-            }
+            this.ui.startDialogueWithCow(target.obj);
         } else if (target.type === 'krishna') {
-            this.ui.openKrishnaMenu();
+            this.ui.startDialogueWithKrishna();
         } else if (target.type === 'balram') {
-            this.ui.openBalramMenu();
+            this.ui.startDialogueWithBalram();
         } else if (target.type === 'sakha') {
-            this.ui.showDialogue(target.obj.name, target.obj.dialogue, '🌿', 'text-yellow-400');
+            this.ui.startDialogueWithSakha(target.obj);
         }
 
         this.ui.updateBagUI(this.inventory);
@@ -428,29 +410,29 @@ export class Game {
         if (item === 'butter') {
             if ((this.inventory.butter || 0) > 0) {
                 this.inventory.butter--;
-                this.ui.showDialogue("Krishna", "Aha! Fresh churned Makhan! You are truly my dearest Sakha in all the three worlds!", "🍯", "text-yellow-400");
                 this.particles.createSparkle(this.krishna.x, this.krishna.y - 30, '#fef08a', 45);
                 this.sound.playCheer();
+                this.ui.startDialogueWithKrishna("Aha! Sweet freshly churned butter from Maiya! Nothing in all three worlds brings Me greater joy, my beloved Sakha! Take some to share with everyone!");
             } else {
                 this.ui.showToast("No Makhan in pot! Feed Gau Mata a mango to churn fresh butter! 🐮");
             }
         } else if (item === 'garland') {
             if ((this.inventory.garlands || 0) > 0) {
                 this.inventory.garlands--;
-                this.ui.showDialogue("Krishna", "This sacred Vaijayanti garland smells of the divine love of Vrindavan! How lovingly you strung it!", "📿", "text-blue-400");
                 this.particles.createPetals(this.krishna.x, this.krishna.y - 20, '#f472b6', 50);
                 this.sound.playCheer();
+                this.ui.startDialogueWithKrishna("This sacred Vaijayanti garland smells of the divine love of Vrindavan! How lovingly you strung it!");
             } else {
                 this.ui.showToast("String a Vaijayanti Garland in your Sakha Potli (Bag) first! 📿");
             }
         } else if (item === 'lotus') {
             if ((this.inventory.lotus || 0) > 0) {
                 this.inventory.lotus--;
-                this.ui.showDialogue("Krishna", "A fresh lotus from the Yamuna lily pond! Pure and blooming like your loving heart, Sakha.", "🪷", "text-blue-400");
                 this.particles.createPetals(this.krishna.x, this.krishna.y - 20, '#38bdf8', 40);
                 this.sound.playCheer();
+                this.ui.startDialogueWithKrishna("A fresh blooming lotus from the Kamal Sarovar pond! Pure and blooming like your loving heart, Sakha.");
             } else {
-                this.ui.showToast("Gather a blooming lotus from the Kamal Sarovar pond first! 🪷");
+                this.ui.showToast("Gather a blooming lotus from the Kamal Sarovar lily pond first! 🪷");
             }
         }
         this.ui.updateBagUI(this.inventory);
@@ -460,18 +442,18 @@ export class Game {
         if (item === 'fruit') {
             if ((this.inventory.fruits || 0) > 0) {
                 this.inventory.fruits--;
-                this.ui.showDialogue("Dao Balaram", "These juicy Vrindavan mangoes give immense strength! Well gathered, little brother!", "🥭", "text-white");
                 this.particles.createPetals(this.balram.x, this.balram.y - 30, '#facc15', 35);
                 this.sound.playCheer();
+                this.ui.startDialogueWithBalram("These juicy Vrindavan mangoes give immense strength! Well gathered, little brother!");
             } else {
                 this.ui.showToast("Pick some sweet mangoes from the trees first! 🥭");
             }
         } else if (item === 'water') {
             if ((this.inventory.water || 0) > 0) {
                 this.inventory.water--;
-                this.ui.showDialogue("Dao Balaram", "Cool Yamuna Jal is nectar after herding the cows through the pastures!", "💧", "text-white");
                 this.particles.createDust(this.balram.x, this.balram.y - 20, '#38bdf8', 30);
                 this.sound.playSplash();
+                this.ui.startDialogueWithBalram("Cool Yamuna Jal is nectar after herding the cows through the pastures!");
             } else {
                 this.ui.showToast("Fill water from the Yamuna river first! 💧");
             }
@@ -658,17 +640,199 @@ export class Game {
 
         ctx.restore();
 
-        // 7. Minimap
-        this.minimap.draw(
-            this.mapManager.currentMap,
-            this.camera,
-            this.player,
-            this.krishna,
-            this.balram,
-            this.sakhas,
-            this.cows,
-            this.mapManager.getObstacles()
-        );
+        // 7. Continuous Target Directional Cursors for Krishna & Balram (Off-Screen Radar Tracker)
+        if (this.sound && this.sound.compassEnabled) {
+            this.drawDirectionalPointers(ctx);
+        }
+
+        // 8. Minimap (if enabled)
+        if (this.sound && this.sound.minimapEnabled) {
+            this.minimap.draw(
+                this.mapManager.currentMap,
+                this.camera,
+                this.player,
+                this.krishna,
+                this.balram,
+                this.sakhas,
+                this.cows,
+                this.mapManager.getObstacles()
+            );
+        }
+    }
+
+    toggleMinimap() {
+        this.sound.toggleMinimap();
+        const mmContainer = document.getElementById('minimapContainer');
+        const reopenBtn = document.getElementById('reopenMinimapBtn');
+        if (this.sound.minimapEnabled) {
+            if (mmContainer) mmContainer.classList.remove('collapsed');
+            if (reopenBtn) reopenBtn.classList.add('hidden');
+            this.ui.showToast("🗺️ Radar Map enabled");
+        } else {
+            if (mmContainer) mmContainer.classList.add('collapsed');
+            if (reopenBtn) reopenBtn.classList.add('hidden');
+            this.ui.showToast("🗺️ Radar Map hidden");
+        }
+        this.ui.updateOptionsUI();
+    }
+
+    toggleCompass() {
+        this.sound.toggleCompass();
+        this.ui.showToast(this.sound.compassEnabled ? "🧭 Target Pointers enabled" : "🧭 Target Pointers disabled");
+        this.ui.updateOptionsUI();
+    }
+
+    drawDirectionalPointers(ctx) {
+        if (!this.player) return;
+
+        // Krishna and Balram continuous pointers
+        // Active during Tag, Holi, or anytime they are off-screen
+        let krishnaIndicator = null;
+        let balramIndicator = null;
+
+        if (this.krishna && !this.krishna.isCaught) {
+            krishnaIndicator = this.getOffscreenPosition(this.krishna);
+        }
+
+        if (this.balram && !this.balram.isCaught) {
+            balramIndicator = this.getOffscreenPosition(this.balram);
+        }
+
+        // If both indicators land too close on screen edge, slightly separate them so they don't overlap
+        if (krishnaIndicator && balramIndicator) {
+            const dist = Math.hypot(krishnaIndicator.x - balramIndicator.x, krishnaIndicator.y - balramIndicator.y);
+            if (dist < 48) {
+                const nx = -(krishnaIndicator.y - this.canvas.height / 2);
+                const ny = krishnaIndicator.x - this.canvas.width / 2;
+                const len = Math.hypot(nx, ny) || 1;
+                balramIndicator.x += (nx / len) * 26;
+                balramIndicator.y += (ny / len) * 26;
+            }
+        }
+
+        if (krishnaIndicator) {
+            this.drawIndicatorBadge(ctx, krishnaIndicator, 'Krishna', '🦚', '#facc15', '#00f0ff');
+        }
+
+        if (balramIndicator) {
+            this.drawIndicatorBadge(ctx, balramIndicator, 'Balram', '🌾', '#ffffff', '#38bdf8');
+        }
+    }
+
+    getOffscreenPosition(target) {
+        if (!target) return null;
+
+        const w = this.canvas.width;
+        const h = this.canvas.height;
+        const screenX = target.x - this.camera.x;
+        const screenY = target.y - this.camera.y;
+
+        // On-screen boundary check (with comfortable margin)
+        const pad = 45;
+        if (screenX >= pad && screenX <= w - pad && screenY >= pad && screenY <= h - pad) {
+            return null; // On-screen! No edge pointer needed
+        }
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const dx = screenX - cx;
+        const dy = screenY - cy;
+        const angle = Math.atan2(dy, dx);
+
+        const dist = Math.hypot(this.player.x - target.x, this.player.y - target.y);
+        const distPaces = Math.max(1, Math.round(dist / 32));
+
+        // Edge padding for pointer badge
+        const edgePad = 52;
+        const halfW = w / 2 - edgePad;
+        const halfH = h / 2 - edgePad;
+
+        const tX = dx !== 0 ? Math.abs(halfW / dx) : Infinity;
+        const tY = dy !== 0 ? Math.abs(halfH / dy) : Infinity;
+        const t = Math.min(tX, tY);
+
+        return {
+            x: cx + dx * t,
+            y: cy + dy * t,
+            angle: angle,
+            distPaces: distPaces
+        };
+    }
+
+    drawIndicatorBadge(ctx, pos, label, icon, primaryColor, glowColor) {
+        const h = this.canvas.height;
+        ctx.save();
+        ctx.translate(pos.x, pos.y);
+
+        const pulseTime = (Date.now() % 1200) / 1200;
+
+        // 1. Radar Sonic Wave radiating outward in target direction
+        ctx.save();
+        ctx.rotate(pos.angle);
+        ctx.strokeStyle = `rgba(250, 204, 21, ${0.85 * (1 - pulseTime)})`;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(18 + pulseTime * 12, 0);
+        ctx.lineTo(8 + pulseTime * 12, -9);
+        ctx.lineTo(8 + pulseTime * 12, 9);
+        ctx.closePath();
+        ctx.stroke();
+
+        // 2. Solid Direction Chevron Arrow pointing outward
+        ctx.fillStyle = primaryColor;
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(20, 0);
+        ctx.lineTo(8, -10);
+        ctx.lineTo(11, 0);
+        ctx.lineTo(8, 10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+
+        // 3. Circular Badge with Avatar Icon
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 16;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, 19, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '16px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(icon, 0, 1);
+
+        // 4. Compact Name & Distance Tag (e.g. "Krishna 24m")
+        ctx.shadowBlur = 0;
+        const tagText = `${label} ${pos.distPaces}m`;
+        ctx.font = 'bold 11px Outfit, monospace, sans-serif';
+        const tagMetrics = ctx.measureText(tagText);
+        const tagW = tagMetrics.width + 12;
+        const tagH = 18;
+
+        // Offset tag away from screen edge so it's always readable
+        let tagOffsetY = 26;
+        if (pos.y > h - 70) tagOffsetY = -26;
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        ctx.strokeStyle = glowColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(-tagW / 2, tagOffsetY - tagH / 2, tagW, tagH, 5);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tagText, 0, tagOffsetY);
+
+        ctx.restore();
     }
 
     gameLoop(timestamp) {
