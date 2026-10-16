@@ -94,11 +94,23 @@ export class VrindavanPastures {
             });
         });
 
-        // 3. Flower Gardens (Lotus & Marigold flower bushes at the meadow perimeter)
+        // 3. Sacred Kamal Sarovar (Lotus Pond with blooming lotuses & lily pads in the water)
+        this.obstacles.push({
+            shape: 'circle',
+            type: 'pond',
+            x: this.centerX - 310,
+            y: this.centerY + 160,
+            radius: 54,
+            visualRadius: 80,
+            hasResource: 'lotus',
+            resourceRegenTimer: 0
+        });
+
+        // 4. Flower Bushes (Fragrant wild Jasmine / Malati / Parijat bush blossoms)
         const flowerBushLocations = [
             { x: this.centerX - 240, y: this.centerY + 10, r: 36 },
             { x: this.centerX + 240, y: this.centerY + 15, r: 36 },
-            { x: this.centerX - 210, y: this.centerY + 210, r: 38 },
+            { x: this.centerX - 210, y: this.centerY + 240, r: 38 },
             { x: this.centerX + 210, y: this.centerY + 200, r: 38 },
             { x: this.width - this.riverWidth - 130, y: this.centerY - 220, r: 42 },
             { x: this.width - this.riverWidth - 110, y: this.centerY + 70, r: 40 },
@@ -118,7 +130,7 @@ export class VrindavanPastures {
             });
         });
 
-        // 4. Natural Rocks & Varied Trees scattered across outer pastures
+        // 5. Natural Rocks & Varied Trees scattered across outer pastures
         const natureCount = 65;
         const treeTypesPool = ['mango', 'banyan', 'parijat', 'palm', 'kadamba'];
         for (let i = 0; i < natureCount; i++) {
@@ -157,6 +169,7 @@ export class VrindavanPastures {
                 obs.resourceRegenTimer -= dt;
                 if (obs.resourceRegenTimer <= 0) {
                     if (obs.type === 'bush') obs.hasResource = 'flower';
+                    if (obs.type === 'pond') obs.hasResource = 'lotus';
                     if (obs.type === 'tree' && obs.treeType === 'mango') obs.hasResource = 'fruit';
                     if (obs.type === 'tree' && obs.treeType === 'parijat') obs.hasResource = 'flower';
                 }
@@ -244,6 +257,10 @@ export class VrindavanPastures {
                 ctx.arc(this.centerX + f.dx, clearingY + f.dy, 2.5, 0, Math.PI * 2);
                 ctx.fill();
             }
+
+            // 3. Decorated Divine Resting Asana (Peetambari silk carpet, bolsters, and Makhan handi)
+            TreeRenderer.drawDivineAsana(ctx, this.centerX, this.centerY + 40);
+
             ctx.restore();
         }
 
@@ -272,12 +289,51 @@ export class VrindavanPastures {
     }
 
     drawProps(ctx, camera) {
-        // Draw Trunks, Roots, Rocks, Bushes, and Flower blossoms
+        // Draw Trunks, Roots, Rocks, Bushes, Lotus Pond, and Flower blossoms
         for (const obs of this.obstacles) {
             if (!camera.isInView(obs.x, obs.y, obs.visualRadius || obs.w)) continue;
 
             if (obs.type === 'tree' || obs.type === 'kadamba') {
                 TreeRenderer.drawTrunk(ctx, obs);
+            } else if (obs.type === 'pond') {
+                ctx.save();
+                // Pebble bank border
+                ctx.fillStyle = '#94a3b8';
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Clear sacred lotus pond water
+                const waterGrad = ctx.createRadialGradient(obs.x, obs.y, 10, obs.x, obs.y, obs.visualRadius - 6);
+                waterGrad.addColorStop(0, '#60a5fa');
+                waterGrad.addColorStop(0.7, '#2563eb');
+                waterGrad.addColorStop(1, '#1d4ed8');
+                ctx.fillStyle = waterGrad;
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.visualRadius - 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Gentle water sheen
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(obs.x - 12, obs.y - 12, obs.visualRadius * 0.45, 0.9 * Math.PI, 1.4 * Math.PI);
+                ctx.stroke();
+
+                // Floating Lily pads and blooming Sacred Lotuses
+                const pondLotuses = [
+                    { dx: -24, dy: -14 },
+                    { dx: 22, dy: -18 },
+                    { dx: -18, dy: 24 },
+                    { dx: 26, dy: 20 },
+                    { dx: 2, dy: 6 }
+                ];
+                pondLotuses.forEach((lp, idx) => {
+                    const hasBloom = obs.hasResource === 'lotus' || idx < 3;
+                    TreeRenderer.drawLilyPadLotus(ctx, obs.x + lp.dx, obs.y + lp.dy, hasBloom);
+                });
+
+                ctx.restore();
             } else if (obs.type === 'rock') {
                 ctx.save();
                 // Boulder shadow
@@ -316,7 +372,7 @@ export class VrindavanPastures {
                 ctx.arc(obs.x - 3, obs.y - 4, obs.visualRadius * 0.75, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Blooming Lotus / Marigold Flowers
+                // Fragrant Wild Forest Jasmine / Malati Blossoms on bushes
                 if (obs.hasResource === 'flower') {
                     const flowerOffsets = [
                         { dx: -obs.visualRadius * 0.35, dy: -obs.visualRadius * 0.2 },
@@ -325,7 +381,7 @@ export class VrindavanPastures {
                     ];
 
                     flowerOffsets.forEach(pt => {
-                        TreeRenderer.drawLotusFlower(ctx, obs.x + pt.dx, obs.y + pt.dy);
+                        TreeRenderer.drawForestBlossoms(ctx, obs.x + pt.dx, obs.y + pt.dy);
                     });
                 }
                 ctx.restore();

@@ -12,8 +12,8 @@ export class Entity {
         this.currentSpeed = (minSpeed + maxSpeed) / 2;
         this.type = type;
         
-        this.dx = 1;
-        this.dy = 0;
+        this.dx = 0;
+        this.dy = 1;
         this.wanderAngle = Math.random() * Math.PI * 2;
         
         this.isCaught = false;

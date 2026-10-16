@@ -23,8 +23,15 @@ export class SoundManager {
         this.currentTrackIndex = 0;
         this.audioEl = new Audio();
         this.audioEl.preload = 'metadata';
-        this.audioEl.volume = 0.45;
+        this.musicVolume = 1.0;
+        this.audioEl.volume = this.musicVolume;
         this.isMusicPlaying = false;
+
+        // Settings
+        this.bgmEnabled = true;
+        this.sfxEnabled = true;
+        this.textSpeed = 'FAST';
+        this.bigPortrait = true;
 
         this.setupAudioListeners();
     }
@@ -51,12 +58,59 @@ export class SoundManager {
         }
     }
 
+    setMusicVolume(volPercent) {
+        this.musicVolume = Math.max(0, Math.min(100, volPercent)) / 100;
+        this.audioEl.volume = this.musicVolume;
+        return Math.round(this.musicVolume * 100);
+    }
+
+    adjustVolume(delta) {
+        const curPct = Math.round(this.musicVolume * 100);
+        return this.setMusicVolume(curPct + delta);
+    }
+
+    toggleBgm() {
+        this.bgmEnabled = !this.bgmEnabled;
+        if (!this.bgmEnabled) {
+            this.pauseBhajan();
+        } else {
+            this.playBhajan(this.currentTrackIndex);
+        }
+        return this.bgmEnabled;
+    }
+
+    cycleBhajanTrack() {
+        const nextIdx = (this.currentTrackIndex + 1) % this.bhajanTracks.length;
+        if (this.bgmEnabled) {
+            this.playBhajan(nextIdx);
+        } else {
+            this.currentTrackIndex = nextIdx;
+            this.notifyTrackChange(this.bhajanTracks[nextIdx]);
+        }
+        return this.bhajanTracks[this.currentTrackIndex];
+    }
+
+    toggleSfx() {
+        this.sfxEnabled = !this.sfxEnabled;
+        return this.sfxEnabled;
+    }
+
+    toggleTextSpeed() {
+        this.textSpeed = this.textSpeed === 'FAST' ? 'NORMAL' : 'FAST';
+        return this.textSpeed;
+    }
+
+    togglePortrait() {
+        this.bigPortrait = !this.bigPortrait;
+        return this.bigPortrait;
+    }
+
     toggle() {
         this.enabled = !this.enabled;
         if (!this.enabled) {
             this.pauseBhajan();
         } else {
-            if (this.isMusicPlaying) {
+            if (this.bgmEnabled) {
                 this.playBhajan(this.currentTrackIndex);
             }
         }
@@ -77,13 +131,14 @@ export class SoundManager {
     }
 
     playBhajan(index = 0) {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.bgmEnabled) return;
         this.init();
 
         this.currentTrackIndex = (index + this.bhajanTracks.length) % this.bhajanTracks.length;
         const track = this.bhajanTracks[this.currentTrackIndex];
 
         this.audioEl.src = encodeURI(track.file);
+        this.audioEl.volume = this.musicVolume;
         this.audioEl.play()
             .then(() => {
                 this.isMusicPlaying = true;
@@ -112,21 +167,14 @@ export class SoundManager {
 
     notifyTrackChange(track) {
         const titleEl = document.getElementById('nowPlayingTitle');
-        const playBtn = document.getElementById('bhajanPlayBtn');
-        const bhajanBar = document.getElementById('bhajanPlayerUI');
+        const optTrackBtn = document.getElementById('optTrackBtn');
+        const curTrack = track || this.bhajanTracks[this.currentTrackIndex];
 
         if (titleEl) {
-            titleEl.innerText = track ? track.title : 'Play Bhajan';
+            titleEl.innerText = this.isMusicPlaying ? curTrack.title : 'Paused';
         }
-        if (playBtn) {
-            playBtn.innerHTML = this.isMusicPlaying ? '⏸️' : '▶️';
-        }
-        if (bhajanBar) {
-            if (this.isMusicPlaying) {
-                bhajanBar.classList.add('playing');
-            } else {
-                bhajanBar.classList.remove('playing');
-            }
+        if (optTrackBtn) {
+            optTrackBtn.innerText = `BHAJAN ${curTrack.id} - ${curTrack.title.toUpperCase()}`;
         }
     }
 
@@ -134,7 +182,7 @@ export class SoundManager {
      * Play a Divine Bansuri Flute note
      */
     playFluteNote(freq = 587.33, duration = 0.8) {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         this.init();
         if (!this.ctx) return;
 
@@ -171,7 +219,7 @@ export class SoundManager {
     }
 
     playDivineFlutePhrase() {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         const melody = [
             { f: 369.99, d: 0.35, wait: 0 },
             { f: 440.00, d: 0.35, wait: 280 },
@@ -189,7 +237,7 @@ export class SoundManager {
     }
 
     playBallHit(isSpike = false) {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         this.init();
         if (!this.ctx) return;
 
@@ -212,7 +260,7 @@ export class SoundManager {
     }
 
     playBallBounce() {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         this.init();
         if (!this.ctx) return;
 
@@ -235,7 +283,7 @@ export class SoundManager {
     }
 
     playSplash() {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         this.init();
         if (!this.ctx) return;
 
@@ -267,13 +315,31 @@ export class SoundManager {
     }
 
     playCheer() {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.sfxEnabled) return;
         const notes = [523.25, 659.25, 783.99, 1046.50];
         notes.forEach((f, idx) => {
             setTimeout(() => {
                 this.playFluteNote(f, 0.4);
             }, idx * 90);
         });
+    }
+
+    playCowBell() {
+        if (!this.enabled || !this.sfxEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(820, now);
+        osc.frequency.exponentialRampToValueAtTime(520, now + 0.25);
+        gain.gain.setValueAtTime(0.28, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.32);
     }
 }
 

@@ -75,7 +75,11 @@ export class AssetLoader {
         const sw = 1024;
         const sh = 1024;
 
-        if (Math.abs(dx) > Math.abs(dy)) {
+        if (!isMoving) {
+            // Idle / Resting pose: always face FRONT (Top-Left quadrant)
+            sx = 0;
+            sy = 0;
+        } else if (Math.abs(dx) > Math.abs(dy)) {
             if (dx < 0) {
                 // Facing LEFT -> Bottom-Left quadrant
                 sx = 0;

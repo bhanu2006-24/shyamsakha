@@ -6,16 +6,68 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Global action helpers for modal onclick handlers
     window.talkToFriends = () => game.talkToFriends();
-    window.offerItem = (item) => game.offerItem(item);
-    window.openGameChoice = () => game.ui.openGameChoice();
-    window.closeInteractionMenu = () => game.ui.closeInteractionMenu();
-    window.closeGameChoice = () => game.ui.closeGameChoice();
     window.startGameMode = (mode) => game.startGameMode(mode);
-    window.closeMapModal = () => game.ui.closeMapModal();
-    window.selectMap = (mapKey) => {
-        game.loadMap(mapKey);
-        game.ui.closeMapModal();
-    };
-    window.closeHelpModal = () => game.ui.closeHelp();
     window.returnToHub = () => game.returnToHub();
+
+    // Sakha Potli (Bag) Modals & Actions
+    window.openBagModal = () => game.ui.openBagModal();
+    window.closeBagModal = () => game.ui.closeBagModal();
+    window.selectBagItem = (key) => game.ui.selectBagItem(key);
+    window.craftGarland = () => game.craftGarland();
+    window.offerFromPotli = (item) => {
+        if (item === 'fruit' || item === 'water') {
+            game.offerToBalram(item);
+        } else {
+            game.offerToKrishna(item);
+        }
+    };
+
+    // Options & Audio Modal Actions
+    window.openOptionsModal = () => game.ui.openOptionsModal();
+    window.closeOptionsModal = () => game.ui.closeOptionsModal();
+    window.setMusicVolume = (vol) => {
+        game.sound.setMusicVolume(vol);
+        game.ui.updateOptionsUI();
+    };
+    window.adjustVolume = (delta) => {
+        game.sound.adjustVolume(delta);
+        game.ui.updateOptionsUI();
+    };
+    window.toggleBgm = () => {
+        game.sound.toggleBgm();
+        game.ui.updateOptionsUI();
+    };
+    window.cycleBhajanTrack = () => {
+        game.sound.cycleBhajanTrack();
+        game.ui.updateOptionsUI();
+    };
+    window.toggleSfx = () => {
+        game.sound.toggleSfx();
+        game.ui.updateOptionsUI();
+    };
+    window.toggleTextSpeed = () => {
+        game.sound.toggleTextSpeed();
+        game.ui.updateOptionsUI();
+    };
+    window.togglePortrait = () => {
+        game.sound.togglePortrait();
+        game.ui.updateOptionsUI();
+    };
+
+    // Shree Krishna Pastimes Modal
+    window.openKrishnaMenu = () => game.ui.openKrishnaMenu();
+    window.closeKrishnaMenu = () => game.ui.closeKrishnaMenu();
+    window.startPastimeFromKrishna = (mode) => game.startPastimeFromKrishna(mode);
+    window.offerToKrishna = (item) => game.offerToKrishna(item);
+    window.playKrishnaFluteSong = () => game.playFluteMelody();
+
+    // Dao Balaram Sacred Map Travel Modal
+    window.openBalramMenu = () => game.ui.openBalramMenu();
+    window.closeBalramMenu = () => game.ui.closeBalramMenu();
+    window.travelFromBalram = (mapKey) => game.travelFromBalram(mapKey);
+    window.offerToBalram = (item) => game.offerToBalram(item);
+
+    // Help & Guide Modal
+    window.openHelpModal = () => game.ui.openHelp();
+    window.closeHelpModal = () => game.ui.closeHelp();
 });

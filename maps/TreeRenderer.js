@@ -450,6 +450,235 @@ export class TreeRenderer {
     }
 
     /**
+     * Wild Forest Jasmine / Chameli Blossoms on bushes (वन पुष्प)
+     */
+    static drawForestBlossoms(ctx, x, y) {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+
+        // 5 delicate white wild petals
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * Math.PI * 2) / 5 - Math.PI / 2;
+            const px = x + Math.cos(angle) * 4.5;
+            const py = y + Math.sin(angle) * 4.5;
+            ctx.beginPath();
+            ctx.arc(px, py, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Golden center stamen
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    /**
+     * Water Lily Pad with Floating Sacred Lotus (कमल व कुमुदिनी)
+     */
+    static drawLilyPadLotus(ctx, x, y, hasFlower = true) {
+        ctx.save();
+
+        // 1. Lily Pad Leaf on Water
+        ctx.fillStyle = '#166534';
+        ctx.beginPath();
+        ctx.arc(x, y, 16, 0.25 * Math.PI, 1.85 * Math.PI); // Notch in pad
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.fill();
+
+        // Leaf veins
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 10, y - 8);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 9, y - 9);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - 11, y + 6);
+        ctx.stroke();
+
+        // 2. Blooming Sacred Pink Lotus on pad
+        if (hasFlower) {
+            TreeRenderer.drawLotusFlower(ctx, x + 2, y - 1);
+        }
+
+        ctx.restore();
+    }
+
+    /**
+     * Divine Decorated Resting Asana (गोपाल विश्राम आसन)
+     * Royal silk carpet, velvet bolsters, fresh Makhan Handi, and flower petals
+     * where Shree Krishna and Dao Balaram sit peacefully in the Vrindavan hub
+     */
+    static drawDivineAsana(ctx, cx, cy) {
+        ctx.save();
+
+        // 1. Royal Peetambari Silk Carpet / Asana
+        const carpetW = 220;
+        const carpetH = 95;
+        const carpetX = cx - carpetW / 2;
+        const carpetY = cy - 25;
+
+        // Shadow under the carpet
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 26, carpetW * 0.52, carpetH * 0.42, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Base Carpet Fabric (Vibrant saffron-amber silk)
+        const carpetGrad = ctx.createLinearGradient(carpetX, carpetY, carpetX + carpetW, carpetY + carpetH);
+        carpetGrad.addColorStop(0, '#b45309');
+        carpetGrad.addColorStop(0.5, '#d97706');
+        carpetGrad.addColorStop(1, '#92400e');
+        ctx.fillStyle = carpetGrad;
+
+        // Rounded carpet rectangle
+        ctx.beginPath();
+        ctx.roundRect(carpetX, carpetY, carpetW, carpetH, 18);
+        ctx.fill();
+
+        // Golden Embroidered Borders & Vedic Lotus Motif
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.6)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(carpetX + 6, carpetY + 6, carpetW - 12, carpetH - 12, 12);
+        ctx.stroke();
+
+        // Diamond weave embroidery pattern
+        ctx.strokeStyle = 'rgba(253, 224, 71, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let ix = carpetX + 25; ix < carpetX + carpetW - 20; ix += 25) {
+            ctx.moveTo(ix, carpetY + 8);
+            ctx.lineTo(ix, carpetY + carpetH - 8);
+        }
+        ctx.stroke();
+
+        // Four Golden Silk Corner Tassels
+        const corners = [
+            [carpetX + 4, carpetY + 4],
+            [carpetX + carpetW - 4, carpetY + 4],
+            [carpetX + 4, carpetY + carpetH - 4],
+            [carpetX + carpetW - 4, carpetY + carpetH - 4]
+        ];
+        ctx.fillStyle = '#fde047';
+        for (const [tx, ty] of corners) {
+            ctx.beginPath();
+            ctx.arc(tx, ty, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 2. Royal Silk Bolsters (गद्दी / तकिया)
+        // Left Bolster for Dao Balram (White/Silver silk with blue piping)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+        ctx.beginPath();
+        ctx.ellipse(cx - 58, cy + 2, 28, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.roundRect(cx - 86, cy - 14, 56, 24, 12);
+        ctx.fill();
+        ctx.strokeStyle = '#0284c7';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Right Bolster for Shree Krishna (Royal Blue silk with gold piping)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+        ctx.beginPath();
+        ctx.ellipse(cx + 58, cy + 2, 28, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#1e3a8a';
+        ctx.beginPath();
+        ctx.roundRect(cx + 30, cy - 14, 56, 24, 12);
+        ctx.fill();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // 3. Earthen Butter Pot (माखन की मटकी / Handi) in Center
+        const potX = cx;
+        const potY = cy - 2;
+
+        // Pot Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+        ctx.beginPath();
+        ctx.ellipse(potX, potY + 12, 14, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Terracotta Handi body
+        const potGrad = ctx.createRadialGradient(potX - 4, potY - 2, 2, potX, potY, 15);
+        potGrad.addColorStop(0, '#ea580c');
+        potGrad.addColorStop(0.7, '#c2410c');
+        potGrad.addColorStop(1, '#7c2d12');
+        ctx.fillStyle = potGrad;
+        ctx.beginPath();
+        ctx.arc(potX, potY, 13, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Sacred Red Mauli string wrapped around the handi
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(potX, potY, 13, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.stroke();
+
+        // Creamy White Butter overflowing rim with Tulsi leaf
+        ctx.fillStyle = '#fffbeb';
+        ctx.beginPath();
+        ctx.ellipse(potX, potY - 11, 10, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fresh Tulsi leaf on butter
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.ellipse(potX + 2, potY - 12, 4, 2, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. Brass Thali with Sweet Mangoes
+        const thaliX = cx + 88;
+        const thaliY = cy + 18;
+        ctx.fillStyle = '#eab308';
+        ctx.beginPath();
+        ctx.ellipse(thaliX, thaliY, 16, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ca8a04';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Mini mangoes on thali
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.arc(thaliX - 4, thaliY - 2, 4, 0, Math.PI * 2);
+        ctx.arc(thaliX + 4, thaliY - 1, 3.8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 5. Scattered Fragrant Flower Petals around Asana
+        const petalColors = ['#f472b6', '#facc15', '#f43f5e', '#ffffff'];
+        const petalCoords = [
+            [-95, -18], [-85, 32], [-40, 36], [38, 38], [80, 34],
+            [95, -16], [-105, 12], [105, 10], [-15, -20], [15, -20]
+        ];
+        petalCoords.forEach(([px, py], idx) => {
+            ctx.fillStyle = petalColors[idx % petalColors.length];
+            ctx.beginPath();
+            ctx.arc(cx + px, cy + py, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        ctx.restore();
+    }
+
+    /**
      * Blooming Pink Lotus (कमल पुष्प)
      */
     static drawLotusFlower(ctx, x, y) {

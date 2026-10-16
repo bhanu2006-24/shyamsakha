@@ -54,7 +54,7 @@ export class Game {
         this.holiGame = new HoliGame(this);
 
         this.state = 'hub'; // 'hub', 'volleyball', 'tag', 'holi', 'gameover'
-        this.inventory = { flowers: 0, fruits: 0, water: 0, butter: 1 };
+        this.inventory = { flowers: 0, lotus: 0, fruits: 0, water: 0, butter: 1, garlands: 0 };
         this.lastTime = 0;
         this.interactableTarget = null;
 
@@ -175,7 +175,7 @@ export class Game {
     }
 
     bindEvents() {
-        // Spacebar interaction or Jump Spike
+        // Keyboard shortcuts
         window.addEventListener('keydown', (e) => {
             if (e.key === ' ' && this.state === 'hub' && this.interactableTarget) {
                 this.handleInteraction();
@@ -186,9 +186,51 @@ export class Game {
                 this.playFluteMelody();
             }
 
-            // 'M' key: Open Map Modal
-            if ((e.key === 'm' || e.key === 'M')) {
-                this.ui.openMapModal();
+            // 'B' key: Toggle Sakha Potli (Bag)
+            if (e.key === 'b' || e.key === 'B') {
+                if (this.ui.bagModal && !this.ui.bagModal.classList.contains('hidden')) {
+                    this.ui.closeBagModal();
+                } else {
+                    this.ui.openBagModal();
+                }
+            }
+
+            // 'O' key: Toggle Options & Audio Modal
+            if (e.key === 'o' || e.key === 'O') {
+                if (this.ui.optionsModal && !this.ui.optionsModal.classList.contains('hidden')) {
+                    this.ui.closeOptionsModal();
+                } else {
+                    this.ui.openOptionsModal();
+                }
+            }
+
+            // 'Escape' key: Close any active modal
+            if (e.key === 'Escape') {
+                this.ui.closeAllModals();
+            }
+
+            // 'H' key: Toggle Help / Guide Modal
+            if (e.key === 'h' || e.key === 'H') {
+                if (this.ui.helpModal && !this.ui.helpModal.classList.contains('hidden')) {
+                    this.ui.closeHelp();
+                } else {
+                    this.ui.openHelp();
+                }
+            }
+
+            // 'M' key: Toggle Minimap Radar
+            if (e.key === 'm' || e.key === 'M') {
+                const mmContainer = document.getElementById('minimapContainer');
+                const reopenBtn = document.getElementById('reopenMinimapBtn');
+                if (mmContainer) {
+                    if (mmContainer.classList.contains('collapsed')) {
+                        mmContainer.classList.remove('collapsed');
+                        if (reopenBtn) reopenBtn.classList.add('hidden');
+                    } else {
+                        mmContainer.classList.add('collapsed');
+                        if (reopenBtn) reopenBtn.classList.remove('hidden');
+                    }
+                }
             }
         });
 
@@ -199,25 +241,14 @@ export class Game {
         }
 
         // Top HUD buttons
-        const soundBtn = document.getElementById('soundToggleBtn');
-        const soundIcon = document.getElementById('soundIcon');
-        const soundText = document.getElementById('soundText');
-        if (soundBtn) {
-            soundBtn.addEventListener('click', () => {
-                const isOn = this.sound.toggle();
-                if (soundIcon) soundIcon.innerText = isOn ? '🔊' : '🔇';
-                if (soundText) soundText.innerText = isOn ? 'Sound' : 'Muted';
-            });
+        const bagBtn = document.getElementById('bagBtn');
+        if (bagBtn) {
+            bagBtn.addEventListener('click', () => this.ui.openBagModal());
         }
 
-        const mapBtn = document.getElementById('mapSelectBtn');
-        if (mapBtn) {
-            mapBtn.addEventListener('click', () => this.ui.openMapModal());
-        }
-
-        const helpBtn = document.getElementById('helpBtn');
-        if (helpBtn) {
-            helpBtn.addEventListener('click', () => this.ui.openHelp());
+        const optionsBtn = document.getElementById('optionsBtn');
+        if (optionsBtn) {
+            optionsBtn.addEventListener('click', () => this.ui.openOptionsModal());
         }
 
         const fluteBtn = document.getElementById('fluteCallBtn');
@@ -225,29 +256,9 @@ export class Game {
             fluteBtn.addEventListener('click', () => this.playFluteMelody());
         }
 
-        // Bhajan Player Controls
-        const bhajanPlayBtn = document.getElementById('bhajanPlayBtn');
-        if (bhajanPlayBtn) {
-            bhajanPlayBtn.addEventListener('click', () => {
-                const isPlaying = this.sound.toggleBhajan();
-                if (isPlaying) {
-                    this.ui.showToast("🎶 Playing Vrindavan Bhajan! Haribol!");
-                }
-            });
-        }
-
-        const bhajanNextBtn = document.getElementById('bhajanNextBtn');
-        if (bhajanNextBtn) {
-            bhajanNextBtn.addEventListener('click', () => {
-                this.sound.nextBhajan();
-            });
-        }
-
-        const bhajanPrevBtn = document.getElementById('bhajanPrevBtn');
-        if (bhajanPrevBtn) {
-            bhajanPrevBtn.addEventListener('click', () => {
-                this.sound.prevBhajan();
-            });
+        const helpBtn = document.getElementById('helpBtn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => this.ui.openHelp());
         }
 
         // Minimap Collapse / Reopen
@@ -284,16 +295,19 @@ export class Game {
         this.interactableTarget = null;
         const obstacles = this.mapManager.getObstacles();
 
-        // 1. Check Resources
+        // 1. Check Resources (Bushes for Forest Flowers, Pond for Sacred Lotus, Trees for Mangoes, River for Jal)
         for (const obs of obstacles) {
-            if (obs.hasResource && (obs.type === 'bush' || obs.type === 'tree')) {
+            if (obs.hasResource && (obs.type === 'bush' || obs.type === 'pond' || obs.type === 'tree')) {
                 const d = Math.hypot(this.player.x - obs.x, this.player.y - obs.y);
                 if (d < (obs.radius || 30) + 70) {
                     this.interactableTarget = { type: obs.type, obj: obs };
-                    this.ui.showPrompt(
-                        obs.type === 'bush' ? '🌸' : '🍋',
-                        obs.type === 'bush' ? 'Press SPACE to Gather Lotus Flower' : 'Press SPACE to Pick Ripe Fruit'
-                    );
+                    if (obs.type === 'bush') {
+                        this.ui.showPrompt('🌸', 'Press SPACE to Gather Forest Flowers');
+                    } else if (obs.type === 'pond') {
+                        this.ui.showPrompt('🪷', 'Press SPACE to Gather Sacred Lotus');
+                    } else {
+                        this.ui.showPrompt('🥭', 'Press SPACE to Pick Ripe Mango');
+                    }
                     return;
                 }
             } else if (obs.type === 'river') {
@@ -307,24 +321,32 @@ export class Game {
             }
         }
 
-        // 2. Check Krishna & Friends
+        // 2. Check Shree Krishna (Pastimes & Offerings)
         const dK = Math.hypot(this.player.x - this.krishna.x, this.player.y - this.krishna.y);
-        if (dK < 150) {
+        if (dK < 95) {
             this.interactableTarget = { type: 'krishna' };
-            this.ui.showPrompt('💬', 'Press SPACE to Talk with Krishna & Dau Dada');
+            this.ui.showPrompt('🦚', 'Press SPACE to Talk with Shree Krishna (Pastimes)');
             return;
         }
 
-        // 3. Check Sakhas
+        // 3. Check Dao Balaram (Sacred Map Travel & Offerings)
+        const dB = Math.hypot(this.player.x - this.balram.x, this.player.y - this.balram.y);
+        if (dB < 95) {
+            this.interactableTarget = { type: 'balram' };
+            this.ui.showPrompt('🌾', 'Press SPACE to Talk with Dao Balaram (Travel to Dhams)');
+            return;
+        }
+
+        // 4. Check Sakhas
         for (const s of this.sakhas) {
-            if (Math.hypot(this.player.x - s.x, this.player.y - s.y) < 100) {
+            if (Math.hypot(this.player.x - s.x, this.player.y - s.y) < 85) {
                 this.interactableTarget = { type: 'sakha', obj: s };
                 this.ui.showPrompt('💬', `Press SPACE to Talk with ${s.name}`);
                 return;
             }
         }
 
-        // 4. Check Gau Mata (Cows)
+        // 5. Check Gau Mata (Cows)
         for (const cow of this.cows) {
             if (Math.hypot(this.player.x - cow.x, this.player.y - cow.y) < 80) {
                 this.interactableTarget = { type: 'cow', obj: cow };
@@ -347,7 +369,14 @@ export class Game {
             target.obj.resourceRegenTimer = 18;
             this.particles.createPetals(this.player.x, this.player.y, '#f472b6', 15);
             this.sound.playFluteNote(587.33, 0.25);
-            this.ui.showToast("+1 Fragrant Lotus Flower gathered! 🌸");
+            this.ui.showToast("+1 Fragrant Forest Flower gathered! 🌸");
+        } else if (target.type === 'pond' && target.obj.hasResource) {
+            this.inventory.lotus = (this.inventory.lotus || 0) + 1;
+            target.obj.hasResource = null;
+            target.obj.resourceRegenTimer = 22;
+            this.particles.createPetals(this.player.x, this.player.y, '#38bdf8', 18);
+            this.sound.playFluteNote(523.25, 0.3);
+            this.ui.showToast("+1 Sacred Water Lotus gathered from pond! 🪷");
         } else if (target.type === 'tree' && target.obj.hasResource) {
             this.inventory.fruits++;
             target.obj.hasResource = null;
@@ -371,13 +400,105 @@ export class Game {
                 this.ui.showToast("🐮 Gau Mata nuzzles you gently with divine affection! ❤️");
             }
         } else if (target.type === 'krishna') {
-            this.ui.openInteractionMenu();
+            this.ui.openKrishnaMenu();
+        } else if (target.type === 'balram') {
+            this.ui.openBalramMenu();
         } else if (target.type === 'sakha') {
             this.ui.showDialogue(target.obj.name, target.obj.dialogue, '🌿', 'text-yellow-400');
         }
 
-        this.ui.updateInventory(this.inventory);
+        this.ui.updateBagUI(this.inventory);
         this.checkInteractions();
+    }
+
+    craftGarland() {
+        if ((this.inventory.flowers || 0) >= 3) {
+            this.inventory.flowers -= 3;
+            this.inventory.garlands = (this.inventory.garlands || 0) + 1;
+            this.ui.showToast("✨ Beautiful Vaijayanti Garland hand-woven! 📿");
+            this.sound.playCheer();
+            this.particles.createPetals(this.player.x, this.player.y, '#f472b6', 30);
+            this.ui.updateBagUI(this.inventory);
+        } else {
+            this.ui.showToast("Gather at least 3 Forest Flowers from bushes first! 🌸");
+        }
+    }
+
+    offerToKrishna(item) {
+        if (item === 'butter') {
+            if ((this.inventory.butter || 0) > 0) {
+                this.inventory.butter--;
+                this.ui.showDialogue("Krishna", "Aha! Fresh churned Makhan! You are truly my dearest Sakha in all the three worlds!", "🍯", "text-yellow-400");
+                this.particles.createSparkle(this.krishna.x, this.krishna.y - 30, '#fef08a', 45);
+                this.sound.playCheer();
+            } else {
+                this.ui.showToast("No Makhan in pot! Feed Gau Mata a mango to churn fresh butter! 🐮");
+            }
+        } else if (item === 'garland') {
+            if ((this.inventory.garlands || 0) > 0) {
+                this.inventory.garlands--;
+                this.ui.showDialogue("Krishna", "This sacred Vaijayanti garland smells of the divine love of Vrindavan! How lovingly you strung it!", "📿", "text-blue-400");
+                this.particles.createPetals(this.krishna.x, this.krishna.y - 20, '#f472b6', 50);
+                this.sound.playCheer();
+            } else {
+                this.ui.showToast("String a Vaijayanti Garland in your Sakha Potli (Bag) first! 📿");
+            }
+        } else if (item === 'lotus') {
+            if ((this.inventory.lotus || 0) > 0) {
+                this.inventory.lotus--;
+                this.ui.showDialogue("Krishna", "A fresh lotus from the Yamuna lily pond! Pure and blooming like your loving heart, Sakha.", "🪷", "text-blue-400");
+                this.particles.createPetals(this.krishna.x, this.krishna.y - 20, '#38bdf8', 40);
+                this.sound.playCheer();
+            } else {
+                this.ui.showToast("Gather a blooming lotus from the Kamal Sarovar pond first! 🪷");
+            }
+        }
+        this.ui.updateBagUI(this.inventory);
+    }
+
+    offerToBalram(item) {
+        if (item === 'fruit') {
+            if ((this.inventory.fruits || 0) > 0) {
+                this.inventory.fruits--;
+                this.ui.showDialogue("Dao Balaram", "These juicy Vrindavan mangoes give immense strength! Well gathered, little brother!", "🥭", "text-white");
+                this.particles.createPetals(this.balram.x, this.balram.y - 30, '#facc15', 35);
+                this.sound.playCheer();
+            } else {
+                this.ui.showToast("Pick some sweet mangoes from the trees first! 🥭");
+            }
+        } else if (item === 'water') {
+            if ((this.inventory.water || 0) > 0) {
+                this.inventory.water--;
+                this.ui.showDialogue("Dao Balaram", "Cool Yamuna Jal is nectar after herding the cows through the pastures!", "💧", "text-white");
+                this.particles.createDust(this.balram.x, this.balram.y - 20, '#38bdf8', 30);
+                this.sound.playSplash();
+            } else {
+                this.ui.showToast("Fill water from the Yamuna river first! 💧");
+            }
+        }
+        this.ui.updateBagUI(this.inventory);
+    }
+
+    startPastimeFromKrishna(mode) {
+        this.ui.closeKrishnaMenu();
+        const pastimesNames = {
+            volleyball: "Kanduka Kridha (Volleyball)",
+            tag: "Pakad Pakdai (Tag Chase)",
+            holi: "Rangotsav (Holi Pichkari)"
+        };
+        this.ui.showDialogue("Krishna", `Ha ha! Let us play ${pastimesNames[mode] || mode}! Run, Sakhas!`, "🦚", "text-blue-400");
+        this.startGameMode(mode);
+    }
+
+    travelFromBalram(mapKey) {
+        this.ui.closeBalramMenu();
+        const mapNames = {
+            vrindavan: "Vrindavan Pastures (वृन्दावन गोचारण)",
+            yamuna: "Yamuna Sandbanks (यमुना तट)",
+            govardhan: "Govardhan Foothills (गिरिराज गोवर्धन)"
+        };
+        this.ui.showDialogue("Dao Balaram", `Come, little brothers! Let us guide the cows to ${mapNames[mapKey] || mapKey}!`, "🌾", "text-white");
+        this.loadMap(mapKey);
     }
 
     talkToFriends() {
@@ -391,47 +512,6 @@ export class Game {
         const text = quotes[Math.floor(Math.random() * quotes.length)];
         this.ui.showDialogue("Krishna", text, "🦚", "text-blue-400");
         this.sound.playFluteNote(493.88, 0.4);
-    }
-
-    offerItem(type) {
-        if (type === 'garland') {
-            if (this.inventory.flowers >= 3) {
-                this.inventory.flowers -= 3;
-                this.ui.showDialogue("Krishna", "This Vaijayanti garland of wild forest flowers is so dear to my heart! Thank you, Sakha.", "🌸", "text-blue-400");
-                this.particles.createPetals(this.krishna.x, this.krishna.y, '#f472b6', 45);
-                this.sound.playCheer();
-            } else {
-                this.ui.showToast("You need 3 Flowers to string a sacred garland! 🌸");
-            }
-        } else if (type === 'butter') {
-            if (this.inventory.butter >= 1) {
-                this.inventory.butter--;
-                this.ui.showDialogue("Krishna", "Aha! Fresh Makhan (Butter)! You are truly my dearest friend in all the three worlds!", "🍯", "text-yellow-400");
-                this.particles.createSparkle(this.krishna.x, this.krishna.y, '#fef08a', 40);
-                this.sound.playCheer();
-            } else {
-                this.ui.showToast("No Makhan in pot right now!");
-            }
-        } else if (type === 'fruit') {
-            if (this.inventory.fruits >= 2) {
-                this.inventory.fruits -= 2;
-                this.ui.showDialogue("Dao Balaram", "These ripe forest fruits give immense strength! Well gathered, little brother!", "🍋", "text-white");
-                this.particles.createPetals(this.balram.x, this.balram.y, '#facc15', 35);
-                this.sound.playCheer();
-            } else {
-                this.ui.showToast("You need at least 2 Fruits for this offering!");
-            }
-        } else if (type === 'water') {
-            if (this.inventory.water >= 1) {
-                this.inventory.water--;
-                this.ui.showDialogue("Krishna", "Ah! Crystal clear Yamuna Jal is so refreshing after tending the cows.", "💧", "text-blue-400");
-                this.particles.createDust(this.krishna.x, this.krishna.y, '#38bdf8', 30);
-                this.sound.playSplash();
-            } else {
-                this.ui.showToast("Collect Yamuna Jal from the riverbank first!");
-            }
-        }
-        this.ui.updateInventory(this.inventory);
     }
 
     startGameMode(mode) {
@@ -490,10 +570,26 @@ export class Game {
         if (this.player) {
             this.player.update(dt, this.input, obstacles, mapW, mapH, this.particles);
 
-            // Update stamina bar UI
+            // Update dynamic stamina bar UI (Only show when used, hide when full)
             const staminaFill = document.getElementById('staminaFill');
+            const staminaWidget = document.getElementById('floatingStaminaWidget');
             if (staminaFill) {
                 staminaFill.style.width = `${this.player.stamina}%`;
+                // Color transition from emerald to amber to coral
+                if (this.player.stamina > 50) {
+                    staminaFill.style.background = 'linear-gradient(90deg, #10b981, #34d399)';
+                } else if (this.player.stamina > 20) {
+                    staminaFill.style.background = 'linear-gradient(90deg, #f59e0b, #fbbf24)';
+                } else {
+                    staminaFill.style.background = 'linear-gradient(90deg, #ef4444, #f87171)';
+                }
+            }
+            if (staminaWidget) {
+                if (this.player.stamina >= 99.5) {
+                    staminaWidget.classList.add('hidden-stamina');
+                } else {
+                    staminaWidget.classList.remove('hidden-stamina');
+                }
             }
         }
 

@@ -1,9 +1,16 @@
 # 🦚 Shyam Sakha (श्याम सखा)
 ### *The Transcendental Pastimes of Shree Krishna & His Friends in Vrindavan*
 
+[![Play Live on Cloudflare Pages](https://img.shields.io/badge/Play%20Live-Cloudflare%20Pages-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://shyamsakha.pages.dev/)
+[![Play Live on GitHub Pages](https://img.shields.io/badge/Play%20Live-GitHub%20Pages-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://bhanu2006-24.github.io/shyamsakha/)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![HTML5 / ES6 Modules](https://img.shields.io/badge/Tech-HTML5%20%7C%20Canvas%20%7C%20ES6%20Modules-blue.svg)](#)
 [![Web Audio API](https://img.shields.io/badge/Audio-Procedural%20Web%20Audio%20Bansuri-emerald.svg)](#)
+
+🎮 **Play Online Directly in Your Browser:**
+- 🌐 **Primary Live Site (Cloudflare Pages)**: [https://shyamsakha.pages.dev/](https://shyamsakha.pages.dev/)
+- 🌐 **GitHub Pages Mirror**: [https://bhanu2006-24.github.io/shyamsakha/](https://bhanu2006-24.github.io/shyamsakha/)
 
 Welcome to **Shyam Sakha (श्याम सखा)** — a rich, modular 2D web game inspired by the eternal childhood pastimes (*Bal Lilas*) of **Shree Krishna**, His elder brother **Dao Balaram**, the cowherd friends (**Sakhas** like Sudama, Subala, Mansukha, Madhumangala), and the sacred cows (**Gau Mata**) in the holy land of Braj.
 
