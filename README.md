@@ -126,11 +126,14 @@ shyamsakha/
 | Key / Action | Function |
 |---|---|
 | **W, A, S, D** or **Arrow Keys** | Move your Sakha |
-| **SHIFT** (Hold) | Sprint (Consumes Stamina) |
-| **SPACE** | Interact / Gather Resource / Bump Volleyball |
+| **SHIFT** (Hold) | Sprint (Consumes Stamina, dynamic gauge appears) |
+| **SPACE** | Interact / Gather Resource / Bump Volleyball / Talk |
 | **SHIFT + SPACE** | Jump Spike (Smash ball in Volleyball) |
+| **B** | Open Sakha Potli (Bag, Offerings & Items) |
+| **O / ESC** | Options & Audio Settings (Music Volume, BGM, Track cycle) |
 | **F** | Play Krishna's Flute (Cows & Sakhas gather joyfully) |
-| **M** | Open Sacred Map Selector |
+| **M** | Toggle Tactical Radar Minimap |
+| **H** | Open Game Guide & Controls |
 | **Left Click** | Shoot Pichkari in Holi / Click UI buttons |
 | **Touch Controls** | Mobile & tablet tap support for buttons and prompt |
 
