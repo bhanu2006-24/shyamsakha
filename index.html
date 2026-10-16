@@ -3,1356 +3,308 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vrindavan Pastures - Play with Krishna</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a; 
-            color: #f8fafc;
-            overflow: hidden;
-            touch-action: none;
-            user-select: none;
-        }
-        #gameCanvas {
-            background-color: #1e293b;
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-        .ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        .panel {
-            pointer-events: auto;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid #334155;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
-        
-        .hud-panel {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(8px);
-            border: 1px solid #334155;
-            pointer-events: auto;
-        }
-        #interactionPrompt {
-            transition: all 0.2s ease-out;
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        #interactionPrompt.active {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        
-        /* Circular Minimap styles */
-        #minimapContainer {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 180px;
-            height: 180px;
-            border-radius: 16px; /* Changed from 50% to see the corners! */
-            overflow: hidden;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            background-color: #4ade80;
-            pointer-events: none;
-        }
-        #minimapCanvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-    </style>
-</head>
-<body class="w-screen h-screen flex flex-col">
+    <title>Shyam Sakha (श्याम सखा) - Playful Pastimes with Shree Krishna</title>
+    <meta name="description" content="An immersive Vedic web game experiencing the playful pastimes of Shree Krishna, Dao Balaram, and the cowherd friends (Sakhas) in Vrindavan. Featuring Kanduka Kridha (Volleyball), Tag, and Holi festivals.">
 
-    <div class="w-full flex justify-between items-center p-3 bg-slate-900 border-b border-slate-700 z-20 shrink-0 shadow-lg">
-        <div>
-            <h1 class="text-xl md:text-2xl font-bold text-green-400 drop-shadow-md">Vrindavan Pastures</h1>
-            <p id="stateTextUI" class="text-xs font-semibold text-amber-400">Phase: Resting (Gather Snacks or Ask to Play)</p>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/games.css">
+</head>
+<body class="flex flex-col">
+
+    <!-- Top Navigation HUD -->
+    <header class="top-hud">
+        <div class="brand-section">
+            <h1 class="game-title">
+                <span>🦚</span> Shyam Sakha <span style="font-size: 0.95rem; opacity: 0.85; font-family: sans-serif;">(श्याम सखा)</span>
+            </h1>
+            <div class="map-phase-badge">
+                <span id="currentMapName" class="tag-badge tag-playing">वृन्दावन गोचारण</span>
+                <span id="stateTextUI" class="tag-badge tag-resting">Phase: Resting under Kadamba Tree</span>
+            </div>
         </div>
-        
-        <!-- Inventory UI (Visible during Hub) -->
-        <div id="inventoryUI" class="flex gap-4 md:gap-8 text-sm bg-slate-800 p-2 px-4 rounded-full border border-slate-600">
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-pink-400 inline-block shadow-[0_0_8px_#f472b6]"></span>
-                <span class="text-slate-300">Flowers:</span>
+
+        <!-- Inventory Bar -->
+        <div id="inventoryUI" class="inventory-bar">
+            <div class="inv-pill" title="Lotus Flowers for Garlands">
+                <span class="inv-dot dot-flower"></span>
+                <span>Flowers:</span>
                 <span id="invFlowers" class="font-bold text-pink-400">0</span>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block shadow-[0_0_8px_#facc15]"></span>
-                <span class="text-slate-300">Fruits:</span>
+            <div class="inv-pill" title="Sweet Vrindavan Forest Fruits">
+                <span class="inv-dot dot-fruit"></span>
+                <span>Fruits:</span>
                 <span id="invFruits" class="font-bold text-yellow-400">0</span>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-blue-400 inline-block shadow-[0_0_8px_#60a5fa]"></span>
-                <span class="text-slate-300">Yamuna Jal:</span>
+            <div class="inv-pill" title="Sacred Yamuna Jal">
+                <span class="inv-dot dot-water"></span>
+                <span>Yamuna Jal:</span>
                 <span id="invWater" class="font-bold text-blue-400">0</span>
             </div>
+            <div class="inv-pill" title="Freshly Churned Makhan (Butter)">
+                <span class="inv-dot dot-butter"></span>
+                <span>Makhan:</span>
+                <span id="invButter" class="font-bold text-amber-200">1</span>
+            </div>
         </div>
 
-        <!-- Chase Stats UI (Visible during Game) -->
-        <div id="statsUI" class="hidden flex gap-4 md:gap-6 text-sm">
-            <div class="flex flex-col items-center">
-                <span class="text-slate-400">Stamina (SHIFT)</span>
-                <div class="w-16 h-3 bg-slate-700 rounded-full mt-1 border border-slate-500 overflow-hidden">
-                    <div id="staminaFill" class="h-full bg-green-400 w-full transition-all duration-75"></div>
+        <!-- Stamina & Quick Action HUD -->
+        <div class="stats-bar">
+            <div class="stat-group">
+                <span class="stat-label">Stamina [Shift]</span>
+                <div class="stamina-meter">
+                    <div id="staminaFill" class="stamina-fill" style="width: 100%;"></div>
                 </div>
             </div>
-            <div class="flex flex-col items-center">
-                <span class="text-slate-400">Your Speed</span>
-                <span id="playerSpeedUI" class="font-mono font-bold text-red-400">0</span>
-            </div>
-            <div class="flex flex-col items-center hidden md:flex">
-                <span class="text-slate-400">Krishna Speed</span>
-                <span id="targetSpeedUI" class="font-mono font-bold text-blue-400">0</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-slate-400">Time</span>
-                <span id="timeUI" class="font-mono font-bold text-white">0.0s</span>
-            </div>
-            <div class="flex flex-col items-center">
-                <span class="text-slate-400">Active Friends</span>
-                <span id="friendsUI" class="font-mono font-bold text-yellow-400">8</span>
+
+            <div class="hud-btn-group">
+                <button id="fluteCallBtn" class="icon-btn" title="Call cows with Krishna's Flute (Key: F)">
+                    <span>🪈</span> Flute (F)
+                </button>
+                <button id="mapSelectBtn" class="icon-btn" title="Explore Maps (Key: M)">
+                    <span>🗺️</span> Maps (M)
+                </button>
+                <button id="soundToggleBtn" class="icon-btn" title="Toggle Sound">
+                    <span>🔊</span> Sound
+                </button>
+                <button id="helpBtn" class="icon-btn" title="How to Play">
+                    <span>❓</span> Guide
+                </button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div id="canvasContainer" class="flex-grow relative w-full h-full">
+    <!-- Canvas World Container -->
+    <main id="canvasContainer" class="canvas-container">
         <canvas id="gameCanvas"></canvas>
-        
-        <!-- Minimap -->
+
+        <!-- Minimap Radar -->
         <div id="minimapContainer">
+            <span class="minimap-label">RADAR MAP</span>
             <canvas id="minimapCanvas"></canvas>
         </div>
 
-        <!-- Interaction Prompt Overlay -->
-        <div class="ui-layer justify-end pb-32">
-            <button id="interactionPrompt" class="pointer-events-auto bg-slate-800/90 text-white border-2 border-green-500 font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(34,197,94,0.4)] flex items-center gap-3 hover:bg-slate-700 hover:scale-105 transition-all">
-                <span id="interactionIcon" class="text-xl">🌸</span>
-                <span id="interactionText">Press SPACE to Gather</span>
-            </button>
-        </div>
+        <!-- Dynamic Interaction Prompt -->
+        <button id="interactionPrompt">
+            <span id="interactionIcon" style="font-size: 1.4rem;">🌸</span>
+            <span id="interactionText">Press SPACE to Gather</span>
+        </button>
 
-        <!-- Interaction Menu (Talk / Offer / Play) -->
-        <div id="interactionMenu" class="ui-layer hidden z-30">
-            <div class="panel p-6 rounded-xl text-center max-w-sm shadow-2xl shadow-blue-500/20">
-                <h2 class="text-2xl font-bold mb-4 text-white">Time with Friends</h2>
-                <div class="flex flex-col gap-3">
-                    <button onclick="talkToFriends()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow border border-slate-500 text-left flex gap-3">
-                        <span>💬</span> Talk to Krishna & Dao
-                    </button>
-                    <button onclick="offerItem('garland')" class="bg-pink-700 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow border border-pink-500 text-left flex gap-3">
-                        <span>🌸</span> Offer Garland (3 Flowers)
-                    </button>
-                    <button onclick="offerItem('fruit')" class="bg-yellow-600 hover:bg-yellow-500 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow border border-yellow-400 text-left flex gap-3">
-                        <span>🍋</span> Offer Fruits (2 Fruits)
-                    </button>
-                    <button onclick="offerItem('water')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg transition-all shadow border border-blue-400 text-left flex gap-3">
-                        <span>💧</span> Offer Yamuna Jal (1 Water)
-                    </button>
-                    <button onclick="openPlayMenu()" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg border border-green-400 mt-2 text-center">
-                        🏃‍♂️ Let's Play a Game!
-                    </button>
-                </div>
-                <button onclick="closeInteractionMenu()" class="mt-5 text-sm text-slate-400 hover:text-white underline">Maybe Later</button>
+        <!-- Toast Notifications Container -->
+        <div id="toastContainer"></div>
+
+        <!-- Volleyball / Kanduka Kridha Scoreboard -->
+        <div id="volleyballScoreboard" class="hidden">
+            <div class="team-box">
+                <span class="team-name">Sakha Team (You)</span>
+                <span id="scorePlayer" class="team-score score-player">0</span>
+            </div>
+            <div class="vs-divider">VS</div>
+            <div class="team-box">
+                <span class="team-name">Krishna & Balram</span>
+                <span id="scoreKrishna" class="team-score score-krishna">0</span>
+            </div>
+            <div class="rally-indicator">
+                <span class="team-name">Rally</span>
+                <span id="rallyCount" class="rally-count">0</span>
             </div>
         </div>
 
         <!-- Dialogue Box -->
-        <div id="dialogueBox" class="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-full max-w-2xl hidden z-40 transition-all duration-300 pointer-events-none">
-            <div class="panel p-4 md:p-6 rounded-2xl border-2 border-slate-500 flex gap-4 items-center shadow-2xl bg-slate-900/95">
-                <div id="dialogueIcon" class="text-4xl md:text-5xl drop-shadow-md">🦚</div>
-                <div class="flex-grow">
-                    <h3 id="dialogueName" class="font-extrabold text-lg md:text-xl mb-1 text-blue-400 drop-shadow">Krishna</h3>
-                    <p id="dialogueText" class="text-slate-100 text-base md:text-lg leading-snug">Dialogue goes here...</p>
+        <div id="dialogueBox">
+            <div class="dialogue-card">
+                <div id="dialogueAvatar" class="dialogue-avatar">🦚</div>
+                <div class="dialogue-content">
+                    <h3 id="dialogueName" class="dialogue-speaker">Krishna</h3>
+                    <p id="dialogueText" class="dialogue-text">Welcome to Vrindavan, my dear friend!</p>
                 </div>
             </div>
         </div>
 
-        <!-- Offer & Play Screen -->
-        <div id="offerScreen" class="ui-layer hidden z-30">
-            <div class="panel p-8 rounded-xl text-center max-w-lg shadow-2xl shadow-yellow-500/20">
-                <h2 class="text-3xl font-bold mb-2 text-yellow-400">Let's Play!</h2>
-                <p class="mb-6 text-slate-300">Krishna and Dao Dada are excited to play with you and the friends!</p>
-                
-                <h3 class="font-bold text-white mb-4">Choose a Game:</h3>
-                <div class="flex flex-col gap-4">
-                    <button onclick="startGame('tag')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg border border-blue-400">
-                        🏃‍♂️ Pakad Pakdai (Tag)
-                        <p class="text-xs font-normal opacity-80 mt-1">Chase them down and touch them to win!</p>
+        <!-- Interaction Menu Modal (Offerings & Play) -->
+        <div id="interactionMenuModal" class="modal-overlay hidden">
+            <div class="glass-panel modal-card">
+                <div class="modal-header">
+                    <h2 class="modal-title divine-font text-yellow-400">Time with Friends</h2>
+                    <p class="modal-subtitle">Share affection, make sacred offerings, or initiate joyful pastimes!</p>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="talkToFriends()" class="action-card">
+                        <span class="action-icon">💬</span>
+                        <div class="action-info">
+                            <h4>Talk with Krishna & Dau Dada</h4>
+                            <p>Hear divine pastimes and loving banter.</p>
+                        </div>
                     </button>
-                    <button onclick="startGame('holi')" class="bg-pink-600 hover:bg-pink-500 text-white font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-lg border border-pink-400">
-                        💦 Holi (Water Fight)
-                        <p class="text-xs font-normal opacity-80 mt-1">Click to shoot Pichkari. Dodge Water Bombs!</p>
+
+                    <button onclick="offerItem('garland')" class="action-card">
+                        <span class="action-icon">🌸</span>
+                        <div class="action-info">
+                            <h4>Offer Vaijayanti Garland (3 Flowers)</h4>
+                            <p>String wild Vrindavan lotuses for Krishna.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="offerItem('butter')" class="action-card">
+                        <span class="action-icon">🍯</span>
+                        <div class="action-info">
+                            <h4>Offer Fresh Makhan (1 Butter)</h4>
+                            <p>Mother Yashoda's freshly churned butter pot.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="offerItem('fruit')" class="action-card">
+                        <span class="action-icon">🍋</span>
+                        <div class="action-info">
+                            <h4>Offer Forest Fruits (2 Fruits)</h4>
+                            <p>Sweet ripe fruits for Dao Balaram & friends.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="offerItem('water')" class="action-card">
+                        <span class="action-icon">💧</span>
+                        <div class="action-info">
+                            <h4>Offer Yamuna Jal (1 Water)</h4>
+                            <p>Pure cool river water to quench thirst.</p>
+                        </div>
+                    </button>
+
+                    <button onclick="openGameChoice()" class="btn-gold" style="margin-top: 8px;">
+                        <span>🏐 Let's Play a Game!</span>
                     </button>
                 </div>
-                <button onclick="closeOfferScreen()" class="mt-6 text-sm text-slate-400 hover:text-white underline">Maybe Later</button>
+                <button onclick="closeInteractionMenu()" class="modal-close-btn">Maybe Later</button>
             </div>
         </div>
 
-        <!-- Game Over Screen -->
-        <div id="gameOverScreen" class="ui-layer hidden z-30">
-            <div class="panel p-8 rounded-xl text-center max-w-md shadow-2xl shadow-green-500/20">
-                <h2 id="gameOverTitle" class="text-4xl font-extrabold mb-2 text-green-400">Captured!</h2>
-                <p id="gameOverDesc" class="mb-6 text-slate-300">Result goes here.</p>
-                <button id="returnToHubBtn" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-8 rounded-full transition-all transform hover:scale-105 shadow-lg">
-                    Return to Rest under the Tree
+        <!-- Game Chooser Modal -->
+        <div id="gameChoiceModal" class="modal-overlay hidden">
+            <div class="glass-panel modal-card">
+                <div class="modal-header">
+                    <h2 class="modal-title divine-font text-yellow-400">Choose a Pastime (लीला)</h2>
+                    <p class="modal-subtitle">The cows are grazing happily—now it's time to play!</p>
+                </div>
+                <div class="modal-actions">
+                    <button onclick="startGameMode('volleyball')" class="action-card" style="border-color: #facc15;">
+                        <span class="action-icon">🏐</span>
+                        <div class="action-info">
+                            <h4>Kanduka Kridha (Gopa Volleyball)</h4>
+                            <p>Play volleyball on the Yamuna sandbank court! Bump, pass, and jump spike!</p>
+                        </div>
+                    </button>
+
+                    <button onclick="startGameMode('tag')" class="action-card">
+                        <span class="action-icon">🏃‍♂️</span>
+                        <div class="action-info">
+                            <h4>Pakad Pakdai (Tag Chase)</h4>
+                            <p>Sprint across the lush fields to chase down Krishna & Dao Balram!</p>
+                        </div>
+                    </button>
+
+                    <button onclick="startGameMode('holi')" class="action-card">
+                        <span class="action-icon">💦</span>
+                        <div class="action-info">
+                            <h4>Rangotsav (Holi Pichkari Battle)</h4>
+                            <p>Click to spray fragrant color water streams and dodge water balloons!</p>
+                        </div>
+                    </button>
+                </div>
+                <button onclick="closeGameChoice()" class="modal-close-btn">Return to Rest</button>
+            </div>
+        </div>
+
+        <!-- Map Selection Modal -->
+        <div id="mapChoiceModal" class="modal-overlay hidden">
+            <div class="glass-panel modal-card">
+                <div class="modal-header">
+                    <h2 class="modal-title divine-font text-sky-400">Vrindavan Map Selector</h2>
+                    <p class="modal-subtitle">Travel to sacred places across the holy land of Braj</p>
+                </div>
+
+                <div class="map-grid">
+                    <div onclick="selectMap('vrindavan')" class="map-option-card">
+                        <span class="map-icon">🌳</span>
+                        <span class="map-title">Vrindavan Pastures</span>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">Kadamba Tree & Hub</small>
+                    </div>
+
+                    <div onclick="selectMap('yamuna')" class="map-option-card">
+                        <span class="map-icon">🏐</span>
+                        <span class="map-title">Yamuna Sandbanks</span>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">Volleyball Court Arena</small>
+                    </div>
+
+                    <div onclick="selectMap('govardhan')" class="map-option-card">
+                        <span class="map-icon">⛰️</span>
+                        <span class="map-title">Govardhan Foothills</span>
+                        <small style="color: #94a3b8; font-size: 0.75rem;">Sacred Hill & Springs</small>
+                    </div>
+                </div>
+
+                <button onclick="closeMapModal()" class="modal-close-btn">Close Map</button>
+            </div>
+        </div>
+
+        <!-- Help / Guide Modal -->
+        <div id="helpModal" class="modal-overlay hidden">
+            <div class="glass-panel modal-card" style="max-width: 580px;">
+                <div class="modal-header">
+                    <h2 class="modal-title divine-font text-yellow-400">Game Guide & Controls</h2>
+                    <p class="modal-subtitle">Experience the transcendental cowherd pastimes of Shree Krishna</p>
+                </div>
+
+                <div class="help-grid">
+                    <div class="help-row">
+                        <p><span class="key-badge">W A S D</span> / <span class="key-badge">Arrows</span> Move Player</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">SHIFT</span> Sprint (Consumes Stamina)</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">SPACE</span> Gather / Talk / Bump Ball</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">SHIFT + SPACE</span> Jump Spike in Volleyball</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">F</span> Krishna Flute Melody & Call Cows</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">M</span> Open Sacred Map Travel</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">Left Click</span> Shoot Pichkari in Holi</p>
+                    </div>
+                    <div class="help-row">
+                        <p><span class="key-badge">Touch</span> On-screen buttons supported</p>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.85rem; color: #cbd5e1; margin-top: 10px; line-height: 1.5; text-align: left;">
+                    <p>🌸 <strong>Gather Offerings:</strong> Collect wild lotus flowers from pink bushes, sweet forest fruits from trees, cool Yamuna Jal from the river, and offer them to Krishna and Dau Balaram!</p>
+                    <p style="margin-top: 6px;">🏐 <strong>Kanduka Kridha:</strong> Head to the Yamuna Sandbanks or choose Volleyball from the Play menu. Team up with Sudama against Krishna & Balaram!</p>
+                </div>
+
+                <button onclick="closeHelpModal()" class="btn-primary" style="margin-top: 18px; width: 100%;">
+                    Got it! Let's Play!
                 </button>
             </div>
         </div>
-    </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const minimapCanvas = document.getElementById('minimapCanvas');
-        const mCtx = minimapCanvas.getContext('2d');
-        const container = document.getElementById('canvasContainer');
-
-        // UI Elements
-        const inventoryUI = document.getElementById('inventoryUI');
-        const statsUI = document.getElementById('statsUI');
-        const interactionMenu = document.getElementById('interactionMenu');
-        const dialogueBox = document.getElementById('dialogueBox');
-        const offerScreen = document.getElementById('offerScreen');
-        const gameOverScreen = document.getElementById('gameOverScreen');
-        const interactionPrompt = document.getElementById('interactionPrompt');
-        const interactionText = document.getElementById('interactionText');
-        const interactionIcon = document.getElementById('interactionIcon');
-        const stateTextUI = document.getElementById('stateTextUI');
-        
-        let gameState = 'hub'; // 'hub', 'playing', 'gameover'
-        let gameMode = 'tag'; 
-        let lastTime = 0;
-        let gameTime = 0;
-        let speedUpdateTimer = 0;
-        let playerStamina = 100;
-        
-        // Inventory System
-        let inventory = { flowers: 0, fruits: 0, water: 0 };
-        const REQUIREMENT = { flowers: 3, fruits: 2, water: 1 };
-        
-        const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, w: false, a: false, s: false, d: false, ' ': false, Shift: false };
-
-        // World Constants
-        const MAP_WIDTH = 4500;
-        const MAP_HEIGHT = 4500;
-        const CAMERA_SMOOTHING = 0.1;
-        const CENTER_X = MAP_WIDTH / 2;
-        const CENTER_Y = MAP_HEIGHT / 2;
-
-        let camera = { x: 0, y: 0, width: 0, height: 0 };
-        let player, targetKrishna, targetDao;
-        let otherAIs = [];
-        let cows = [];
-        let obstacles = [];
-        let particles = [];
-        let projectiles = [];
-        let splats = []; // Colorful holi puddles
-        let interactableTarget = null; // What the player is currently near
-        let dialogueTimeout; // Timer for dialogue box
-
-        function getRandom(min, max) { return Math.random() * (max - min) + min; }
-
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x; this.y = y;
-                this.radius = getRandom(2, 4);
-                this.color = color;
-                this.life = 1.0;
-                this.decay = getRandom(1.5, 3.0);
-                this.vx = getRandom(-10, 10);
-                this.vy = getRandom(-10, 10);
-            }
-            update(dt) { 
-                this.x += this.vx * dt; this.y += this.vy * dt;
-                this.life -= this.decay * dt; 
-                this.radius *= 0.95; 
-            }
-            draw(ctx) {
-                if (this.life <= 0) return;
-                ctx.globalAlpha = this.life;
-                ctx.fillStyle = this.color;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
-                ctx.globalAlpha = 1.0;
-            }
-        }
-
-        class Projectile {
-            constructor(x, y, targetX, targetY, speed, color, isBomb, team) {
-                this.x = x; this.y = y;
-                let dx = targetX - x; let dy = targetY - y;
-                let dist = Math.hypot(dx, dy);
-                if (dist === 0) dist = 1;
-                this.vx = (dx / dist) * speed; 
-                this.vy = (dy / dist) * speed;
-                this.color = color;
-                this.isBomb = isBomb;
-                this.team = team;
-                this.radius = isBomb ? 14 : 6; 
-                this.life = 1.8; 
-            }
-            update(dt) {
-                this.x += this.vx * dt; this.y += this.vy * dt;
-                this.life -= dt;
-            }
-            draw(ctx) {
-                ctx.fillStyle = this.color;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
-                ctx.globalAlpha = 0.4;
-                ctx.beginPath(); ctx.arc(this.x - this.vx * 0.04, this.y - this.vy * 0.04, this.radius * 0.8, 0, Math.PI * 2); ctx.fill();
-                ctx.globalAlpha = 1.0;
-            }
-        }
-
-        function getAvoidanceForce(entity, lookAhead = 120) {
-            let steerX = 0, steerY = 0;
-            let count = 0;
-            for (let obs of obstacles) {
-                if (obs.shape === 'circle') {
-                    let dx = entity.x - obs.x; let dy = entity.y - obs.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    let isSoft = (obs.type === 'bush' || obs.type === 'rock');
-                    let safeDist = obs.radius + entity.radius + (isSoft ? lookAhead/2 : lookAhead);
-                    
-                    if (dist < safeDist && dist > 0) {
-                        let force = Math.pow((safeDist - dist) / safeDist, 2); 
-                        if (isSoft) force *= 0.15; // Much weaker avoidance for soft obstacles
-
-                        let pushX = (dx / dist) * force;
-                        let pushY = (dy / dist) * force;
-                        
-                        // Tangent sliding
-                        let tangentX = (-dy / dist) * force * (isSoft ? 0.2 : 0.9);
-                        let tangentY = (dx / dist) * force * (isSoft ? 0.2 : 0.9);
-
-                        steerX += pushX + tangentX;
-                        steerY += pushY + tangentY;
-                        count++;
-                    }
-                } else if (obs.shape === 'rect') {
-                    let testX = entity.x; let testY = entity.y;
-                    if (entity.x < obs.x) testX = obs.x;      
-                    else if (entity.x > obs.x + obs.w) testX = obs.x + obs.w;   
-                    if (entity.y < obs.y) testY = obs.y;      
-                    else if (entity.y > obs.y + obs.h) testY = obs.y + obs.h;
-                    
-                    let dx = entity.x - testX; let dy = entity.y - testY;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    let safeDist = entity.radius + lookAhead;
-                    
-                    if(dist < safeDist && dist > 0) {
-                        let force = Math.pow((safeDist - dist) / safeDist, 2);
-                        steerX += (dx / dist) * force;
-                        steerY += (dy / dist) * force;
-                        count++;
-                    }
-                }
-            }
-            if (count > 0) { steerX /= count; steerY /= count; }
-            return {x: steerX, y: steerY};
-        }
-
-        class Entity {
-            constructor(x, y, radius, color, minSpeed, maxSpeed, type) {
-                this.x = x; this.y = y;
-                this.radius = radius; this.color = color;
-                this.minSpeed = minSpeed; this.maxSpeed = maxSpeed;
-                this.currentSpeed = getRandom(minSpeed, maxSpeed);
-                this.type = type;
-                this.wanderAngle = Math.random() * Math.PI * 2;
-                this.dx = 1; this.dy = 0;
-                this.isCaught = false;
-                this.shootCooldown = 0;
-                this.terrainModifier = 1.0;
-            }
-
-            draw(ctx) {
-                if (this.type === 'cow') {
-                    // Draw Ved Lakshana Cow (Gau Mata)
-                    let angle = Math.atan2(this.dy, this.dx);
-                    ctx.save();
-                    ctx.translate(this.x, this.y);
-                    ctx.rotate(angle);
-                    
-                    let cowColor = this.color; // Assigned during spawn (creamy, brown, etc.)
-
-                    // Shadow
-                    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-                    ctx.beginPath(); ctx.ellipse(2, 5, this.radius + 6, this.radius + 2, 0, 0, Math.PI * 2); ctx.fill();
-
-                    // Main Body
-                    ctx.fillStyle = cowColor;
-                    ctx.beginPath(); ctx.ellipse(0, 0, this.radius + 4, this.radius - 2, 0, 0, Math.PI * 2); ctx.fill();
-                    
-                    // Surya Ketu Nadi (Prominent Hump on the back)
-                    ctx.fillStyle = cowColor;
-                    ctx.beginPath(); ctx.ellipse(-6, 0, 8, 6, 0, 0, Math.PI * 2); ctx.fill();
-                    // Gentle shading for the hump to make it pop 3D
-                    ctx.fillStyle = 'rgba(0,0,0,0.08)';
-                    ctx.beginPath(); ctx.ellipse(-8, 0, 6, 4, 0, 0, Math.PI * 2); ctx.fill();
-
-                    // Head
-                    ctx.fillStyle = cowColor;
-                    ctx.beginPath(); ctx.ellipse(this.radius + 2, 0, 9, 6, 0, 0, Math.PI * 2); ctx.fill();
-                    
-                    // Snout (Muzzle)
-                    ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Slight darkening
-                    ctx.beginPath(); ctx.arc(this.radius + 8, 0, 4, 0, Math.PI*2); ctx.fill();
-
-                    // Long hanging ears
-                    ctx.fillStyle = cowColor;
-                    ctx.beginPath(); ctx.ellipse(this.radius - 1, -7, 7, 2.5, Math.PI/6, 0, Math.PI * 2); ctx.fill();
-                    ctx.beginPath(); ctx.ellipse(this.radius - 1, 7, 7, 2.5, -Math.PI/6, 0, Math.PI * 2); ctx.fill();
-
-                    // Sweeping Horns (curving beautifully upwards/backwards)
-                    ctx.fillStyle = '#e2e8f0'; // Ivory horn color
-                    ctx.beginPath(); 
-                    ctx.moveTo(this.radius - 2, -4); 
-                    ctx.quadraticCurveTo(this.radius - 6, -14, this.radius - 2, -18); 
-                    ctx.lineTo(this.radius + 1, -4); 
-                    ctx.fill();
-                    
-                    ctx.beginPath(); 
-                    ctx.moveTo(this.radius - 2, 4); 
-                    ctx.quadraticCurveTo(this.radius - 6, 14, this.radius - 2, 18); 
-                    ctx.lineTo(this.radius + 1, 4); 
-                    ctx.fill();
-                    
-                    ctx.restore();
-                    return; // Skip standard drawing
-                }
-
-                // Main Glow
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius + 6, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.globalAlpha = this.isCaught ? 0.05 : (gameState === 'hub' ? 0.1 : 0.25);
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-
-                // Ghost out eliminated players
-                ctx.globalAlpha = this.isCaught ? 0.25 : 1.0;
-
-                // Body
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                
-                if (this.isCaught) {
-                    if (gameMode === 'holi') {
-                        let grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-                        grad.addColorStop(0, '#ec4899'); grad.addColorStop(0.5, '#06b6d4'); grad.addColorStop(1, '#eab308');
-                        ctx.fillStyle = grad;
-                    } else { ctx.fillStyle = '#64748b'; }
-                } else { ctx.fillStyle = this.color; }
-
-                ctx.fill();
-                ctx.lineWidth = 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-                
-                // Reset alpha for details
-                ctx.globalAlpha = 1.0;
-
-                if (this.isCaught) return;
-
-                let angle = Math.atan2(this.dy, this.dx);
-                
-                // Nose direction
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x + Math.cos(angle) * (this.radius + 4), this.y + Math.sin(angle) * (this.radius + 4));
-                ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.stroke();
-
-                // Details based on character
-                if (this.type === 'krishna') {
-                    let backX = this.x - Math.cos(angle) * (this.radius - 2);
-                    let backY = this.y - Math.sin(angle) * (this.radius - 2);
-                    
-                    // Mor Pankh (Feather)
-                    ctx.fillStyle = '#0ea5e9'; ctx.beginPath(); ctx.arc(backX, backY, 8, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#16a34a'; ctx.beginPath(); ctx.arc(backX, backY, 5, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(backX, backY, 2, 0, Math.PI*2); ctx.fill();
-                    
-                    // Flute if resting
-                    if(gameState === 'hub') {
-                        ctx.strokeStyle = '#fef08a'; ctx.lineWidth = 3;
-                        ctx.beginPath(); ctx.moveTo(this.x + 5, this.y + 5); ctx.lineTo(this.x + 20, this.y + 15); ctx.stroke();
-                    }
-                }
-            }
-
-            updateSpeed() { this.currentSpeed = getRandom(this.minSpeed, this.maxSpeed); }
-        }
-
-        class Obstacle {
-            constructor(shape, type, x, y, w, h) {
-                this.shape = shape; this.type = type;
-                this.x = x; this.y = y; this.w = w; this.h = h;
-                this.radius = w; // Collision Radius
-                this.visualRadius = h; // Visual Drawing Radius
-                
-                // Resource properties
-                this.hasResource = false;
-                this.resourceRegenTimer = 0;
-                
-                if (type === 'bush' && Math.random() > 0.3) this.hasResource = 'flower';
-                if (type === 'tree' && Math.random() > 0.5) this.hasResource = 'fruit';
-                if (type === 'river') this.hasResource = 'water';
-            }
-
-            draw(ctx, layer = 'all') {
-                if (this.type === 'river' || this.type === 'wall') {
-                    if (layer === 'canopy') return;
-                    ctx.fillStyle = this.type === 'river' ? '#2563eb' : '#334155';
-                    ctx.fillRect(this.x, this.y, this.w, this.h);
-                    
-                    if (this.type === 'river') {
-                        ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.beginPath();
-                        for (let i = 0; i < this.h / 120; i++) {
-                            let wx = this.x + getRandom(20, this.w - 50);
-                            let wy = this.y + i * 120 + getRandom(-20, 20);
-                            ctx.moveTo(wx, wy); ctx.quadraticCurveTo(wx + 25, wy - 15, wx + 50, wy);
-                        }
-                        ctx.stroke();
-                    }
-                } else if (this.type === 'tree' || this.type === 'kadamba') {
-                    let vRad = this.visualRadius;
-                    if (layer === 'all' || layer === 'ground') {
-                        // Tree shadow
-                        ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                        ctx.beginPath(); ctx.arc(this.x + 5, this.y + 5, vRad, 0, Math.PI * 2); ctx.fill();
-                        // Trunk (Uses collision radius for visual accuracy)
-                        ctx.fillStyle = '#78350f';
-                        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2); ctx.fill();
-                    }
-                    if (layer === 'all' || layer === 'canopy') {
-                        // Leaves (Uses visual radius)
-                        ctx.fillStyle = this.type === 'kadamba' ? '#14532d' : '#166534';
-                        ctx.beginPath(); ctx.arc(this.x, this.y - vRad * 0.2, vRad, 0, Math.PI * 2); ctx.fill();
-                        ctx.fillStyle = this.type === 'kadamba' ? '#166534' : '#15803d';
-                        ctx.beginPath(); ctx.arc(this.x, this.y + vRad * 0.2, vRad * 0.8, 0, Math.PI * 2); ctx.fill();
-                        
-                        // Fruits
-                        if (this.hasResource === 'fruit') {
-                            ctx.fillStyle = '#facc15';
-                            ctx.beginPath(); ctx.arc(this.x - vRad*0.4, this.y - vRad*0.3, 6, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(this.x + vRad*0.3, this.y + vRad*0.4, 6, 0, Math.PI*2); ctx.fill();
-                            ctx.beginPath(); ctx.arc(this.x + vRad*0.5, this.y - vRad*0.1, 6, 0, Math.PI*2); ctx.fill();
-                        }
-                    }
-                } else if (this.type === 'rock') {
-                    if (layer === 'canopy') return;
-                    ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.arc(this.x + 4, this.y + 4, this.visualRadius, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#64748b'; ctx.beginPath(); ctx.arc(this.x, this.y, this.visualRadius, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#475569'; ctx.beginPath(); ctx.arc(this.x - this.visualRadius*0.2, this.y - this.visualRadius*0.2, this.visualRadius*0.6, 0, Math.PI*2); ctx.fill();
-                } else if (this.type === 'bush') {
-                    if (layer === 'canopy') return;
-                    ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.beginPath(); ctx.arc(this.x + 2, this.y + 2, this.visualRadius, 0, Math.PI*2); ctx.fill();
-                    ctx.fillStyle = '#65a30d'; ctx.beginPath(); ctx.arc(this.x, this.y, this.visualRadius, 0, Math.PI*2); ctx.fill();
-                    
-                    // Flowers
-                    if (this.hasResource === 'flower') {
-                        ctx.fillStyle = '#f472b6';
-                        ctx.beginPath(); ctx.arc(this.x + this.visualRadius*0.3, this.y - this.visualRadius*0.3, 5, 0, Math.PI*2); ctx.fill();
-                        ctx.beginPath(); ctx.arc(this.x - this.visualRadius*0.4, this.y + this.visualRadius*0.2, 5, 0, Math.PI*2); ctx.fill();
-                    }
-                }
-            }
-            
-            updateResource(dt) {
-                if (!this.hasResource && this.resourceRegenTimer > 0) {
-                    this.resourceRegenTimer -= dt;
-                    if (this.resourceRegenTimer <= 0) {
-                        if (this.type === 'bush') this.hasResource = 'flower';
-                        if (this.type === 'tree') this.hasResource = 'fruit';
-                    }
-                }
-            }
-        }
-
-        function resizeCanvas() {
-            const rect = container.getBoundingClientRect();
-            canvas.width = rect.width; canvas.height = rect.height;
-            camera.width = canvas.width; camera.height = canvas.height;
-            
-            minimapCanvas.width = 160; minimapCanvas.height = 160;
-        }
-        window.addEventListener('resize', resizeCanvas);
-
-        function initMap() {
-            obstacles = [];
-            const border = 50;
-            // Boundaries
-            obstacles.push(new Obstacle('rect', 'wall', -border, -border, MAP_WIDTH + border*2, border));
-            obstacles.push(new Obstacle('rect', 'wall', -border, MAP_HEIGHT, MAP_WIDTH + border*2, border));
-            obstacles.push(new Obstacle('rect', 'wall', -border, 0, border, MAP_HEIGHT));
-            
-            // River
-            const riverWidth = 500;
-            obstacles.push(new Obstacle('rect', 'river', MAP_WIDTH - riverWidth, 0, riverWidth + border, MAP_HEIGHT));
-
-            // Giant Central Kadamba Tree (w: 40 collision trunk, h: 160 visual leaves)
-            obstacles.push(new Obstacle('circle', 'kadamba', CENTER_X, CENTER_Y, 40, 160));
-
-            // Generate Nature
-            const numObs = 300;
-            for(let i=0; i<numObs; i++) {
-                let typeRand = Math.random();
-                let type = typeRand < 0.45 ? 'tree' : (typeRand < 0.75 ? 'rock' : 'bush');
-                let radius = getRandom(30, 80);
-                
-                let x = getRandom(radius + 50, MAP_WIDTH - riverWidth - radius - 50);
-                let y = getRandom(radius + 50, MAP_HEIGHT - radius - 50);
-                
-                // Keep clear of the center Kadamba tree area
-                if (Math.hypot(x - CENTER_X, y - CENTER_Y) > 300) {
-                    obstacles.push(new Obstacle('circle', type, x, y, radius, radius));
-                }
-            }
-        }
-
-        function getSafeSpawnPosition(radius, minDistanceToCenter = 0, avoidRiver = true) {
-            let x, y, isSafe;
-            for (let i = 0; i < 200; i++) {
-                x = getRandom(radius + 50, MAP_WIDTH - (avoidRiver ? 550 : 50));
-                y = getRandom(radius + 50, MAP_HEIGHT - radius - 50);
-                
-                if (minDistanceToCenter > 0 && Math.hypot(x - CENTER_X, y - CENTER_Y) < minDistanceToCenter) continue;
-
-                isSafe = true;
-                for (let obs of obstacles) {
-                    if (checkCollision({x, y, radius}, obs)) { isSafe = false; break; }
-                }
-                if (isSafe) return { x, y };
-            }
-            return { x: CENTER_X + 200, y: CENTER_Y + 200 };
-        }
-
-        function initEntitiesHub() {
-            // Player spawns near the center tree
-            player = new Entity(CENTER_X - 150, CENTER_Y + 100, 18, '#ef4444', 320, 400, 'player'); 
-            
-            // Krishna and Dao sitting under Kadamba
-            targetKrishna = new Entity(CENTER_X + 20, CENTER_Y + 30, 16, '#3b82f6', 360, 450, 'krishna');
-            targetDao = new Entity(CENTER_X - 30, CENTER_Y + 40, 18, '#ffffff', 340, 420, 'dao');
-            targetKrishna.dx = -1; targetKrishna.dy = 0; // facing left
-            targetDao.dx = 1; targetDao.dy = 0; // facing right
-
-            // Friends scattered around center peacefully
-            otherAIs = [];
-            for (let i = 0; i < 8; i++) {
-                otherAIs.push(new Entity(
-                    CENTER_X + getRandom(-400, 400), CENTER_Y + getRandom(-400, 400), 
-                    14, '#eab308', 270, 330, 'other'
-                ));
-            }
-            
-            // Spawn Ved Lakshana Cows with Native Colors
-            cows = [];
-            const nativeCowColors = ['#fffdd0', '#fef3c7', '#d2b48c', '#b45309', '#e6c280']; // Creamy, Sand, Brown hues
-            for(let i = 0; i < 15; i++) {
-                let cPos = getSafeSpawnPosition(22, 0, true);
-                let randColor = nativeCowColors[Math.floor(Math.random() * nativeCowColors.length)];
-                cows.push(new Entity(cPos.x, cPos.y, 22, randColor, 20, 40, 'cow'));
-            }
-            
-            particles = []; projectiles = []; splats = [];
-            camera.x = player.x - camera.width / 2;
-            camera.y = player.y - camera.height / 2;
-            clampCamera();
-            
-            updateInventoryUI();
-            
-            gameState = 'hub';
-            stateTextUI.innerText = "Phase: Resting (Gather Offerings to Play)";
-            inventoryUI.classList.remove('hidden');
-            statsUI.classList.add('hidden');
-        }
-
-        function startGame(mode) {
-            gameMode = mode;
-            closeOfferScreen();
-            
-            // Randomize spawn positions for everyone except player (start from where they are)
-            let kPos = getSafeSpawnPosition(16, 1500); // Spawn far away
-            targetKrishna.x = kPos.x; targetKrishna.y = kPos.y;
-            targetKrishna.isCaught = false;
-            
-            let dPos = getSafeSpawnPosition(18, 1500);
-            targetDao.x = dPos.x; targetDao.y = dPos.y;
-            targetDao.isCaught = false;
-
-            for (let ai of otherAIs) {
-                let fPos = getSafeSpawnPosition(14, 500);
-                ai.x = fPos.x; ai.y = fPos.y;
-                ai.isCaught = false;
-                ai.shootCooldown = getRandom(1, 4); // Stagger initial shots
-            }
-            
-            player.isCaught = false;
-            playerStamina = 100;
-            projectiles = []; particles = []; splats = [];
-            
-            gameTime = 0; speedUpdateTimer = 0;
-            gameState = 'playing';
-            
-            stateTextUI.innerText = gameMode === 'tag' ? "Phase: Pakad Pakdai (Chase!)" : "Phase: Holi (Splash!)";
-            inventoryUI.classList.add('hidden');
-            statsUI.classList.remove('hidden');
-            
-            // Reset inventory costs
-            inventory.flowers = Math.max(0, inventory.flowers - REQUIREMENT.flowers);
-            inventory.fruits = Math.max(0, inventory.fruits - REQUIREMENT.fruits);
-            inventory.water = Math.max(0, inventory.water - REQUIREMENT.water);
-            updateInventoryUI();
-        }
-
-        function checkCollision(circle, obs) {
-            if (obs.shape === 'rect') {
-                let testX = Math.max(obs.x, Math.min(circle.x, obs.x + obs.w));
-                let testY = Math.max(obs.y, Math.min(circle.y, obs.y + obs.h));
-                return Math.hypot(circle.x - testX, circle.y - testY) <= circle.radius;
-            } else if (obs.shape === 'circle') {
-                // Ignore rocks and bushes for hard collision (pass-through)
-                if (obs.type === 'rock' || obs.type === 'bush') return false;
-                
-                return Math.hypot(circle.x - obs.x, circle.y - obs.y) < (circle.radius + obs.radius);
-            }
-            return false;
-        }
-
-        function moveEntity(entity, dx, dy) {
-            if(dx !== 0 || dy !== 0) { entity.dx = dx; entity.dy = dy; }
-
-            // X Movement
-            entity.x += dx;
-            for (let obs of obstacles) {
-                if (checkCollision(entity, obs)) { entity.x -= dx; break; }
-            }
-
-            // Y Movement
-            entity.y += dy;
-            for (let obs of obstacles) {
-                if (checkCollision(entity, obs)) { entity.y -= dy; break; }
-            }
-            
-            entity.x = Math.max(0, Math.min(entity.x, MAP_WIDTH));
-            entity.y = Math.max(0, Math.min(entity.y, MAP_HEIGHT));
-        }
-
-        function clampCamera() {
-            camera.x = Math.max(0, Math.min(camera.x, MAP_WIDTH - camera.width));
-            camera.y = Math.max(0, Math.min(camera.y, MAP_HEIGHT - camera.height));
-        }
-
-        function updateInventoryUI() {
-            document.getElementById('invFlowers').innerText = inventory.flowers;
-            document.getElementById('invFruits').innerText = inventory.fruits;
-            document.getElementById('invWater').innerText = inventory.water;
-        }
-
-        function checkInteractions() {
-            interactableTarget = null;
-            let minDist = Infinity;
-            
-            // Check resources
-            for (let obs of obstacles) {
-                if (obs.hasResource && (obs.type === 'bush' || obs.type === 'tree')) {
-                    let d = Math.hypot(player.x - obs.x, player.y - obs.y);
-                    if (d < obs.radius + 60 && d < minDist) { minDist = d; interactableTarget = { type: obs.type, obj: obs }; }
-                } else if (obs.type === 'river') {
-                    // Check near river bounding box
-                    let testX = Math.max(obs.x, Math.min(player.x, obs.x + obs.w));
-                    let d = Math.abs(player.x - testX);
-                    if (d < 60 && Math.abs(player.y - obs.y) < obs.h) {
-                        interactableTarget = { type: 'river', obj: obs };
-                    }
-                }
-            }
-
-            // Check Krishna/Dao for offering
-            let dK = Math.hypot(player.x - targetKrishna.x, player.y - targetKrishna.y);
-            if (dK < 180) { // Slightly increased interaction range
-                interactableTarget = { type: 'krishna' };
-            }
-
-            // Update UI Prompt
-            if (interactableTarget) {
-                if (interactableTarget.type === 'bush') { interactionIcon.innerText = '🌸'; interactionText.innerText = 'Gather Flower'; }
-                else if (interactableTarget.type === 'tree') { interactionIcon.innerText = '🍋'; interactionText.innerText = 'Gather Fruit'; }
-                else if (interactableTarget.type === 'river') { interactionIcon.innerText = '💧'; interactionText.innerText = 'Fill Yamuna Jal'; }
-                else if (interactableTarget.type === 'krishna') { 
-                    interactionIcon.innerText = '💬'; 
-                    interactionText.innerText = 'Interact with Friends';
-                }
-                interactionPrompt.classList.add('active');
-            } else {
-                interactionPrompt.classList.remove('active');
-            }
-        }
-
-        function handleInteraction() {
-            if (!interactableTarget || gameState !== 'hub') return;
-
-            if (interactableTarget.type === 'bush' && interactableTarget.obj.hasResource) {
-                inventory.flowers++; interactableTarget.obj.hasResource = false; interactableTarget.obj.resourceRegenTimer = 15;
-                for(let i=0; i<10; i++) particles.push(new Particle(player.x, player.y, '#f472b6'));
-            } 
-            else if (interactableTarget.type === 'tree' && interactableTarget.obj.hasResource) {
-                inventory.fruits++; interactableTarget.obj.hasResource = false; interactableTarget.obj.resourceRegenTimer = 15;
-                for(let i=0; i<10; i++) particles.push(new Particle(player.x, player.y, '#facc15'));
-            }
-            else if (interactableTarget.type === 'river') {
-                inventory.water++;
-                for(let i=0; i<10; i++) particles.push(new Particle(player.x, player.y, '#60a5fa'));
-            }
-            else if (interactableTarget.type === 'krishna') {
-                interactionMenu.classList.remove('hidden');
-                interactionPrompt.classList.remove('active');
-            }
-            updateInventoryUI();
-            checkInteractions(); // refresh immediately
-        }
-
-        // --- NEW DIALOGUE & INTERACTION SYSTEM ---
-        
-        function showDialogue(name, text, icon, colorClass) {
-            interactionMenu.classList.add('hidden');
-            
-            document.getElementById('dialogueName').innerText = name;
-            document.getElementById('dialogueName').className = `font-extrabold text-lg md:text-xl mb-1 drop-shadow ${colorClass}`;
-            document.getElementById('dialogueText').innerText = text;
-            document.getElementById('dialogueIcon').innerText = icon;
-            
-            dialogueBox.classList.remove('hidden');
-            // Small pop animation
-            dialogueBox.style.transform = 'translate(-50%, 10px)';
-            dialogueBox.style.opacity = '0';
-            setTimeout(() => {
-                dialogueBox.style.transform = 'translate(-50%, 0)';
-                dialogueBox.style.opacity = '1';
-            }, 10);
-
-            clearTimeout(dialogueTimeout);
-            dialogueTimeout = setTimeout(() => {
-                dialogueBox.classList.add('hidden');
-            }, 4500); // Hide after 4.5 seconds
-        }
-
-        function talkToFriends() {
-            const dialogues = [
-                "It's such a beautiful day in Vrindavan, isn't it?",
-                "The cows are grazing so peacefully today.",
-                "Dao Dada was just telling a very funny story!",
-                "Have you seen the lotuses blooming by the Yamuna?",
-                "The cool breeze makes me want to play all day long!",
-                "Thank you for spending time with us under the Kadamba tree."
-            ];
-            let text = dialogues[Math.floor(Math.random() * dialogues.length)];
-            showDialogue("Krishna", text, "🦚", "text-blue-400");
-        }
-
-        function offerItem(type) {
-            if (type === 'garland') {
-                if (inventory.flowers >= 3) {
-                    inventory.flowers -= 3;
-                    showDialogue("Krishna", "This flower garland is so beautiful! Thank you, my dear friend.", "🌸", "text-blue-400");
-                    for(let i=0; i<40; i++) particles.push(new Particle(targetKrishna.x, targetKrishna.y, '#f472b6'));
-                } else {
-                    showDialogue("System", "You need at least 3 flowers to make a beautiful garland.", "❌", "text-slate-400");
-                }
-            } else if (type === 'fruit') {
-                if (inventory.fruits >= 2) {
-                    inventory.fruits -= 2;
-                    showDialogue("Dao Dada", "These fruits are perfectly sweet! You are the best.", "🍋", "text-white");
-                    for(let i=0; i<40; i++) particles.push(new Particle(targetDao.x, targetDao.y, '#facc15'));
-                } else {
-                    showDialogue("System", "You need at least 2 fruits to make a proper offering.", "❌", "text-slate-400");
-                }
-            } else if (type === 'water') {
-                if (inventory.water >= 1) {
-                    inventory.water -= 1;
-                    showDialogue("Krishna", "Ah, the cool Yamuna water is so refreshing! Perfect for a sunny day.", "💧", "text-blue-400");
-                    for(let i=0; i<40; i++) particles.push(new Particle(targetKrishna.x, targetKrishna.y, '#60a5fa'));
-                } else {
-                    showDialogue("System", "You need to fetch Yamuna Jal from the river first.", "❌", "text-slate-400");
-                }
-            }
-            updateInventoryUI();
-        }
-
-        function openPlayMenu() {
-            interactionMenu.classList.add('hidden');
-            offerScreen.classList.remove('hidden');
-        }
-
-        function closeInteractionMenu() {
-            interactionMenu.classList.add('hidden');
-        }
-
-        function closeOfferScreen() { offerScreen.classList.add('hidden'); }
-
-        function applyTerrain(ent) {
-            ent.terrainModifier = 1.0;
-            if (ent.isCaught) return;
-            for (let obs of obstacles) {
-                if (obs.type === 'bush' && Math.hypot(ent.x - obs.x, ent.y - obs.y) < obs.visualRadius) {
-                    ent.terrainModifier = 0.5; // Slow down in bush
-                    if (Math.random() < 0.1) particles.push(new Particle(ent.x, ent.y, '#4ade80')); // Rustle leaves
-                    break;
-                } else if (obs.type === 'rock' && Math.hypot(ent.x - obs.x, ent.y - obs.y) < obs.visualRadius) {
-                    ent.terrainModifier = 1.25; // Speed boost over rock
-                    break;
-                }
-            }
-        }
-
-        function updateLogic(dt) {
-            // Update obstacles (Regen resources)
-            for(let obs of obstacles) obs.updateResource(dt);
-            
-            // Update particles
-            for (let i = particles.length - 1; i >= 0; i--) {
-                particles[i].update(dt);
-                if (particles[i].life <= 0) particles.splice(i, 1);
-            }
-
-            // Player Stamina & Sprint Logic
-            let speedMult = 1.0;
-            if (keys.Shift && playerStamina > 0 && (keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight)) {
-                playerStamina = Math.max(0, playerStamina - dt * 40); // Deplete
-                speedMult = 1.6;
-                if (Math.random() < 0.3) particles.push(new Particle(player.x, player.y + player.radius, '#ffffff')); // Sprint dust
-            } else {
-                playerStamina = Math.min(100, playerStamina + dt * 15); // Regen
-            }
-            document.getElementById('staminaFill').style.width = playerStamina + '%';
-            document.getElementById('staminaFill').className = playerStamina < 25 ? 'h-full bg-red-500 w-full transition-all duration-75' : 'h-full bg-green-400 w-full transition-all duration-75';
-
-            // Player Input
-            let px = 0, py = 0;
-            if (keys.ArrowUp || keys.w) py -= 1;
-            if (keys.ArrowDown || keys.s) py += 1;
-            if (keys.ArrowLeft || keys.a) px -= 1;
-            if (keys.ArrowRight || keys.d) px += 1;
-
-            if (!player.isCaught && (px !== 0 || py !== 0)) {
-                applyTerrain(player);
-                let length = Math.sqrt(px * px + py * py);
-                px /= length; py /= length;
-                moveEntity(player, px * player.currentSpeed * speedMult * player.terrainModifier * dt, py * player.currentSpeed * speedMult * player.terrainModifier * dt);
-                if (Math.random() < 0.3) particles.push(new Particle(player.x, player.y + player.radius, '#65a30d'));
-            }
-
-            // Cow AI (Peaceful wandering)
-            for(let cow of cows) {
-                if (Math.random() < 0.01) cow.wanderAngle += getRandom(-1, 1);
-                let cx = Math.cos(cow.wanderAngle);
-                let cy = Math.sin(cow.wanderAngle);
-                let avoid = getAvoidanceForce(cow, 100);
-                cx += avoid.x * 3; cy += avoid.y * 3;
-                let cLen = Math.hypot(cx, cy);
-                if (cLen > 0) { cx /= cLen; cy /= cLen; }
-                moveEntity(cow, cx * cow.currentSpeed * dt, cy * cow.currentSpeed * dt);
-            }
-
-            // Camera Follow
-            camera.x += (player.x - camera.width / 2 - camera.x) * CAMERA_SMOOTHING;
-            camera.y += (player.y - camera.height / 2 - camera.y) * CAMERA_SMOOTHING;
-            clampCamera();
-
-            if (gameState === 'hub') {
-                checkInteractions();
-                // Friends wander casually near center
-                for (let ai of otherAIs) {
-                    if (Math.random() < 0.02) ai.wanderAngle += getRandom(-1, 1);
-                    
-                    // Pull gently to center
-                    let dxC = CENTER_X - ai.x; let dyC = CENTER_Y - ai.y;
-                    if (Math.hypot(dxC, dyC) > 500) {
-                        ai.wanderAngle = Math.atan2(dyC, dxC);
-                    }
-                    
-                    let ax = Math.cos(ai.wanderAngle) * 0.5; let ay = Math.sin(ai.wanderAngle) * 0.5;
-                    let avoid = getAvoidanceForce(ai, 80);
-                    ax += avoid.x * 2; ay += avoid.y * 2;
-                    let l = Math.hypot(ax, ay);
-                    if(l>0) { ax /= l; ay /= l; }
-                    
-                    applyTerrain(ai);
-                    moveEntity(ai, ax * 100 * ai.terrainModifier * dt, ay * 100 * ai.terrainModifier * dt);
-                }
-                return; // SKIP CHASE LOGIC
-            }
-
-            /* --- CHASE / HOLI LOGIC (gameState === 'playing') --- */
-            gameTime += dt;
-            speedUpdateTimer += dt;
-            if (player) player.shootCooldown -= dt;
-
-            // Holi Projectiles
-            for (let i = projectiles.length - 1; i >= 0; i--) {
-                let p = projectiles[i];
-                p.update(dt);
-                
-                let hit = false;
-                if (p.life <= 0) { 
-                    hit = true; // Explode on expire
-                } else if (p.team === 'seekers') {
-                    for (let t of [targetKrishna, targetDao].filter(t => !t.isCaught)) {
-                        if (Math.hypot(p.x - t.x, p.y - t.y) < t.radius + p.radius) {
-                            t.isCaught = true;
-                            for(let j=0; j<40; j++) particles.push(new Particle(t.x, t.y, p.color));
-                            hit = true; break;
-                        }
-                    }
-                } else {
-                    for (let s of [player, ...otherAIs].filter(s => !s.isCaught)) {
-                        if (Math.hypot(p.x - s.x, p.y - s.y) < s.radius + p.radius) {
-                            s.isCaught = true;
-                            for(let j=0; j<40; j++) particles.push(new Particle(s.x, s.y, p.color));
-                            if (s === player) endGame(false);
-                            hit = true; break;
-                        }
-                    }
-                }
-                
-                if (hit) {
-                    // Create Holi Splat on ground
-                    splats.push({x: p.x, y: p.y, r: p.radius * getRandom(1.5, 3), c: p.color});
-                    projectiles.splice(i, 1);
-                }
-            }
-
-            // Dynamic Speeds
-            if (speedUpdateTimer >= 1.0) {
-                player.updateSpeed(); targetKrishna.updateSpeed(); targetDao.updateSpeed();
-                otherAIs.forEach(ai => ai.updateSpeed());
-                speedUpdateTimer = 0;
-                
-                document.getElementById('playerSpeedUI').innerText = (player.currentSpeed / 1000).toFixed(2);
-                document.getElementById('targetSpeedUI').innerText = (targetKrishna.currentSpeed / 1000).toFixed(2);
-            }
-            document.getElementById('timeUI').innerText = gameTime.toFixed(1) + "s";
-            document.getElementById('friendsUI').innerText = otherAIs.filter(a => !a.isCaught).length;
-
-            let pursuers = [player, ...otherAIs].filter(a => !a.isCaught);
-            let targets = [targetKrishna, targetDao].filter(t => !t.isCaught);
-
-            // Cooldowns
-            for (let t of targets) t.shootCooldown -= dt;
-            for (let p of pursuers) p.shootCooldown -= dt;
-
-            // Target AI (Krishna & Dao Fleeing + Dodging)
-            for (let targetAI of targets) {
-                let tx = 0, ty = 0;
-                let closestPursuer = null; let minPDist = Infinity;
-
-                for(let p of pursuers) {
-                    let dx = targetAI.x - p.x; let dy = targetAI.y - p.y;
-                    let dist = Math.sqrt(dx*dx + dy*dy);
-                    if (dist < minPDist) { minPDist = dist; closestPursuer = p; }
-                    if (dist < 1200) { 
-                        let weight = 1500 / (dist + 1); 
-                        tx += (dx / dist) * weight; ty += (dy / dist) * weight;
-                    }
-                }
-
-                // AI DODGING HOLI WATER
-                if (gameMode === 'holi') {
-                    for (let proj of projectiles) {
-                        if (proj.team === 'seekers') {
-                            let projDist = Math.hypot(targetAI.x - proj.x, targetAI.y - proj.y);
-                            if (projDist < 250) {
-                                // Steer perpendicular to projectile velocity to dodge
-                                tx += -proj.vy * 5; 
-                                ty += proj.vx * 5;
-                            }
-                        }
-                    }
-                }
-
-                if (Math.hypot(tx, ty) > 0) {
-                    let l = Math.hypot(tx, ty); tx /= l; ty /= l;
-                } else {
-                    if (Math.random() < 0.05) targetAI.wanderAngle += getRandom(-0.5, 0.5);
-                    tx = Math.cos(targetAI.wanderAngle); ty = Math.sin(targetAI.wanderAngle);
-                }
-                
-                let targetAvoid = getAvoidanceForce(targetAI, 180);
-                tx += targetAvoid.x * 5.0; ty += targetAvoid.y * 5.0;
-
-                let fLength = Math.hypot(tx, ty);
-                if(fLength > 0) { tx /= fLength; ty /= fLength; }
-
-                applyTerrain(targetAI);
-                moveEntity(targetAI, tx * targetAI.currentSpeed * targetAI.terrainModifier * dt, ty * targetAI.currentSpeed * targetAI.terrainModifier * dt);
-                if (Math.random() < 0.3) particles.push(new Particle(targetAI.x, targetAI.y + targetAI.radius, '#65a30d'));
-
-                if (gameMode === 'holi' && targetAI.shootCooldown <= 0 && closestPursuer && minPDist < 800) {
-                    projectiles.push(new Projectile(targetAI.x, targetAI.y, closestPursuer.x, closestPursuer.y, 500, targetAI.color, true, 'hiders'));
-                    targetAI.shootCooldown = getRandom(1.5, 3.0);
-                }
-            }
-
-            // Friends AI (Chasing)
-            for (let ai of pursuers) {
-                if (ai === player || targets.length === 0) continue;
-                let closestTarget = targets[0];
-                let minTDist = Infinity;
-                for (let t of targets) {
-                    let d = Math.hypot(t.x - ai.x, t.y - ai.y);
-                    if (d < minTDist) { minTDist = d; closestTarget = t; }
-                }
-
-                let ax = closestTarget.x - ai.x; let ay = closestTarget.y - ai.y;
-                let l = Math.hypot(ax, ay);
-                if(l > 0) { ax /= l; ay /= l; }
-
-                for (let friend of pursuers) {
-                    if (friend === ai) continue;
-                    let fx = ai.x - friend.x; let fy = ai.y - friend.y;
-                    let fDist = Math.hypot(fx, fy);
-                    if (fDist < 100 && fDist > 0) { ax += (fx / fDist) * 0.8; ay += (fy / fDist) * 0.8; }
-                }
-
-                let aiAvoid = getAvoidanceForce(ai, 140);
-                ax += aiAvoid.x * 4.0; ay += aiAvoid.y * 4.0;
-                
-                let nL = Math.hypot(ax, ay);
-                if (nL > 0) { ax /= nL; ay /= nL; }
-                
-                applyTerrain(ai);
-                moveEntity(ai, ax * ai.currentSpeed * ai.terrainModifier * dt, ay * ai.currentSpeed * ai.terrainModifier * dt);
-
-                if (gameMode === 'holi' && ai.shootCooldown <= 0 && minTDist < 600) {
-                    projectiles.push(new Projectile(ai.x, ai.y, closestTarget.x, closestTarget.y, 650, '#06b6d4', false, 'seekers'));
-                    ai.shootCooldown = getRandom(2.0, 4.0);
-                }
-            }
-
-            // Capture logic (Tag)
-            if (gameMode === 'tag') {
-                for (let t of targets) {
-                    if (Math.hypot(player.x - t.x, player.y - t.y) < player.radius + t.radius) {
-                        t.isCaught = true;
-                        for(let i=0; i<30; i++) particles.push(new Particle(t.x, t.y, t.color));
-                    }
-                }
-            }
-
-            if (targetKrishna.isCaught && targetDao.isCaught) { endGame(true); }
-        }
-
-        function drawMinimap() {
-            mCtx.clearRect(0, 0, 180, 180);
-            const scale = 180 / Math.max(MAP_WIDTH, MAP_HEIGHT);
-
-            mCtx.save();
-            // REMOVED CIRCULAR CLIPPING SO WE CAN SEE CORNERS!
-            // Background is now handled by CSS border-radius
-
-            // Base Green Background
-            mCtx.fillStyle = 'rgba(74, 222, 128, 0.9)'; mCtx.fillRect(0, 0, 180, 180);
-            
-            // River
-            mCtx.fillStyle = 'rgba(37, 99, 235, 0.9)';
-            mCtx.fillRect((MAP_WIDTH - 500) * scale, 0, 500 * scale, MAP_HEIGHT * scale);
-
-            // Obstacles & Resources
-            let isHub = gameState === 'hub';
-            for (let obs of obstacles) {
-                if (obs.shape === 'circle') {
-                    // Permanently show map details (rocks, bushes, trees)
-                    if (obs.type === 'rock') mCtx.fillStyle = 'rgba(100, 116, 139, 0.7)'; // Grey
-                    else if (obs.type === 'tree' || obs.type === 'kadamba') mCtx.fillStyle = 'rgba(21, 128, 61, 0.8)'; // Dark Green
-                    else if (obs.type === 'bush') mCtx.fillStyle = 'rgba(101, 163, 13, 0.7)'; // Light Green
-                    else mCtx.fillStyle = 'rgba(21, 128, 61, 0.4)';
-
-                    // Only override with pink/yellow if it's the Hub phase AND has a resource
-                    if (isHub && obs.hasResource) {
-                        mCtx.fillStyle = (obs.type === 'bush' ? '#f472b6' : '#facc15');
-                    }
-                    
-                    mCtx.beginPath(); mCtx.arc(obs.x * scale, obs.y * scale, Math.max(2, obs.visualRadius * scale), 0, Math.PI*2); mCtx.fill();
-                }
-            }
-
-            // Camera Box
-            mCtx.strokeStyle = 'rgba(255, 255, 255, 0.8)'; mCtx.lineWidth = 1.5;
-            mCtx.strokeRect(camera.x * scale, camera.y * scale, camera.width * scale, camera.height * scale);
-
-            const drawDot = (ent, color, size) => {
-                if (ent.isCaught) return;
-                mCtx.fillStyle = color; mCtx.beginPath();
-                mCtx.arc(ent.x * scale, ent.y * scale, size, 0, Math.PI*2); mCtx.fill();
-            };
-
-            for(let ai of otherAIs) drawDot(ai, '#eab308', 2);
-            
-            let pulse = 3 + Math.abs(Math.sin(Date.now()/200)) * 1.5;
-            if(targetKrishna) drawDot(targetKrishna, '#3b82f6', pulse); 
-            if(targetDao) drawDot(targetDao, '#ffffff', pulse); 
-            if(player) drawDot(player, '#ef4444', 3);
-
-            mCtx.restore();
-        }
-
-        function draw() {
-            ctx.fillStyle = '#86efac'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.save();
-            ctx.translate(-camera.x, -camera.y);
-
-            // Ground Grid
-            ctx.strokeStyle = 'rgba(21, 128, 61, 0.1)'; ctx.lineWidth = 1; ctx.beginPath();
-            let sX = Math.floor(camera.x / 100) * 100; let sY = Math.floor(camera.y / 100) * 100;
-            for(let x=sX; x<camera.x + camera.width; x+=100) { ctx.moveTo(x, camera.y); ctx.lineTo(x, camera.y + camera.height); }
-            for(let y=sY; y<camera.y + camera.height; y+=100) { ctx.moveTo(camera.x, y); ctx.lineTo(camera.x + camera.width, y); }
-            ctx.stroke();
-            
-            // Draw Holi Splats (Permanent puddles)
-            for (let s of splats) {
-                if (s.x > camera.x - s.r && s.x < camera.x + camera.width + s.r && s.y > camera.y - s.r && s.y < camera.y + camera.height + s.r) {
-                    ctx.fillStyle = s.c;
-                    ctx.globalAlpha = 0.5;
-                    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-                    // Inner darker detail
-                    ctx.globalAlpha = 0.7;
-                    ctx.beginPath(); ctx.arc(s.x + 2, s.y - 1, s.r * 0.4, 0, Math.PI*2); ctx.fill();
-                }
-            }
-            ctx.globalAlpha = 1.0;
-
-            for (let p of particles) p.draw(ctx);
-            for (let p of projectiles) p.draw(ctx);
-
-            // GROUND LAYER: Cull and draw obstacles (Trunks, Rocks, Bushes)
-            for (let obs of obstacles) {
-                let drawIt = false;
-                if (obs.shape === 'rect' && obs.x < camera.x + camera.width && obs.x + obs.w > camera.x && obs.y < camera.y + camera.height && obs.y + obs.h > camera.y) drawIt = true;
-                if (obs.shape === 'circle' && obs.x + obs.visualRadius > camera.x && obs.x - obs.visualRadius < camera.x + camera.width && obs.y + obs.visualRadius > camera.y && obs.y - obs.visualRadius < camera.y + camera.height) drawIt = true;
-                if (drawIt) obs.draw(ctx, 'ground');
-            }
-
-            for (let cow of cows) cow.draw(ctx);
-            for (let ai of otherAIs) ai.draw(ctx);
-            
-            if (targetKrishna) {
-                targetKrishna.draw(ctx);
-                if (!targetKrishna.isCaught && gameState !== 'hub') {
-                    ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)'; ctx.beginPath();
-                    ctx.arc(targetKrishna.x, targetKrishna.y, targetKrishna.radius + 20 + Math.sin(Date.now()/100)*10, 0, Math.PI*2); ctx.stroke();
-                }
-            }
-            if (targetDao) {
-                targetDao.draw(ctx);
-                if (!targetDao.isCaught && gameState !== 'hub') {
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.beginPath();
-                    ctx.arc(targetDao.x, targetDao.y, targetDao.radius + 20 + Math.sin(Date.now()/100)*10, 0, Math.PI*2); ctx.stroke();
-                }
-            }
-
-            if (player) player.draw(ctx);
-
-            // CANOPY LAYER: Draw Tree Leaves ON TOP of everything else
-            for (let obs of obstacles) {
-                if (obs.type === 'tree' || obs.type === 'kadamba') {
-                    let drawIt = false;
-                    if (obs.x + obs.visualRadius > camera.x && obs.x - obs.visualRadius < camera.x + camera.width && obs.y + obs.visualRadius > camera.y && obs.y - obs.visualRadius < camera.y + camera.height) drawIt = true;
-                    if (drawIt) obs.draw(ctx, 'canopy');
-                }
-            }
-
-            // DIVINE X-RAY LAYER: See Krishna and Dao through the trees
-            const drawXRay = (ent, colorStr) => {
-                if (!ent || ent.isCaught || gameState === 'hub') return;
-                ctx.strokeStyle = colorStr;
-                ctx.lineWidth = 3;
-                ctx.setLineDash([6, 6]); // Dashed line for silhouette effect
-                ctx.beginPath();
-                ctx.arc(ent.x, ent.y, ent.radius + 8, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.setLineDash([]); // Reset dash
-            };
-
-            drawXRay(targetKrishna, 'rgba(59, 130, 246, 0.9)'); // Blue dashed ring
-            drawXRay(targetDao, 'rgba(255, 255, 255, 0.9)');   // White dashed ring
-
-            ctx.restore();
-            drawMinimap();
-        }
-
-        function gameLoop(timestamp) {
-            if (!lastTime) lastTime = timestamp;
-            let dt = (timestamp - lastTime) / 1000; 
-            if (dt > 0.1) dt = 0.1;
-            lastTime = timestamp;
-
-            if (gameState !== 'gameover') updateLogic(dt);
-            draw();
-            requestAnimationFrame(gameLoop);
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
-            if (e.key === ' ' && gameState === 'hub') handleInteraction();
-        });
-        window.addEventListener('keyup', (e) => {
-            if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
-        });
-
-        // Touch/Mouse Interaction Button
-        interactionPrompt.addEventListener('click', handleInteraction);
-
-        container.addEventListener('mousedown', (e) => {
-            if (gameState === 'playing' && gameMode === 'holi' && player && !player.isCaught && player.shootCooldown <= 0) {
-                const rect = container.getBoundingClientRect();
-                let clickX = e.clientX - rect.left + camera.x; let clickY = e.clientY - rect.top + camera.y;
-                projectiles.push(new Projectile(player.x, player.y, clickX, clickY, 1200, '#ec4899', false, 'seekers'));
-                player.shootCooldown = 0.35; 
-            }
-        });
-
-        function endGame(win) {
-            gameState = 'gameover';
-            if (win) {
-                document.getElementById('gameOverTitle').innerText = gameMode === 'tag' ? "Got Them!" : "Everyone Splashed!";
-                document.getElementById('gameOverTitle').className = "text-4xl font-extrabold mb-2 text-green-400";
-                document.getElementById('gameOverDesc').innerHTML = `You won in <span class="font-bold text-white">${gameTime.toFixed(2)}</span> seconds.`;
-            } else {
-                document.getElementById('gameOverTitle').innerText = "You got Splashed!";
-                document.getElementById('gameOverTitle').className = "text-4xl font-extrabold mb-2 text-red-500";
-                document.getElementById('gameOverDesc').innerHTML = "A water bomb hit you. The chase ends here!";
-            }
-            gameOverScreen.classList.remove('hidden');
-        }
-
-        document.getElementById('returnToHubBtn').addEventListener('click', () => {
-            gameOverScreen.classList.add('hidden');
-            initEntitiesHub();
-        });
-
-        // Start
-        resizeCanvas();
-        initMap(); 
-        initEntitiesHub();
-        requestAnimationFrame(gameLoop);
-
-    </script>
+        <!-- Game Over / Results Modal -->
+        <div id="gameOverModal" class="modal-overlay hidden">
+            <div class="glass-panel modal-card">
+                <h2 id="gameOverTitle" class="modal-title text-green-400">Match Completed!</h2>
+                <p id="gameOverDesc" style="margin-bottom: 24px; color: #cbd5e1;">Splendid pastimes with Krishna and friends!</p>
+                <button onclick="returnToHub()" class="btn-gold">
+                    Return to Rest under the Kadamba Tree
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Main Module Script -->
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

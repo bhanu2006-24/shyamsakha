@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;600;700;800&display=swap');
+
+:root {
+    --bg-dark: #090d16;
+    --bg-card: rgba(15, 23, 42, 0.88);
+    --gold: #facc15;
+    --gold-glow: rgba(250, 204, 21, 0.4);
+    --divine-blue: #38bdf8;
+    --krishna-blue: #0284c7;
+    --peacock-green: #10b981;
+    --lotus-pink: #f472b6;
+    --balram-white: #f8fafc;
+    --border-glow: rgba(255, 255, 255, 0.12);
+    --court-sand: #fef08a;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: var(--bg-dark);
+    color: #f8fafc;
+    overflow: hidden;
+    touch-action: none;
+    width: 100vw;
+    height: 100vh;
+}
+
+h1, h2, h3, .divine-font {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+}
+
+#gameCanvas {
+    background-color: #1e293b;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.canvas-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+    background: var(--bg-card);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-glow);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border-radius: 18px;
+}
+
+/* Overlay UI layers */
+.ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 30;
+}
+
+.interactive {
+    pointer-events: auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Subtle Shimmer & Pulse Animations */
+@keyframes divinePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 15px var(--gold-glow);
+    }
+    50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 25px rgba(250, 204, 21, 0.7);
+    }
+}
+
+@keyframes floatGentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.float-anim {
+    animation: floatGentle 3s ease-in-out infinite;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #eab308, #ca8a04);
+    color: #0f172a;
+    font-weight: 800;
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(234, 179, 8, 0.7);
+}
