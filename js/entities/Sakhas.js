@@ -96,43 +96,97 @@ export class Sakha extends Entity {
         this.walkTimer = 0;
         this.isMoving = false;
         
-        // Pastoral Routine System
+        // Pastoral Routine System (Lifelike Idle, Strolls, and Devotional Offerings)
         this.homeX = x;
         this.homeY = y;
-        this.routineState = 'wander'; // 'wander', 'seek_fruit', 'carry_offering', 'offer_action'
-        this.routineTimer = 10 + (presetIndex * 12) + Math.random() * 10;
+        this.routineState = 'idle'; // 'idle', 'stroll', 'seek_fruit', 'carry_offering', 'offer_action', 'return_home'
+        this.idleTimer = 2.0 + (presetIndex * 1.5) + Math.random() * 3.0; // Staggered peaceful standing
+        this.strollTargetX = x;
+        this.strollTargetY = y;
+        this.strollTimer = 0;
+        this.routineTimer = 25 + (presetIndex * 15) + Math.random() * 15;
         this.heldItem = null; // 'mango', 'flower', null
         this.targetOffering = 'krishna';
         this.targetTree = null;
         this.actionCooldown = 0;
     }
 
+    moveTowardsWithAvoidance(targetX, targetY, speed, dt, obstacles, mapW, mapH, game) {
+        const dx = targetX - this.x;
+        const dy = targetY - this.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 4) {
+            this.isMoving = false;
+            return 0;
+        }
+
+        let sx = dx / dist;
+        let sy = dy / dist;
+
+        // 1. Obstacle avoidance (steer around tree trunks, rocks, ponds)
+        for (const obs of obstacles) {
+            if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
+                const odx = this.x - obs.x;
+                const ody = this.y - obs.y;
+                const oDist = Math.hypot(odx, ody);
+                const safeZone = (obs.radius || 28) + this.radius + 35;
+                if (oDist < safeZone && oDist > 0) {
+                    const push = Math.pow((safeZone - oDist) / safeZone, 2) * 2.8;
+                    sx += (odx / oDist) * push;
+                    sy += (ody / oDist) * push;
+                }
+            }
+        }
+
+        // 2. Mutual Sakha separation force (never clump or overlap!)
+        if (game && game.sakhas) {
+            for (const other of game.sakhas) {
+                if (other === this) continue;
+                const odx = this.x - other.x;
+                const ody = this.y - other.y;
+                const oDist = Math.hypot(odx, ody);
+                if (oDist < 48 && oDist > 0) {
+                    const push = (48 - oDist) / 48 * 2.2;
+                    sx += (odx / oDist) * push;
+                    sy += (ody / oDist) * push;
+                }
+            }
+        }
+
+        const sLen = Math.hypot(sx, sy);
+        if (sLen > 0) {
+            sx /= sLen;
+            sy /= sLen;
+        }
+
+        this.applyTerrain(obstacles);
+        this.moveWithAnim(sx * speed * this.terrainModifier * dt, sy * speed * this.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        return dist;
+    }
+
     updateRoutine(dt, obstacles, mapW, mapH, krishna, balram, game) {
         this.updateDynamicSpeed(dt);
-        this.routineTimer -= dt;
+        if (this.routineTimer > 0) this.routineTimer -= dt;
 
-        if (this.routineState === 'wander') {
-            // Gentle wandering around home clearing anchor
-            if (Math.random() < 0.02) {
-                this.wanderAngle += (Math.random() - 0.5) * 1.5;
+        if (this.routineState === 'idle') {
+            this.isMoving = false;
+            this.walkTimer = 0;
+            this.idleTimer -= dt;
+
+            // Face naturally towards Krishna / central resting mat
+            if (krishna) {
+                const fdx = krishna.x - this.x;
+                const fdy = krishna.y - this.y;
+                const fLen = Math.hypot(fdx, fdy);
+                if (fLen > 0) {
+                    this.dx = fdx / fLen;
+                    this.dy = fdy / fLen;
+                }
             }
-            
-            // Leash force back to home if drifted too far
-            const dHome = Math.hypot(this.x - this.homeX, this.y - this.homeY);
-            let moveX = Math.cos(this.wanderAngle) * 45;
-            let moveY = Math.sin(this.wanderAngle) * 45;
 
-            if (dHome > 160) {
-                const pullAngle = Math.atan2(this.homeY - this.y, this.homeX - this.x);
-                moveX = Math.cos(pullAngle) * 55;
-                moveY = Math.sin(pullAngle) * 55;
-            }
-
-            this.moveWithAnim(moveX * dt, moveY * dt, obstacles, mapW, mapH, dt);
-
-            // Time to start autonomous pastoral task (e.g. pick fruit or flower for Kanha/Dao)
+            // Time to either stretch legs with a gentle stroll or start fruit offering
             if (this.routineTimer <= 0) {
-                this.routineTimer = 28 + Math.random() * 24;
+                this.routineTimer = 35 + Math.random() * 30;
                 // Find nearest mango tree or parijat bush
                 let bestTree = null;
                 let bestDist = Infinity;
@@ -146,32 +200,54 @@ export class Sakha extends Entity {
                     }
                 }
 
-                if (bestTree && bestDist < 650) {
+                if (bestTree && bestDist < 550) {
                     this.targetTree = bestTree;
                     this.routineState = 'seek_fruit';
                     this.actionCooldown = 0;
+                    return;
                 } else if (Math.random() < 0.35 && game && game.ui) {
-                    // Pastime poll callout in hub
                     this.pollPastimeCallout(game);
                 }
             }
+
+            if (this.idleTimer <= 0) {
+                // Decide next relaxed action: short 1.5–2.5s stroll nearby
+                const strollAngle = Math.random() * Math.PI * 2;
+                const strollDist = 30 + Math.random() * 45;
+                this.strollTargetX = this.homeX + Math.cos(strollAngle) * strollDist;
+                this.strollTargetY = this.homeY + Math.sin(strollAngle) * strollDist;
+                this.strollTimer = 1.8 + Math.random() * 1.2;
+                this.routineState = 'stroll';
+            }
+
+        } else if (this.routineState === 'stroll') {
+            this.strollTimer -= dt;
+            const remaining = this.moveTowardsWithAvoidance(this.strollTargetX, this.strollTargetY, 55, dt, obstacles, mapW, mapH, game);
+
+            if (remaining < 18 || this.strollTimer <= 0) {
+                this.routineState = 'idle';
+                this.idleTimer = 4.5 + Math.random() * 5.0; // Stand peacefully for 4.5–9.5 seconds
+                this.isMoving = false;
+                this.walkTimer = 0;
+            }
+
         } else if (this.routineState === 'seek_fruit') {
             if (!this.targetTree) {
-                this.routineState = 'wander';
+                this.routineState = 'return_home';
                 return;
             }
 
-            const dx = this.targetTree.x - this.x;
-            const dy = this.targetTree.y - this.y;
-            const dist = Math.hypot(dx, dy);
+            // Stand safely outside tree trunk / bush canopy
+            const targetDist = (this.targetTree.radius || 28) + this.radius + 18;
+            const curDist = Math.hypot(this.targetTree.x - this.x, this.targetTree.y - this.y);
 
-            if (dist > 45) {
-                const speed = this.currentSpeed * 0.75;
-                this.moveWithAnim((dx / dist) * speed * dt, (dy / dist) * speed * dt, obstacles, mapW, mapH, dt);
+            if (curDist > targetDist + 10) {
+                this.moveTowardsWithAvoidance(this.targetTree.x, this.targetTree.y, this.currentSpeed * 0.72, dt, obstacles, mapW, mapH, game);
             } else {
                 // Arrived at tree/bush! Pluck fruit or flower
-                this.actionCooldown += dt;
                 this.isMoving = false;
+                this.walkTimer = 0;
+                this.actionCooldown += dt;
                 if (this.actionCooldown >= 1.6) {
                     this.heldItem = (this.targetTree.type === 'bush') ? 'flower' : 'mango';
                     this.targetOffering = Math.random() < 0.7 ? 'krishna' : 'balram';
@@ -182,27 +258,32 @@ export class Sakha extends Entity {
                     }
                 }
             }
+
         } else if (this.routineState === 'carry_offering') {
             const targetObj = (this.targetOffering === 'krishna' && krishna) ? krishna : balram;
             if (!targetObj) {
-                this.routineState = 'wander';
+                this.routineState = 'return_home';
                 return;
             }
 
-            const dx = targetObj.x - this.x;
-            const dy = (targetObj.y + 35) - this.y;
-            const dist = Math.hypot(dx, dy);
+            // Stand respectfully 55px in front of Krishna / Balram
+            const stopDist = 58;
+            const curDist = Math.hypot(targetObj.x - this.x, (targetObj.y + 35) - this.y);
 
-            if (dist > 48) {
-                const speed = this.currentSpeed * 0.8;
-                this.moveWithAnim((dx / dist) * speed * dt, (dy / dist) * speed * dt, obstacles, mapW, mapH, dt);
+            if (curDist > stopDist) {
+                this.moveTowardsWithAvoidance(targetObj.x, targetObj.y + 35, this.currentSpeed * 0.75, dt, obstacles, mapW, mapH, game);
             } else {
                 // Arrived at Krishna / Balram! Present offering
                 this.routineState = 'offer_action';
                 this.actionCooldown = 0;
                 this.isMoving = false;
-                this.dx = dx / (dist || 1);
-                this.dy = dy / (dist || 1);
+                this.walkTimer = 0;
+
+                const fdx = targetObj.x - this.x;
+                const fdy = targetObj.y - this.y;
+                const fLen = Math.hypot(fdx, fdy) || 1;
+                this.dx = fdx / fLen;
+                this.dy = fdy / fLen;
 
                 if (game) {
                     if (this.targetOffering === 'krishna') {
@@ -225,13 +306,24 @@ export class Sakha extends Entity {
                     }
                 }
             }
+
         } else if (this.routineState === 'offer_action') {
             this.actionCooldown += dt;
             this.isMoving = false;
-            if (this.actionCooldown >= 2.8) {
+            this.walkTimer = 0;
+            if (this.actionCooldown >= 2.5) {
                 this.heldItem = null;
-                this.routineState = 'wander';
-                this.routineTimer = 22 + Math.random() * 20;
+                this.routineState = 'return_home';
+            }
+
+        } else if (this.routineState === 'return_home') {
+            const remaining = this.moveTowardsWithAvoidance(this.homeX, this.homeY, 65, dt, obstacles, mapW, mapH, game);
+            if (remaining < 25) {
+                this.routineState = 'idle';
+                this.idleTimer = 6.0 + Math.random() * 6.0;
+                this.routineTimer = 35 + Math.random() * 30;
+                this.isMoving = false;
+                this.walkTimer = 0;
             }
         }
     }
@@ -244,14 +336,6 @@ export class Sakha extends Entity {
             `🏃‍♂️ ${this.name}: "Let's play Pakad Pakdai (Tag Chase)! Kanha and Dau get a head start!"`
         ];
         game.ui.showToast(polls[Math.floor(Math.random() * polls.length)], 4500);
-    }
-
-    moveWithAnim(dx, dy, obstacles, mapWidth, mapHeight, dt) {
-        this.isMoving = (dx !== 0 || dy !== 0);
-        if (this.isMoving) {
-            this.walkTimer += dt;
-        }
-        this.move(dx, dy, obstacles, mapWidth, mapHeight);
     }
 
     draw(ctx) {

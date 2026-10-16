@@ -25,16 +25,13 @@ export function checkLineOfSight(x1, y1, x2, y2, obstacles, particleSystem, maxD
         return false;
     }
 
-    // 2. Check if thick tree canopy or dense bush occludes the view
+    // 2. Check if thick tree trunks/canopy occlude the view
     for (const obs of obstacles) {
-        if (obs.shape === 'circle') {
-            const isOccluder = (obs.type === 'tree' || obs.type === 'bush');
-            if (isOccluder) {
-                const blockRadius = (obs.type === 'tree') ? (obs.visualRadius * 0.72) : (obs.visualRadius * 0.85);
-                const d = distToSegment(obs.x, obs.y, x1, y1, x2, y2);
-                if (d < blockRadius) {
-                    return false; // Vision blocked by dense pastoral foliage!
-                }
+        if (obs.shape === 'circle' && obs.type === 'tree') {
+            const blockRadius = obs.visualRadius * 0.62;
+            const d = distToSegment(obs.x, obs.y, x1, y1, x2, y2);
+            if (d < blockRadius) {
+                return false; // Vision blocked by dense pastoral tree grove!
             }
         }
     }

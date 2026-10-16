@@ -126,14 +126,29 @@ export class Entity {
         this.y = Math.max(this.radius, Math.min(this.y, mapHeight - this.radius));
     }
 
+    moveWithAnim(dx, dy, obstacles, mapWidth, mapHeight, dt) {
+        const startX = this.x;
+        const startY = this.y;
+        this.move(dx, dy, obstacles, mapWidth, mapHeight);
+        const actualMoved = Math.hypot(this.x - startX, this.y - startY);
+
+        if (actualMoved > 0.08) {
+            this.isMoving = true;
+            this.walkTimer = (this.walkTimer || 0) + dt;
+        } else {
+            this.isMoving = false;
+            this.walkTimer = 0;
+        }
+    }
+
     checkCollision(obs) {
         if (obs.shape === 'rect') {
             const testX = Math.max(obs.x, Math.min(this.x, obs.x + obs.w));
             const testY = Math.max(obs.y, Math.min(this.y, obs.y + obs.h));
             return Math.hypot(this.x - testX, this.y - testY) <= this.radius;
         } else if (obs.shape === 'circle') {
-            // Bushes and small rocks don't block movement completely (soft obstacles)
-            if (obs.type === 'bush' || obs.type === 'rock' || obs.type === 'lotus') return false;
+            // Bushes, flower carpets, and small rocks don't block movement completely (soft obstacles)
+            if (obs.type === 'bush' || obs.type === 'rock' || obs.type === 'lotus' || obs.type === 'flower_carpet') return false;
             return Math.hypot(this.x - obs.x, this.y - obs.y) < (this.radius + obs.radius);
         }
         return false;

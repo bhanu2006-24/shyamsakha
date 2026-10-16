@@ -48,13 +48,6 @@ export class Krishna extends Entity {
         }
     }
 
-    moveWithAnim(dx, dy, obstacles, mapWidth, mapHeight, dt) {
-        this.isMoving = (dx !== 0 || dy !== 0);
-        if (this.isMoving) {
-            this.walkTimer += dt;
-        }
-        this.move(dx, dy, obstacles, mapWidth, mapHeight);
-    }
 
     draw(ctx) {
         ctx.save();

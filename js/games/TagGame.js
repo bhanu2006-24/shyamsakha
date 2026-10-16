@@ -66,7 +66,8 @@ export class TagGame {
         const mapH = this.game.mapManager.getHeight();
 
         // 1. Check if PLAYER tags Krishna (Only the player's tag wins!)
-        if (!krishna.isCaught && Math.hypot(player.x - krishna.x, player.y - krishna.y) < player.radius + krishna.radius + 16) {
+        const kDist = Math.hypot(player.x - krishna.x, player.y - krishna.y);
+        if (!krishna.isCaught && kDist < player.radius + krishna.radius + 28 && (krishna.z || 0) < 65) {
             krishna.isCaught = true;
             this.game.particles.createPetals(krishna.x, krishna.y, '#38bdf8', 55);
             this.game.sound.playCheer();
@@ -74,7 +75,8 @@ export class TagGame {
         }
 
         // 2. Check if PLAYER tags Dao Balram
-        if (!balram.isCaught && Math.hypot(player.x - balram.x, player.y - balram.y) < player.radius + balram.radius + 16) {
+        const bDist = Math.hypot(player.x - balram.x, player.y - balram.y);
+        if (!balram.isCaught && bDist < player.radius + balram.radius + 28 && (balram.z || 0) < 65) {
             balram.isCaught = true;
             this.game.particles.createPetals(balram.x, balram.y, '#f8fafc', 55);
             this.game.sound.playCheer();
@@ -103,6 +105,7 @@ export class TagGame {
         if (ai.escapeCooldown > 0) ai.escapeCooldown -= dt;
         if (ai.borderBoostTimer > 0) ai.borderBoostTimer -= dt;
         if (ai.smokeCooldown > 0) ai.smokeCooldown -= dt;
+        if (target.evasionCooldown > 0) target.evasionCooldown -= dt;
 
         // Anti-stuck watchdog
         const moveDist = Math.hypot(target.x - ai.lastX, target.y - ai.lastY);
