@@ -19,6 +19,7 @@ export class VolleyballGame {
         this.touchCount = 0;
         this.lastSide = 'player'; // which side touched the ball last
         this.pointCooldown = 0;
+        this.playerHitCooldown = 0;
         this.isActive = false;
 
         // UI refs
@@ -37,6 +38,7 @@ export class VolleyballGame {
         this.isActive = true;
         this.touchCount = 0;
         this.pointCooldown = 1.0;
+        this.playerHitCooldown = 0.5;
 
         if (this.scoreboardEl) this.scoreboardEl.classList.remove('hidden');
         this.updateScoreUI();
@@ -47,7 +49,7 @@ export class VolleyballGame {
         // Spawn ball for serve
         this.prepareServe();
 
-        this.game.ui.showToast("🏐 Kanduka Kridha (Volleyball) has begun! First to 7 points wins!");
+        this.game.ui.showToast("🏐 Kanduka Kridha (Volleyball) has begun! First to 7 points wins!", 4500);
         this.game.sound.playCheer();
     }
 
@@ -77,10 +79,30 @@ export class VolleyballGame {
         d.x = c.x + c.w * 0.82;
         d.y = c.y + c.h * 0.65;
         d.dx = -1; d.dy = 0;
+
+        // Other Sakhas cheer along North and South sidelines of the court
+        const sidelinePositions = [
+            { x: c.x + c.w * 0.15, y: c.y - 45, dx: 0, dy: 1 },
+            { x: c.x + c.w * 0.35, y: c.y - 45, dx: 0, dy: 1 },
+            { x: c.x + c.w * 0.65, y: c.y - 45, dx: 0, dy: 1 },
+            { x: c.x + c.w * 0.85, y: c.y - 45, dx: 0, dy: 1 },
+            { x: c.x + c.w * 0.25, y: c.y + c.h + 45, dx: 0, dy: -1 },
+            { x: c.x + c.w * 0.50, y: c.y + c.h + 45, dx: 0, dy: -1 },
+            { x: c.x + c.w * 0.75, y: c.y + c.h + 45, dx: 0, dy: -1 }
+        ];
+        for (let i = 1; i < this.game.sakhas.length; i++) {
+            const sp = sidelinePositions[(i - 1) % sidelinePositions.length];
+            const s = this.game.sakhas[i];
+            s.x = sp.x;
+            s.y = sp.y;
+            s.dx = sp.dx;
+            s.dy = sp.dy;
+        }
     }
 
     prepareServe() {
         const c = this.court;
+        this.playerHitCooldown = 0.6;
         if (this.serverTeam === 'player') {
             this.ball.reset(this.game.player.x + 20, this.game.player.y);
             this.ball.serve(this.game.player, c.x + c.w * 0.75, c.y + c.h * 0.5, this.game.sound);
@@ -94,6 +116,10 @@ export class VolleyballGame {
 
     update(dt) {
         if (!this.isActive) return;
+
+        if (this.playerHitCooldown > 0) {
+            this.playerHitCooldown -= dt;
+        }
 
         if (this.pointCooldown > 0) {
             this.pointCooldown -= dt;
@@ -114,7 +140,8 @@ export class VolleyballGame {
         const distToPlayer = Math.hypot(player.x - ball.x, player.y - ball.y);
         const ballHitHeight = ball.z <= 60; // reachable in air
 
-        if (distToPlayer < player.radius + ball.radius + 20 && ballHitHeight) {
+        if (this.playerHitCooldown <= 0 && distToPlayer < player.radius + ball.radius + 22 && ballHitHeight) {
+            this.playerHitCooldown = 0.38;
             // Player bumps or spikes
             const isSpike = player.z > 15 || this.game.input.isDown('Shift');
             

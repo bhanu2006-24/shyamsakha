@@ -147,9 +147,9 @@ export class Game {
         this.cows = [];
         const cowColors = ['#fffdd0', '#fef3c7', '#d2b48c', '#b45309', '#f8fafc'];
         const clearingCowOffsets = [
-            { dx: -240, dy: -30 }, { dx: 240, dy: -25 },
-            { dx: -260, dy: 160 }, { dx: 260, dy: 150 },
-            { dx: -180, dy: 240 }, { dx: 170, dy: 230 }
+            { dx: -220, dy: -40 }, { dx: 220, dy: -40 },
+            { dx: -220, dy: 70 },  { dx: 240, dy: 80 },
+            { dx: -90, dy: 250 },  { dx: 110, dy: 240 }
         ];
 
         for (let i = 0; i < clearingCowOffsets.length; i++) {
@@ -158,10 +158,14 @@ export class Game {
             this.cows.push(new GauMata(cx + co.dx, cy + co.dy, cColor));
         }
 
-        // Additional cows across the wider pastoral meadows
+        // Additional cows across the wider pastoral meadows (guaranteed away from water)
         for (let i = 0; i < 10; i++) {
-            const rx = 150 + Math.random() * (map.width - 700);
-            const ry = 150 + Math.random() * (map.height - 300);
+            let rx = 200 + Math.random() * (map.width - 900);
+            let ry = 200 + Math.random() * (map.height - 400);
+            // Ensure no cow spawns in Kamal Sarovar pond
+            if (Math.hypot(rx - (cx - 420), ry - (cy + 200)) < 130) {
+                rx += 200;
+            }
             const cColor = cowColors[Math.floor(Math.random() * cowColors.length)];
             this.cows.push(new GauMata(rx, ry, cColor));
         }
@@ -227,9 +231,13 @@ export class Game {
                 }
             }
 
-            // 'Escape' key: Close any active modal
+            // 'Escape' key: Close any active modal or return to hub
             if (e.key === 'Escape') {
-                this.ui.closeAllModals();
+                if (this.ui.isAnyModalOpen()) {
+                    this.ui.closeAllModals();
+                } else if (this.state !== 'hub') {
+                    this.returnToHub();
+                }
             }
 
             // 'H' key: Toggle Help / Guide Modal
@@ -254,6 +262,11 @@ export class Game {
         }
 
         // Top HUD buttons
+        const topHubReturnBtn = document.getElementById('topHubReturnBtn');
+        if (topHubReturnBtn) {
+            topHubReturnBtn.addEventListener('click', () => this.returnToHub());
+        }
+
         const bagBtn = document.getElementById('bagBtn');
         if (bagBtn) {
             bagBtn.addEventListener('click', () => this.ui.openBagModal());
@@ -274,24 +287,12 @@ export class Game {
             helpBtn.addEventListener('click', () => this.ui.openHelp());
         }
 
-        // Minimap Collapse / Reopen
-        const minimapContainer = document.getElementById('minimapContainer');
+        // Minimap Close Button
         const minimapToggleBtn = document.getElementById('minimapToggleBtn');
-        const reopenMinimapBtn = document.getElementById('reopenMinimapBtn');
-
-        if (minimapToggleBtn && minimapContainer) {
+        if (minimapToggleBtn) {
             minimapToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                minimapContainer.classList.add('collapsed');
-                if (reopenMinimapBtn) reopenMinimapBtn.classList.remove('hidden');
-            });
-        }
-
-        if (reopenMinimapBtn && minimapContainer) {
-            reopenMinimapBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                minimapContainer.classList.remove('collapsed');
-                reopenMinimapBtn.classList.add('hidden');
+                this.toggleMinimap();
             });
         }
 
@@ -547,25 +548,25 @@ export class Game {
     }
 
     startPastimeFromKrishna(mode) {
-        this.ui.closeKrishnaMenu();
+        this.ui.closeDialogue();
         const pastimesNames = {
             volleyball: "Kanduka Kridha (Volleyball)",
             tag: "Pakad Pakdai (Tag Chase)",
             holi: "Rangotsav (Holi Pichkari)"
         };
-        this.ui.showDialogue("Krishna", `Ha ha! Let us play ${pastimesNames[mode] || mode}! Run, Sakhas!`, "🦚", "text-blue-400");
         this.startGameMode(mode);
+        this.ui.showToast(`✨ Started ${pastimesNames[mode] || mode}! (Press ESC or Return to Hub anytime)`);
     }
 
     travelFromBalram(mapKey) {
-        this.ui.closeBalramMenu();
+        this.ui.closeDialogue();
         const mapNames = {
             vrindavan: "Vrindavan Pastures (वृन्दावन गोचारण)",
             yamuna: "Yamuna Sandbanks (यमुना तट)",
             govardhan: "Govardhan Foothills (गिरिराज गोवर्धन)"
         };
-        this.ui.showDialogue("Dao Balaram", `Come, little brothers! Let us guide the cows to ${mapNames[mapKey] || mapKey}!`, "🌾", "text-white");
         this.loadMap(mapKey);
+        this.ui.showToast(`🌿 Guided friends to ${mapNames[mapKey] || mapKey}!`);
     }
 
     talkToFriends() {
@@ -582,7 +583,7 @@ export class Game {
     }
 
     startGameMode(mode) {
-        this.ui.closeGameChoice();
+        this.ui.closeAllModals();
         this.state = mode;
 
         const hubBtn = document.getElementById('topHubReturnBtn');
@@ -685,8 +686,12 @@ export class Game {
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             this.volleyballGame.update(dt);
         } else if (this.state === 'tag') {
+            if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
+            if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             this.tagGame.update(dt);
         } else if (this.state === 'holi') {
+            if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
+            if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             this.holiGame.update(dt);
         }
 
