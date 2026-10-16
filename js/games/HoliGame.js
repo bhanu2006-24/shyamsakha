@@ -1,6 +1,6 @@
 /**
  * HoliGame (होली उत्सव - Rangotsav Pichkari & Color Fight)
- * Playful, fair, and immersive Vrindavan color fight: Player & Sakhas vs Krishna & Dao Balram
+ * Grand Vrindavan Color Battle: Agile, powerful Krishna & Dao Balram vs Player & Sakhas
  */
 export class Projectile {
     constructor(x, y, targetX, targetY, speed, color, isBomb, team) {
@@ -15,7 +15,7 @@ export class Projectile {
         this.color = color;
         this.isBomb = isBomb;
         this.team = team;
-        this.radius = isBomb ? 13 : 8;
+        this.radius = isBomb ? 14 : 8;
         this.life = 1.9;
     }
 
@@ -33,7 +33,7 @@ export class Projectile {
         ctx.fill();
 
         // Trail glow
-        ctx.globalAlpha = 0.45;
+        ctx.globalAlpha = 0.5;
         ctx.beginPath();
         ctx.arc(this.x - this.vx * 0.035, this.y - this.vy * 0.035, this.radius * 0.85, 0, Math.PI * 2);
         ctx.fill();
@@ -50,11 +50,14 @@ export class HoliGame {
         this.playerSplashes = 0;
         this.krishnaSplashes = 0;
         this.balramSplashes = 0;
-        this.maxSplashes = 3;
-        this.playerIFrameTimer = 0; // Invulnerability frames so player doesn't get combo-spammed
-        this.krishnaAi = { state: 'flee', timer: 2.5, stuckTimer: 0, lastX: 0, lastY: 0, bombCooldown: 2.0, telegraphTimer: 0 };
-        this.balramAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: 0, lastY: 0, bombCooldown: 3.0, telegraphTimer: 0 };
+        this.maxSplashes = 5; // 5 soak points for divine targets!
+        this.playerMaxSplashes = 4;
+        this.playerIFrameTimer = 0;
+        this.krishnaAi = { state: 'flee', timer: 2.5, stuckTimer: 0, lastX: 0, lastY: 0, bombCooldown: 2.2, telegraphTimer: 0 };
+        this.balramAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: 0, lastY: 0, bombCooldown: 2.8, telegraphTimer: 0 };
         this.sakhaShootCooldowns = [];
+        this.krishnaSakhaHits = 0;
+        this.balramSakhaHits = 0;
     }
 
     start() {
@@ -63,47 +66,60 @@ export class HoliGame {
         this.playerSplashes = 0;
         this.krishnaSplashes = 0;
         this.balramSplashes = 0;
+        this.krishnaSakhaHits = 0;
+        this.balramSakhaHits = 0;
         this.playerIFrameTimer = 0;
 
         const p = this.game.player;
         const k = this.game.krishna;
         const b = this.game.balram;
+        const map = this.game.mapManager.currentMap;
+        const cx = map.centerX;
+        const cy = map.centerY;
 
         k.isCaught = false;
         b.isCaught = false;
         p.isCaught = false;
 
-        // Position Krishna & Balram in clear pasture within player sight
-        k.x = p.x + 190;
-        k.y = p.y - 120;
-        b.x = p.x - 190;
-        b.y = p.y - 120;
+        // Player & Sakhas start in the south clearing
+        p.x = cx;
+        p.y = cy + 140;
 
-        this.krishnaAi = { state: 'flee', timer: 2.0, stuckTimer: 0, lastX: k.x, lastY: k.y, bombCooldown: 2.5, telegraphTimer: 0 };
-        this.balramAi = { state: 'flee', timer: 2.8, stuckTimer: 0, lastX: b.x, lastY: b.y, bombCooldown: 3.5, telegraphTimer: 0 };
+        // Krishna & Dao Balram get a grand head start in scenic groves!
+        k.x = cx + 380;
+        k.y = cy - 280;
+        k.currentSpeed = 350; // Divine agile speed!
+
+        b.x = cx - 420;
+        b.y = cy - 220;
+        b.currentSpeed = 330;
+
+        this.krishnaAi = { state: 'flee', timer: 2.5, stuckTimer: 0, lastX: k.x, lastY: k.y, bombCooldown: 2.2, telegraphTimer: 0 };
+        this.balramAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: b.x, lastY: b.y, bombCooldown: 2.8, telegraphTimer: 0 };
 
         this.sakhaShootCooldowns = [];
         this.game.sakhas.forEach((s, idx) => {
             s.isCaught = false;
             s.x = p.x + ((idx % 4) - 1.5) * 80;
-            s.y = p.y + 70 + Math.floor(idx / 4) * 55;
-            this.sakhaShootCooldowns.push(1.0 + Math.random() * 2.0);
+            s.y = p.y + 60 + Math.floor(idx / 4) * 45;
+            this.sakhaShootCooldowns.push(1.5 + Math.random() * 2.0);
+            s.currentSpeed = 260;
         });
 
         this.updateHoliStatusUI();
-        this.game.ui.showToast("💦 Rangotsav has begun! Aim with mouse and click or press Spacebar to shoot! 🌈", 4500);
+        this.game.ui.showToast("💦 Rangotsav has begun! Kanha & Dao Balram took the high ground! Aim and shoot! 🌈", 5000);
         this.game.sound.playSplash();
     }
 
     updateHoliStatusUI() {
-        const pHearts = '💖'.repeat(Math.max(0, this.maxSplashes - this.playerSplashes));
+        const pHearts = '💖'.repeat(Math.max(0, this.playerMaxSplashes - this.playerSplashes));
         const kHearts = '🦚'.repeat(Math.max(0, this.maxSplashes - this.krishnaSplashes));
         const bHearts = '🌾'.repeat(Math.max(0, this.maxSplashes - this.balramSplashes));
         this.game.ui.setPhase(`You [${pHearts || '❌'}] | Kanha [${kHearts || '✔'}] | Balram [${bHearts || '✔'}]`, "tag-playing");
     }
 
     shoot(fromX, fromY, toX, toY, color = '#ec4899', isBomb = false, team = 'player') {
-        const p = new Projectile(fromX, fromY, toX, toY, isBomb ? 520 : 820, color, isBomb, team);
+        const p = new Projectile(fromX, fromY, toX, toY, isBomb ? 600 : 850, color, isBomb, team);
         this.projectiles.push(p);
         this.game.sound.playSplash();
     }
@@ -129,7 +145,6 @@ export class HoliGame {
             let targetX = mouse.worldX;
             let targetY = mouse.worldY;
 
-            // If triggered by Spacebar and mouse hasn't moved, aim in player's facing direction
             if (this.game.input.wasJustPressed(' ') && (!mouse.isDown && Math.hypot(targetX - player.x, targetY - player.y) < 10)) {
                 targetX = player.x + (player.dx || 1) * 350;
                 targetY = player.y + (player.dy || 0) * 350;
@@ -138,27 +153,27 @@ export class HoliGame {
             const colors = ['#ec4899', '#f43f5e', '#a855f7', '#fbbf24'];
             const chosenColor = colors[Math.floor(Math.random() * colors.length)];
             this.shoot(player.x, player.y, targetX, targetY, chosenColor, false, 'player');
-            this.shootCooldown = 0.28;
+            this.shootCooldown = 0.26;
         }
 
         const activeTargets = [krishna, balram].filter(t => !t.isCaught);
         const activePursuers = [player, ...sakhas].filter(p => !p.isCaught);
 
-        // 2. Playful & Fair Target AI (Krishna & Dao Balram)
+        // 2. Playful & Agile Target AI (Krishna & Dao Balram)
         this.updateHoliTargetAi(krishna, this.krishnaAi, player, sakhas, obstacles, mapW, mapH, dt, 'krishna');
         this.updateHoliTargetAi(balram, this.balramAi, player, sakhas, obstacles, mapW, mapH, dt, 'balram');
 
-        // 3. Sakhas Pichkari AI (Teammates support player)
+        // 3. Sakhas Pichkari AI (Support team)
         this.updateSakhasHoliAi(sakhas, activeTargets, obstacles, mapW, mapH, dt);
 
-        // 4. Projectile Physics & Collisions (With Entities AND Tree Trunks)
+        // 4. Projectile Physics & Collisions
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const p = this.projectiles[i];
             p.update(dt);
 
             let hit = false;
 
-            // Check Tree Trunk Collisions (Cover behind trees works!)
+            // Tree Trunk Collisions (Cover behind trees!)
             for (const obs of obstacles) {
                 if (obs.shape === 'circle' && (obs.type === 'tree' || obs.type === 'kadamba')) {
                     if (Math.hypot(p.x - obs.x, p.y - obs.y) < (obs.radius || 28) + p.radius) {
@@ -172,10 +187,9 @@ export class HoliGame {
             if (p.life <= 0) {
                 hit = true;
             } else if (!hit && p.team === 'player') {
-                // Player / Sakha shooting at Krishna / Balram
                 for (const t of activeTargets) {
                     if (Math.hypot(p.x - t.x, p.y - t.y) < t.radius + p.radius) {
-                        this.game.particles.createPetals(t.x, t.y, p.color, 40);
+                        this.game.particles.createPetals(t.x, t.y, p.color, 45);
                         this.game.sound.playSplash();
                         hit = true;
 
@@ -184,9 +198,9 @@ export class HoliGame {
                             if (this.krishnaSplashes >= this.maxSplashes) {
                                 krishna.isCaught = true;
                                 this.game.sound.playCheer();
-                                this.game.ui.showToast("🦚 Kanha is fully soaked in joyous Vrindavan colors!");
+                                this.game.ui.showToast("🦚 Kanha is fully drenched in joyous Vrindavan colors!");
                             } else {
-                                this.game.ui.showToast(`Splashed Krishna! (${this.krishnaSplashes}/${this.maxSplashes}) 🦚`);
+                                this.game.ui.showToast(`Direct hit on Krishna! (${this.krishnaSplashes}/${this.maxSplashes}) 🦚`);
                             }
                         } else if (t === balram) {
                             this.balramSplashes++;
@@ -195,7 +209,7 @@ export class HoliGame {
                                 this.game.sound.playCheer();
                                 this.game.ui.showToast("🌾 Dao Balram is fully drenched in joyful colors!");
                             } else {
-                                this.game.ui.showToast(`Splashed Dao Balram! (${this.balramSplashes}/${this.maxSplashes}) 🌾`);
+                                this.game.ui.showToast(`Direct hit on Dao Balram! (${this.balramSplashes}/${this.maxSplashes}) 🌾`);
                             }
                         }
                         this.updateHoliStatusUI();
@@ -203,7 +217,6 @@ export class HoliGame {
                     }
                 }
             } else if (!hit && p.team === 'krishna') {
-                // Team Krishna shooting at Player & Sakhas
                 for (const s of activePursuers) {
                     if (Math.hypot(p.x - s.x, p.y - s.y) < s.radius + p.radius) {
                         this.game.particles.createPetals(s.x, s.y, p.color, 35);
@@ -212,13 +225,13 @@ export class HoliGame {
 
                         if (s === player && this.playerIFrameTimer <= 0) {
                             this.playerSplashes++;
-                            this.playerIFrameTimer = 1.4; // 1.4s invulnerability so player can react!
-                            if (this.playerSplashes >= this.maxSplashes) {
+                            this.playerIFrameTimer = 1.4; // 1.4s invulnerability so player can dodge!
+                            if (this.playerSplashes >= this.playerMaxSplashes) {
                                 this.isActive = false;
                                 this.updateHoliStatusUI();
                                 this.game.endGame(false, "You got completely soaked by Krishna & Dao Balram's Gulal colors! 🌈");
                             } else {
-                                this.game.ui.showToast(`Splashed by Gulal! (${this.playerSplashes}/${this.maxSplashes}) 💦`);
+                                this.game.ui.showToast(`Splashed by Gulal! (${this.playerSplashes}/${this.playerMaxSplashes}) 💦`);
                             }
                             this.updateHoliStatusUI();
                         }
@@ -271,31 +284,37 @@ export class HoliGame {
         if (ai.timer <= 0) {
             if (ai.state === 'tease') {
                 ai.state = 'flee';
-                ai.timer = 2.5 + Math.random() * 1.5;
-            } else if (distToPlayer > 180 && Math.random() < 0.6) {
-                // Pause and tease, giving player a great opportunity to close in and shoot!
+                ai.timer = 3.0 + Math.random() * 2.0;
+            } else if (distToPlayer > 220 && Math.random() < 0.6) {
+                // Pause and tease, giving player a window to shoot!
                 ai.state = 'tease';
-                ai.timer = 1.3 + Math.random() * 0.7;
+                ai.timer = 1.2 + Math.random() * 0.6;
                 this.game.particles.createSparkle(target.x, target.y, type === 'krishna' ? '#38bdf8' : '#facc15');
             } else {
                 ai.state = 'flee';
-                ai.timer = 2.0 + Math.random() * 1.5;
+                ai.timer = 2.5 + Math.random() * 2.0;
             }
         }
 
-        // Shooting with Visual Telegraph (Fair and readable for player!)
-        if (ai.bombCooldown <= 0 && distToPlayer < 650) {
-            ai.telegraphTimer = 0.5; // 0.5s wind-up sparkle
-            ai.bombCooldown = 3.2 + Math.random() * 1.2; // Fair interval, no spamming
+        // Powerful Shooting with Telegraph
+        if (ai.bombCooldown <= 0 && distToPlayer < 700) {
+            ai.telegraphTimer = 0.45;
+            ai.bombCooldown = 2.8 + Math.random() * 1.0;
         }
 
         if (ai.telegraphTimer > 0) {
             ai.telegraphTimer -= dt;
             this.game.particles.createSparkle(target.x, target.y - 15, type === 'krishna' ? '#38bdf8' : '#facc15');
             if (ai.telegraphTimer <= 0) {
-                // Fire color bomb
                 const color = type === 'krishna' ? '#38bdf8' : '#facc15';
-                this.shoot(target.x, target.y, player.x, player.y, color, true, 'krishna');
+                // Krishna occasionally fires Tri-Gulal wave!
+                if (type === 'krishna' && Math.random() < 0.35) {
+                    this.shoot(target.x, target.y, player.x, player.y, color, true, 'krishna');
+                    this.shoot(target.x, target.y, player.x - 60, player.y - 40, '#a855f7', false, 'krishna');
+                    this.shoot(target.x, target.y, player.x + 60, player.y + 40, '#ec4899', false, 'krishna');
+                } else {
+                    this.shoot(target.x, target.y, player.x, player.y, color, true, 'krishna');
+                }
             }
         }
 
@@ -306,28 +325,27 @@ export class HoliGame {
             const fDist = Math.hypot(faceDx, faceDy) || 1;
             target.dx = faceDx / fDist;
             target.dy = faceDy / fDist;
-            target.moveWithAnim(target.dx * 18 * dt, target.dy * 18 * dt, obstacles, mapW, mapH, dt);
+            target.moveWithAnim(target.dx * 20 * dt, target.dy * 20 * dt, obstacles, mapW, mapH, dt);
             return;
         }
 
-        // State: 'flee' (Smooth curve fleeing at 195 px/s - player at 320 px/s CAN easily catch up!)
+        // Agile Fleeing
         let fx = 0;
         let fy = 0;
 
         const pdx = target.x - player.x;
         const pdy = target.y - player.y;
         const pDist = Math.hypot(pdx, pdy) || 1;
-        fx += (pdx / pDist) * 1.5;
-        fy += (pdy / pDist) * 1.5;
+        fx += (pdx / pDist) * 1.8;
+        fy += (pdy / pDist) * 1.8;
 
-        // Playful weaving angle
         if (Math.random() < 0.05) {
             target.wanderAngle = (target.wanderAngle || 0) + (Math.random() - 0.5) * 1.2;
         }
         fx += Math.cos(target.wanderAngle || 0) * 0.8;
         fy += Math.sin(target.wanderAngle || 0) * 0.8;
 
-        // Smooth obstacle gliding avoidance (tangent sliding)
+        // Smooth obstacle gliding
         for (const obs of obstacles) {
             if (obs.shape === 'circle') {
                 const odx = target.x - obs.x;
@@ -345,20 +363,20 @@ export class HoliGame {
                     const bestTanX = dot1 >= dot2 ? tan1X : tan2X;
                     const bestTanY = dot1 >= dot2 ? tan1Y : tan2Y;
 
-                    const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 4.5;
-                    fx += (normX * 1.5 + bestTanX * 2.5) * pushFactor;
-                    fy += (normY * 1.5 + bestTanY * 2.5) * pushFactor;
+                    const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 5.0;
+                    fx += (normX * 1.5 + bestTanX * 2.8) * pushFactor;
+                    fy += (normY * 1.5 + bestTanY * 2.8) * pushFactor;
                 }
             } else if (obs.type === 'river') {
-                if (target.x > obs.x - 80) fx -= 5.0;
+                if (target.x > obs.x - 80) fx -= 6.0;
             }
         }
 
-        // Repel from borders
-        if (target.x < 240) fx += 4.0;
-        if (target.x > mapW - 750) fx -= 4.0;
-        if (target.y < 240) fy += 4.0;
-        if (target.y > mapH - 320) fy -= 4.0;
+        // Map boundary repulsions
+        if (target.x < 240) fx += 4.5;
+        if (target.x > mapW - 750) fx -= 4.5;
+        if (target.y < 240) fy += 4.5;
+        if (target.y > mapH - 320) fy -= 4.5;
 
         const fLen = Math.hypot(fx, fy);
         if (fLen > 0) {
@@ -366,9 +384,9 @@ export class HoliGame {
             fy /= fLen;
         }
 
-        const baseSpeed = 195; // Walkable & catchable!
+        const speed = type === 'krishna' ? 340 : 320;
         target.applyTerrain(obstacles);
-        target.moveWithAnim(fx * baseSpeed * target.terrainModifier * dt, fy * baseSpeed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        target.moveWithAnim(fx * speed * target.terrainModifier * dt, fy * speed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
     }
 
     updateSakhasHoliAi(sakhas, activeTargets, obstacles, mapW, mapH, dt) {
@@ -381,7 +399,7 @@ export class HoliGame {
             const dist = Math.hypot(dx, dy);
 
             // Follow target at comfortable perimeter
-            if (dist > 220) {
+            if (dist > 250) {
                 let sx = dx / dist;
                 let sy = dy / dist;
 
@@ -399,16 +417,16 @@ export class HoliGame {
                 const sLen = Math.hypot(sx, sy);
                 if (sLen > 0) { sx /= sLen; sy /= sLen; }
                 s.applyTerrain(obstacles);
-                s.moveWithAnim(sx * 190 * s.terrainModifier * dt, sy * 190 * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
+                s.moveWithAnim(sx * 220 * s.terrainModifier * dt, sy * 220 * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
             }
 
             // Shoot Pichkari colors occasionally
             this.sakhaShootCooldowns[idx] -= dt;
-            if (this.sakhaShootCooldowns[idx] <= 0 && dist < 480) {
+            if (this.sakhaShootCooldowns[idx] <= 0 && dist < 500) {
                 const colors = ['#a855f7', '#ec4899', '#10b981', '#3b82f6'];
                 const color = colors[idx % colors.length];
-                this.shoot(s.x, s.y, preferredTarget.x + (Math.random() - 0.5) * 40, preferredTarget.y + (Math.random() - 0.5) * 40, color, false, 'player');
-                this.sakhaShootCooldowns[idx] = 2.4 + Math.random() * 1.8;
+                this.shoot(s.x, s.y, preferredTarget.x + (Math.random() - 0.5) * 50, preferredTarget.y + (Math.random() - 0.5) * 50, color, false, 'player');
+                this.sakhaShootCooldowns[idx] = 2.8 + Math.random() * 2.0;
             }
         });
     }
@@ -421,7 +439,7 @@ export class HoliGame {
             p.draw(ctx);
         }
 
-        // 2. Draw Soft Lotus Crosshair at Mouse Position for Aiming
+        // 2. Aiming Crosshair
         const mouse = this.game.input.mouse;
         if (mouse) {
             ctx.save();
@@ -429,12 +447,10 @@ export class HoliGame {
             ctx.strokeStyle = 'rgba(236, 72, 153, 0.75)';
             ctx.lineWidth = 1.5;
 
-            // Reticle outer ring
             ctx.beginPath();
             ctx.arc(0, 0, 14, 0, Math.PI * 2);
             ctx.stroke();
 
-            // 4 floral crosshair notches
             ctx.beginPath();
             ctx.moveTo(0, -18); ctx.lineTo(0, -9);
             ctx.moveTo(0, 18);  ctx.lineTo(0, 9);
@@ -450,7 +466,7 @@ export class HoliGame {
             ctx.restore();
         }
 
-        // 3. Draw Player Invulnerability Flash Shield
+        // 3. Player Invulnerability Flash Shield
         if (this.playerIFrameTimer > 0) {
             const p = this.game.player;
             ctx.save();

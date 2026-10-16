@@ -1,6 +1,6 @@
 /**
  * TagGame (पकड़ पकड़ाई - Pakad Pakdai)
- * Playful pastoral chase: Pursue Krishna & Dao Balaram across the sunlit pastures!
+ * Grand Pastoral Chase: Pursue the divine, agile Krishna & Dao Balaram across Vrindavan!
  */
 export class TagGame {
     constructor(game) {
@@ -18,30 +18,36 @@ export class TagGame {
         const player = this.game.player;
         const krishna = this.game.krishna;
         const balram = this.game.balram;
+        const map = this.game.mapManager.currentMap;
+        const cx = map.centerX;
+        const cy = map.centerY;
 
-        // Position Krishna & Balram in clear pasture slightly ahead of the player
-        krishna.x = player.x + 180;
-        krishna.y = player.y - 120;
-        krishna.isCaught = false;
-        krishna.currentSpeed = 210; // Comfortable chase speed: player walks at 320, so player can easily catch up!
+        // Player & Sakhas start at the central gathering meadow
+        player.x = cx;
+        player.y = cy + 140;
 
-        balram.x = player.x - 180;
-        balram.y = player.y - 120;
-        balram.isCaught = false;
-        balram.currentSpeed = 200;
-
-        this.krishnaAi = { state: 'flee', timer: 2.5, stuckTimer: 0, lastX: krishna.x, lastY: krishna.y };
-        this.balramAi = { state: 'flee', timer: 3.2, stuckTimer: 0, lastX: balram.x, lastY: balram.y };
-
-        // Position Sakhas in a wide flanking semi-circle
         this.game.sakhas.forEach((s, idx) => {
             s.isCaught = false;
             s.x = player.x + ((idx % 4) - 1.5) * 80;
-            s.y = player.y + 70 + Math.floor(idx / 4) * 50;
-            s.currentSpeed = 230;
+            s.y = player.y + 60 + Math.floor(idx / 4) * 45;
+            s.currentSpeed = 260;
         });
 
-        this.game.ui.showToast("🏃‍♂️ Pakad Pakdai started! Sprint with Shift or run to tag Krishna & Dao Balram!", 4500);
+        // Krishna & Dao Balram get a grand head start in scenic groves!
+        krishna.x = cx + 380;
+        krishna.y = cy - 280;
+        krishna.isCaught = false;
+        krishna.currentSpeed = 380; // Divine agile speed!
+
+        balram.x = cx - 420;
+        balram.y = cy - 220;
+        balram.isCaught = false;
+        balram.currentSpeed = 360; // Powerful stride!
+
+        this.krishnaAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: krishna.x, lastY: krishna.y };
+        this.balramAi = { state: 'flee', timer: 3.5, stuckTimer: 0, lastX: balram.x, lastY: balram.y };
+
+        this.game.ui.showToast("🏃‍♂️ Kanha & Dao Balram took off into the groves! Sprint with Shift and follow the pointers (🦚, 🌾)!", 5000);
         this.game.sound.playCheer();
     }
 
@@ -57,36 +63,34 @@ export class TagGame {
         const mapW = this.game.mapManager.getWidth();
         const mapH = this.game.mapManager.getHeight();
 
-        const targets = [krishna, balram].filter(t => !t.isCaught);
-
-        // 1. Check if player tags Krishna
-        if (!krishna.isCaught && Math.hypot(player.x - krishna.x, player.y - krishna.y) < player.radius + krishna.radius + 14) {
+        // 1. Check if PLAYER tags Krishna (Only the player's tag wins!)
+        if (!krishna.isCaught && Math.hypot(player.x - krishna.x, player.y - krishna.y) < player.radius + krishna.radius + 16) {
             krishna.isCaught = true;
-            this.game.particles.createPetals(krishna.x, krishna.y, '#38bdf8', 45);
+            this.game.particles.createPetals(krishna.x, krishna.y, '#38bdf8', 55);
             this.game.sound.playCheer();
-            this.game.ui.showToast("Caught Shree Krishna! 🦚 Now catch Dao Balram!");
+            this.game.ui.showToast("🌟 YOU tagged Shree Krishna! 🦚 Now sprint to catch Dao Balram!");
         }
 
-        // 2. Check if player tags Balram
-        if (!balram.isCaught && Math.hypot(player.x - balram.x, player.y - balram.y) < player.radius + balram.radius + 14) {
+        // 2. Check if PLAYER tags Dao Balram
+        if (!balram.isCaught && Math.hypot(player.x - balram.x, player.y - balram.y) < player.radius + balram.radius + 16) {
             balram.isCaught = true;
-            this.game.particles.createPetals(balram.x, balram.y, '#f8fafc', 45);
+            this.game.particles.createPetals(balram.x, balram.y, '#f8fafc', 55);
             this.game.sound.playCheer();
-            this.game.ui.showToast("Caught Dao Balram! 🌾 Splendid speed!");
+            this.game.ui.showToast("🌟 YOU tagged Dao Balram! Mighty sprint! 🌾");
         }
 
-        // 3. Smart & Playful AI for Targets (Krishna & Dao Balram)
+        // 3. Smart & Agile AI for Targets (Krishna & Dao Balram)
         this.updateTargetAi(krishna, this.krishnaAi, player, sakhas, obstacles, mapW, mapH, dt, 'krishna');
         this.updateTargetAi(balram, this.balramAi, player, sakhas, obstacles, mapW, mapH, dt, 'balram');
 
-        // 4. Smart Flanking AI for Sakha Friends
+        // 4. Smart Flanking AI for Sakha Friends (Sakhas corral & distract, but do not steal your kill)
         this.updateSakhasAi(sakhas, krishna, balram, obstacles, mapW, mapH, dt);
 
         // 5. Win condition
         if (krishna.isCaught && balram.isCaught) {
             this.isActive = false;
             this.game.sound.playCheer();
-            this.game.endGame(true, `Splendid victory! You and the Sakhas caught both Krishna & Dao Balram in ${this.gameTime.toFixed(1)} seconds! 🌸`);
+            this.game.endGame(true, `Glorious Victory! You caught both Shree Krishna & Dao Balram in ${this.gameTime.toFixed(1)} seconds! 🌸`);
         }
     }
 
@@ -95,7 +99,7 @@ export class TagGame {
 
         ai.timer -= dt;
 
-        // Anti-stuck watchdog: check if target has been blocked for > 0.35s
+        // Anti-stuck watchdog
         const moveDist = Math.hypot(target.x - ai.lastX, target.y - ai.lastY);
         ai.lastX = target.x;
         ai.lastY = target.y;
@@ -106,9 +110,8 @@ export class TagGame {
             ai.stuckTimer = 0;
         }
 
-        // If stuck against obstacle, break out immediately with escape vector
         if (ai.stuckTimer > 0.35) {
-            target.wanderAngle = (target.wanderAngle || 0) + Math.PI * 0.6;
+            target.wanderAngle = (target.wanderAngle || 0) + Math.PI * 0.7;
             ai.stuckTimer = 0;
             ai.state = 'flee';
             ai.timer = 2.0;
@@ -116,58 +119,55 @@ export class TagGame {
 
         const distToPlayer = Math.hypot(target.x - player.x, target.y - player.y);
 
-        // State Transitions
+        // State Machine
         if (ai.timer <= 0) {
             if (ai.state === 'tease') {
                 ai.state = 'flee';
-                ai.timer = 2.5 + Math.random() * 2.0;
-            } else if (distToPlayer > 180 && Math.random() < 0.65) {
-                // Pause and tease, giving the player a great opportunity to catch up!
+                ai.timer = 3.0 + Math.random() * 2.0;
+            } else if (distToPlayer > 240 && Math.random() < 0.6) {
+                // Pause and tease, giving the player a prime chance to catch up!
                 ai.state = 'tease';
-                ai.timer = 1.3 + Math.random() * 0.8;
+                ai.timer = 1.4 + Math.random() * 0.8;
                 const quotes = type === 'krishna' 
-                    ? ["Haha, catch me if you can, Sakha! 🦚", "You'll have to run faster! 🦚", "Look at Dao Dada run! 🦚"]
-                    : ["Ho ho! Almost had me, little brother! 🌾", "Keep your stamina up! 🌾", "Splendid chase! 🌾"];
+                    ? ["Haha! Catch me if you can, Sakha! 🦚", "You'll have to sprint with Shift! 🦚", "Look at Dao Dada run! 🦚"]
+                    : ["Ho ho! Sprint faster, little brother! 🌾", "Keep your stamina up! 🌾", "Glorious chase! 🌾"];
                 this.game.ui.showToast(quotes[Math.floor(Math.random() * quotes.length)]);
                 this.game.particles.createSparkle(target.x, target.y, type === 'krishna' ? '#38bdf8' : '#facc15');
             } else {
                 ai.state = 'flee';
-                ai.timer = 2.0 + Math.random() * 1.5;
+                ai.timer = 2.5 + Math.random() * 2.0;
             }
         }
 
-        // Behavior execution
+        // Tease state: Face player playfully
         if (ai.state === 'tease') {
-            // Stand playfully and face player, slow breathing
             const faceDx = player.x - target.x;
             const faceDy = player.y - target.y;
             const fDist = Math.hypot(faceDx, faceDy) || 1;
             target.dx = faceDx / fDist;
             target.dy = faceDy / fDist;
-            // Gentle playful step
-            target.moveWithAnim(target.dx * 20 * dt, target.dy * 20 * dt, obstacles, mapW, mapH, dt);
+            target.moveWithAnim(target.dx * 25 * dt, target.dy * 25 * dt, obstacles, mapW, mapH, dt);
             return;
         }
 
-        // State: 'flee' (Run playfully at moderate speed)
+        // Flee state: Agile curved running
         let fx = 0;
         let fy = 0;
 
-        // Flee primarily from player
         const pdx = target.x - player.x;
         const pdy = target.y - player.y;
         const pDist = Math.hypot(pdx, pdy) || 1;
-        fx += (pdx / pDist) * 1.6;
-        fy += (pdy / pDist) * 1.6;
+        fx += (pdx / pDist) * 1.8;
+        fy += (pdy / pDist) * 1.8;
 
-        // Weaving curve so they don't run in rigid straight lines
+        // Dynamic weaving angle
         if (Math.random() < 0.05) {
             target.wanderAngle = (target.wanderAngle || 0) + (Math.random() - 0.5) * 1.2;
         }
-        fx += Math.cos(target.wanderAngle || 0) * 0.7;
-        fy += Math.sin(target.wanderAngle || 0) * 0.7;
+        fx += Math.cos(target.wanderAngle || 0) * 0.8;
+        fy += Math.sin(target.wanderAngle || 0) * 0.8;
 
-        // Smooth obstacle gliding avoidance (tangent sliding)
+        // Tangent glide obstacle avoidance (Zero sticking!)
         for (const obs of obstacles) {
             if (obs.shape === 'circle') {
                 const odx = target.x - obs.x;
@@ -178,29 +178,27 @@ export class TagGame {
                 if (oDist < safeZone && oDist > 0) {
                     const normX = odx / oDist;
                     const normY = ody / oDist;
-                    // Two tangents: clockwise and counter-clockwise
                     const tan1X = -normY, tan1Y = normX;
                     const tan2X = normY, tan2Y = -normX;
-                    // Pick tangent best aligned with desired flee heading
                     const dot1 = fx * tan1X + fy * tan1Y;
                     const dot2 = fx * tan2X + fy * tan2Y;
                     const bestTanX = dot1 >= dot2 ? tan1X : tan2X;
                     const bestTanY = dot1 >= dot2 ? tan1Y : tan2Y;
 
-                    const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 4.5;
-                    fx += (normX * 1.5 + bestTanX * 2.5) * pushFactor;
-                    fy += (normY * 1.5 + bestTanY * 2.5) * pushFactor;
+                    const pushFactor = Math.pow((safeZone - oDist) / safeZone, 2) * 5.0;
+                    fx += (normX * 1.5 + bestTanX * 2.8) * pushFactor;
+                    fy += (normY * 1.5 + bestTanY * 2.8) * pushFactor;
                 }
             } else if (obs.type === 'river') {
-                if (target.x > obs.x - 80) fx -= 5.0;
+                if (target.x > obs.x - 80) fx -= 6.0;
             }
         }
 
-        // Repel from map borders (keep in playable meadow)
-        if (target.x < 240) fx += 4.0;
-        if (target.x > mapW - 750) fx -= 4.0;
-        if (target.y < 240) fy += 4.0;
-        if (target.y > mapH - 320) fy -= 4.0;
+        // Map boundary repulsions
+        if (target.x < 240) fx += 4.5;
+        if (target.x > mapW - 750) fx -= 4.5;
+        if (target.y < 240) fy += 4.5;
+        if (target.y > mapH - 320) fy -= 4.5;
 
         const fLen = Math.hypot(fx, fy);
         if (fLen > 0) {
@@ -208,10 +206,10 @@ export class TagGame {
             fy /= fLen;
         }
 
-        // Base speed: 205 px/s (player walks at 320, sprints at 528). Player CAN easily catch up!
-        const baseSpeed = 205;
+        // Agile Speed (Player walks at 320, sprints at 528 with Shift)
+        const speed = type === 'krishna' ? 360 : 340;
         target.applyTerrain(obstacles);
-        target.moveWithAnim(fx * baseSpeed * target.terrainModifier * dt, fy * baseSpeed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        target.moveWithAnim(fx * speed * target.terrainModifier * dt, fy * speed * target.terrainModifier * dt, obstacles, mapW, mapH, dt);
     }
 
     updateSakhasAi(sakhas, krishna, balram, obstacles, mapW, mapH, dt) {
@@ -224,7 +222,7 @@ export class TagGame {
             const dist = Math.hypot(dx, dy);
 
             if (dist > 0) {
-                // Flanking spread: spread across 80 degree arc to surround
+                // Flanking spread arc
                 const spreadAngle = ((idx % 4) - 1.5) * 0.45;
                 const cosA = Math.cos(spreadAngle);
                 const sinA = Math.sin(spreadAngle);
@@ -234,7 +232,6 @@ export class TagGame {
                 let sx = fdx;
                 let sy = fdy;
 
-                // Obstacle avoidance for Sakha
                 for (const obs of obstacles) {
                     if (obs.shape === 'circle') {
                         const odx = s.x - obs.x;
@@ -253,12 +250,19 @@ export class TagGame {
                 s.applyTerrain(obstacles);
                 s.moveWithAnim(sx * s.currentSpeed * s.terrainModifier * dt, sy * s.currentSpeed * s.terrainModifier * dt, obstacles, mapW, mapH, dt);
 
-                // If Sakha catches target, tag with cheer!
-                if (dist < s.radius + activeTarget.radius + 8) {
-                    activeTarget.isCaught = true;
-                    this.game.particles.createPetals(activeTarget.x, activeTarget.y, activeTarget === krishna ? '#38bdf8' : '#f8fafc', 35);
-                    this.game.sound.playCheer();
-                    this.game.ui.showToast(`${s.name || 'Sudama'} cornered and tagged ${activeTarget === krishna ? 'Shree Krishna' : 'Dao Balram'}! 🌸`);
+                // When Sakha reaches target: Krishna & Balram do an acrobatic Divine Evasion Leap!
+                // Sakha does NOT prematurely end the game!
+                if (dist < s.radius + activeTarget.radius + 18) {
+                    activeTarget.vz = 340; // Leap into air over Sakha!
+                    this.game.particles.createSparkle(activeTarget.x, activeTarget.y, activeTarget === krishna ? '#38bdf8' : '#facc15');
+                    s.moveWithAnim(-fdx * 25, -fdy * 25, obstacles, mapW, mapH, dt);
+
+                    if (Math.random() < 0.15) {
+                        const quotes = activeTarget === krishna
+                            ? [`Aha ${s.name || 'Sudama'}! Almost had me! 🦚`, "You'll have to leap higher, Sakha! 🦚"]
+                            : [`Ho ho, nice try ${s.name || 'Subal'}! 🌾`, "Catch me if you can! 🌾"];
+                        this.game.ui.showToast(quotes[Math.floor(Math.random() * quotes.length)]);
+                    }
                 }
             }
         });
