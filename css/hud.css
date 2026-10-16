@@ -18,7 +18,6 @@
 
 /* Base safe bounds for all floating HUD elements */
 #minimapContainer,
-#reopenMinimapBtn,
 .floating-dham-badge,
 .floating-hud-tray,
 .floating-stamina-widget,
@@ -89,12 +88,6 @@
         width: 130px;
         height: 130px;
     }
-    #reopenMinimapBtn {
-        top: 10px;
-        left: 10px;
-        padding: 4px 8px;
-        font-size: 0.75rem;
-    }
     .floating-dham-badge {
         top: 10px;
         font-size: 0.75rem;
@@ -143,12 +136,6 @@
         width: 110px;
         height: 110px;
         border-radius: 12px;
-    }
-    #reopenMinimapBtn {
-        top: 8px;
-        left: 8px;
-        padding: 3px 6px;
-        font-size: 0.7rem;
     }
     .floating-dham-badge {
         top: 8px;
@@ -386,6 +373,27 @@
     box-shadow: 0 0 14px rgba(250, 204, 21, 0.45);
     transform: translateY(-1px);
     color: #fef08a;
+}
+
+.btn-hub-return {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.75), rgba(5, 150, 105, 0.92)) !important;
+    border: 1.5px solid #34d399 !important;
+    color: #ecfdf5 !important;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.6) !important;
+    animation: hubReturnPulse 2s infinite ease-in-out;
+}
+
+.btn-hub-return:hover {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(5, 150, 105, 1)) !important;
+    border-color: #a7f3d0 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 20px rgba(52, 211, 153, 0.9) !important;
+    transform: translateY(-2px) scale(1.03);
+}
+
+@keyframes hubReturnPulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.95); }
 }
 
 /* Dynamic Floating Sprint Stamina Bar (Only shows when sprinting or recovering) */

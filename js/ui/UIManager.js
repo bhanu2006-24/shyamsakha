@@ -771,6 +771,18 @@ export class UIManager {
         if (this.gameOverModal) this.gameOverModal.classList.add('hidden');
     }
 
+    closeGameChoice() {
+        this.closeDialogue();
+    }
+
+    isAnyModalOpen() {
+        return this.isDialogueOpen() ||
+            (this.bagModal && !this.bagModal.classList.contains('hidden')) ||
+            (this.optionsModal && !this.optionsModal.classList.contains('hidden')) ||
+            (this.helpModal && !this.helpModal.classList.contains('hidden')) ||
+            (this.gameOverModal && !this.gameOverModal.classList.contains('hidden'));
+    }
+
     closeAllModals() {
         this.closeDialogue();
         if (this.bagModal) this.bagModal.classList.add('hidden');

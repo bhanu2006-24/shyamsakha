@@ -43,6 +43,25 @@ export class GauMata extends Entity {
         cx += avoid.x * 2.8;
         cy += avoid.y * 2.8;
 
+        // Strong water avoidance: Sacred cows never enter pond water or river
+        for (const obs of obstacles) {
+            if (obs.type === 'pond') {
+                const dx = this.x - obs.x;
+                const dy = this.y - obs.y;
+                const dist = Math.hypot(dx, dy);
+                const safeDist = (obs.radius || 72) + this.radius + 30;
+                if (dist < safeDist && dist > 0) {
+                    const pushFactor = Math.pow((safeDist - dist) / safeDist, 2) * 6.0;
+                    cx += (dx / dist) * pushFactor;
+                    cy += (dy / dist) * pushFactor;
+                }
+            } else if (obs.type === 'river') {
+                if (this.x > obs.x - 45) {
+                    cx -= 5.0; // Repel westwards away from Yamuna water edge
+                }
+            }
+        }
+
         const cLen = Math.hypot(cx, cy);
         if (cLen > 0) {
             cx /= cLen;

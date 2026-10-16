@@ -58,19 +58,19 @@ export class VrindavanPastures {
             // Sweet Mango Orchards (West & Northwest)
             { x: this.centerX - 360, y: this.centerY - 270, r: 75, treeType: 'mango', res: 'fruit' },
             { x: this.centerX - 520, y: this.centerY - 380, r: 80, treeType: 'mango', res: 'fruit' },
-            { x: this.centerX - 460, y: this.centerY + 340, r: 75, treeType: 'mango', res: 'fruit' },
+            { x: this.centerX - 480, y: this.centerY + 390, r: 75, treeType: 'mango', res: 'fruit' },
             { x: this.centerX + 480, y: this.centerY - 240, r: 75, treeType: 'mango', res: 'fruit' },
             { x: this.centerX - 240, y: this.centerY - 450, r: 70, treeType: 'mango', res: 'fruit' },
 
             // Sacred Banyan Trees (Great spreading roots & holy shade to the sides)
-            { x: this.centerX - 460, y: this.centerY + 60, r: 105, treeType: 'banyan', res: null },
+            { x: this.centerX - 480, y: this.centerY + 10, r: 105, treeType: 'banyan', res: null },
             { x: this.centerX + 460, y: this.centerY + 160, r: 100, treeType: 'banyan', res: null },
             { x: this.centerX + 320, y: this.centerY - 420, r: 95, treeType: 'banyan', res: null },
 
             // Fragrant Flowering Parijat Trees (Light jade canopy & star blossoms)
             { x: this.centerX - 270, y: this.centerY - 200, r: 60, treeType: 'parijat', res: 'flower' },
             { x: this.centerX + 270, y: this.centerY - 190, r: 60, treeType: 'parijat', res: 'flower' },
-            { x: this.centerX - 300, y: this.centerY + 240, r: 62, treeType: 'parijat', res: 'flower' },
+            { x: this.centerX - 240, y: this.centerY + 330, r: 62, treeType: 'parijat', res: 'flower' },
             { x: this.centerX + 320, y: this.centerY + 280, r: 65, treeType: 'parijat', res: 'flower' },
 
             // Tall Slender Palm Trees (Near Yamuna sandbanks and eastern border)
@@ -95,13 +95,14 @@ export class VrindavanPastures {
         });
 
         // 3. Sacred Kamal Sarovar (Lotus Pond with blooming lotuses & lily pads in the water)
+        // Positioned in an open glade at (centerX - 420, centerY + 200) completely clear of any tree canopy
         this.obstacles.push({
             shape: 'circle',
             type: 'pond',
-            x: this.centerX - 310,
-            y: this.centerY + 160,
-            radius: 54,
-            visualRadius: 80,
+            x: this.centerX - 420,
+            y: this.centerY + 200,
+            radius: 72,
+            visualRadius: 72,
             hasResource: 'lotus',
             resourceRegenTimer: 0
         });
@@ -110,7 +111,7 @@ export class VrindavanPastures {
         const flowerBushLocations = [
             { x: this.centerX - 240, y: this.centerY + 10, r: 36 },
             { x: this.centerX + 240, y: this.centerY + 15, r: 36 },
-            { x: this.centerX - 210, y: this.centerY + 240, r: 38 },
+            { x: this.centerX - 200, y: this.centerY + 250, r: 38 },
             { x: this.centerX + 210, y: this.centerY + 200, r: 38 },
             { x: this.width - this.riverWidth - 130, y: this.centerY - 220, r: 42 },
             { x: this.width - this.riverWidth - 110, y: this.centerY + 70, r: 40 },

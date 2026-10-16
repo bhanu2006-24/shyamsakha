@@ -27,12 +27,12 @@ export class SoundManager {
         this.audioEl.volume = this.musicVolume;
         this.isMusicPlaying = false;
 
-        // Settings
+        // Settings (Default: Minimap and big portrait are OFF by default per user request)
         this.bgmEnabled = true;
         this.sfxEnabled = true;
         this.textSpeed = 'FAST';
-        this.bigPortrait = true;
-        this.minimapEnabled = true;
+        this.bigPortrait = false;
+        this.minimapEnabled = false;
         this.compassEnabled = true;
 
         this.setupAudioListeners();
@@ -60,15 +60,30 @@ export class SoundManager {
         }
     }
 
-    setMusicVolume(volPercent) {
-        this.musicVolume = Math.max(0, Math.min(100, volPercent)) / 100;
-        this.audioEl.volume = this.musicVolume;
-        return Math.round(this.musicVolume * 100);
+    setMusicVolume(vol) {
+        let pct = typeof vol === 'string' ? parseFloat(vol) : Number(vol);
+        if (isNaN(pct)) pct = 50;
+        // Normalize fraction <= 1.0 (e.g. 0.5) to percentage 50, but preserve 0 and 1
+        if (pct > 0 && pct <= 1.0 && vol !== 1 && vol !== "1") {
+            pct = pct * 100;
+        }
+        pct = Math.max(0, Math.min(100, Math.round(pct)));
+        this.musicVolume = pct / 100;
+        if (this.audioEl) {
+            this.audioEl.volume = this.musicVolume;
+        }
+        return pct;
     }
 
     adjustVolume(delta) {
+        let d = typeof delta === 'string' ? parseFloat(delta) : Number(delta);
+        if (isNaN(d)) d = 10;
+        // If delta is given as fractional 0.1, convert to 10%
+        if (Math.abs(d) <= 1.0 && d !== 0) {
+            d = d * 100;
+        }
         const curPct = Math.round(this.musicVolume * 100);
-        return this.setMusicVolume(curPct + delta);
+        return this.setMusicVolume(curPct + d);
     }
 
     toggleBgm() {

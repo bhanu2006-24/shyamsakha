@@ -17,14 +17,11 @@
     <main id="canvasContainer" class="canvas-container">
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Minimap Radar (Top-Left Corner - 100% Unobstructed, Safe Border Clamped) -->
-        <div id="minimapContainer">
+        <!-- Minimap Radar (Top-Left Corner - Collapsed / Hidden by default per user request) -->
+        <div id="minimapContainer" class="collapsed hidden">
             <button id="minimapToggleBtn" class="minimap-close-btn" title="Hide Minimap">✕</button>
             <canvas id="minimapCanvas"></canvas>
         </div>
-        <button id="reopenMinimapBtn" class="icon-btn hidden" style="position: absolute; top: 14px; left: 14px; z-index: 34; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(250, 204, 21, 0.5);" title="Show Minimap">
-            <span>🗺️ Radar</span>
-        </button>
 
         <!-- Sacred Dham Subtle Indicator (Top-Center Floating Badge) -->
         <div class="floating-dham-badge" title="Sacred Dham">
@@ -35,6 +32,11 @@
 
         <!-- Floating HUD Tray (Top-Right Minimalist Floating Pills) -->
         <div id="floatingHudTray" class="floating-hud-tray">
+            <button id="topHubReturnBtn" class="floating-hud-pill btn-hub-return hidden" title="Return to Hub Clearing (Key: ESC)">
+                <span class="pill-icon">🌿</span>
+                <span class="pill-label">Return to Hub (ESC)</span>
+            </button>
+
             <button id="bagBtn" class="floating-hud-pill btn-bag-highlight" title="Open Sakha Potli / Bag (Key: B)">
                 <span class="pill-icon">🎒</span>
                 <span class="pill-label">Bag (B)</span>
@@ -185,9 +187,9 @@
                         <div class="opt-volume-controls">
                             <span id="optVolumeText" class="opt-val-gold">100%</span>
                             <div class="opt-slider-wrap">
-                                <button onclick="adjustVolume(-0.1)" class="opt-step-btn" title="Lower volume">-</button>
-                                <input type="range" id="optVolumeSlider" min="0" max="100" value="100" class="opt-range" oninput="setMusicVolume(this.value / 100)">
-                                <button onclick="adjustVolume(0.1)" class="opt-step-btn" title="Raise volume">+</button>
+                                <button onclick="adjustVolume(-10)" class="opt-step-btn" title="Lower volume">-</button>
+                                <input type="range" id="optVolumeSlider" min="0" max="100" value="100" class="opt-range" oninput="setMusicVolume(this.value)">
+                                <button onclick="adjustVolume(10)" class="opt-step-btn" title="Raise volume">+</button>
                             </div>
                         </div>
                     </div>
@@ -228,22 +230,22 @@
                         <button id="optTextSpeed" onclick="toggleTextSpeed()" class="opt-cycle-btn">FAST</button>
                     </div>
 
-                    <!-- 6. Big Portrait Toggle -->
+                    <!-- 6. Big Portrait Toggle (Default OFF per user preference) -->
                     <div class="opt-row">
                         <div class="opt-row-label">
                             <span class="opt-icon">👤</span>
                             <span>BIG PORTRAIT</span>
                         </div>
-                        <button id="optPortraitToggle" onclick="togglePortrait()" class="opt-toggle-btn on">ON</button>
+                        <button id="optPortraitToggle" onclick="togglePortrait()" class="opt-toggle-btn off">OFF</button>
                     </div>
 
-                    <!-- 7. Radar Minimap Toggle -->
+                    <!-- 7. Radar Minimap Toggle (Default OFF per user preference) -->
                     <div class="opt-row">
                         <div class="opt-row-label">
                             <span class="opt-icon">🗺️</span>
                             <span>RADAR MINIMAP (M)</span>
                         </div>
-                        <button id="optMinimapToggle" onclick="toggleMinimapSetting()" class="opt-toggle-btn on">ON</button>
+                        <button id="optMinimapToggle" onclick="toggleMinimapSetting()" class="opt-toggle-btn off">OFF</button>
                     </div>
 
                     <!-- 8. Directional Compass Pointers (Krishna & Balram Tracker) -->
