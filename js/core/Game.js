@@ -160,17 +160,29 @@ export class Game {
             this.cows.push(new GauMata(cx + co.dx, cy + co.dy, cColor));
         }
 
-        // Additional cows across the wider pastoral meadows (guaranteed away from water)
-        for (let i = 0; i < 10; i++) {
-            let rx = 200 + Math.random() * (map.width - 900);
-            let ry = 200 + Math.random() * (map.height - 400);
-            // Ensure no cow spawns in Kamal Sarovar pond
-            if (Math.hypot(rx - (cx - 420), ry - (cy + 200)) < 130) {
-                rx += 200;
-            }
-            const cColor = cowColors[Math.floor(Math.random() * cowColors.length)];
-            this.cows.push(new GauMata(rx, ry, cColor));
-        }
+        // Additional cows in designated hardcoded peaceful pastures (ZERO RANDOMNESS!)
+        const pastureCowPositions = [
+            // North Kadamba Pastures
+            { x: cx - 280, y: cy - 750, color: '#fffdd0' },
+            { x: cx + 280, y: cy - 750, color: '#fef3c7' },
+            // West Mango Orchard Pastures
+            { x: cx - 1400, y: cy - 350, color: '#d2b48c' },
+            { x: cx - 1400, y: cy + 350, color: '#b45309' },
+            // South Kamal Sarovar Shore Pastures
+            { x: cx - 450, y: cy + 1200, color: '#f8fafc' },
+            { x: cx + 450, y: cy + 1200, color: '#fffdd0' },
+            // East Yamuna Sandbank Pastures
+            { x: cx + 1800, y: cy - 400, color: '#fef3c7' },
+            { x: cx + 1800, y: cy + 400, color: '#d2b48c' },
+            // South-West Govardhan Foothills
+            { x: cx - 1600, y: cy + 1600, color: '#b45309' },
+            // North-East Banyan Sanctuary
+            { x: cx + 1600, y: cy - 1600, color: '#f8fafc' }
+        ];
+
+        pastureCowPositions.forEach(cp => {
+            this.cows.push(new GauMata(cp.x, cp.y, cp.color));
+        });
 
         this.state = 'hub';
         this.ui.setPhase("🌿 Resting", "tag-resting");

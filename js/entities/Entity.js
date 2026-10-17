@@ -154,27 +154,41 @@ export class Entity {
         return false;
     }
 
-    getAvoidanceForce(obstacles, lookAhead = 120) {
+    getAvoidanceForce(obstacles, lookAhead = 140) {
         let steerX = 0;
         let steerY = 0;
         let count = 0;
 
         for (const obs of obstacles) {
-            if (obs.shape === 'circle') {
+            if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
                 const dx = this.x - obs.x;
                 const dy = this.y - obs.y;
                 const dist = Math.hypot(dx, dy);
                 const isSoft = (obs.type === 'bush' || obs.type === 'rock');
-                const safeDist = obs.radius + this.radius + (isSoft ? lookAhead / 2 : lookAhead);
+                const safeDist = obs.radius + this.radius + (isSoft ? lookAhead * 0.35 : lookAhead);
 
                 if (dist < safeDist && dist > 0) {
-                    let force = Math.pow((safeDist - dist) / safeDist, 2);
-                    if (isSoft) force *= 0.2;
+                    let force = Math.pow((safeDist - dist) / safeDist, 1.8);
+                    if (isSoft) force *= 0.25;
 
-                    const pushX = (dx / dist) * force;
-                    const pushY = (dy / dist) * force;
-                    const tangentX = (-dy / dist) * force * (isSoft ? 0.2 : 0.8);
-                    const tangentY = (dx / dist) * force * (isSoft ? 0.2 : 0.8);
+                    // 1. Radial push away from obstacle center
+                    const pushX = (dx / dist) * force * 1.8;
+                    const pushY = (dy / dist) * force * 1.8;
+
+                    // 2. Intelligent Bidirectional Tangent Glide
+                    // Steers smoothly around the closest side matching travel direction
+                    const t1x = -dy / dist;
+                    const t1y = dx / dist;
+                    const t2x = dy / dist;
+                    const t2y = -dx / dist;
+                    const dot1 = (this.dx || 0) * t1x + (this.dy || 0) * t1y;
+                    const dot2 = (this.dx || 0) * t2x + (this.dy || 0) * t2y;
+                    const bestTx = dot1 >= dot2 ? t1x : t2x;
+                    const bestTy = dot1 >= dot2 ? t1y : t2y;
+
+                    const tangentStrength = isSoft ? 0.4 : 2.4;
+                    const tangentX = bestTx * force * tangentStrength;
+                    const tangentY = bestTy * force * tangentStrength;
 
                     steerX += pushX + tangentX;
                     steerY += pushY + tangentY;

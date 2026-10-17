@@ -17,7 +17,10 @@ export class SoundManager {
             { id: 4, title: "Bhajan 4", file: "assets/audio/bhajan 4.mp3" },
             { id: 5, title: "Bhajan 5", file: "assets/audio/bhajan 5.mp3" },
             { id: 6, title: "Bhajan 6", file: "assets/audio/bhajan 6.mp3" },
-            { id: 7, title: "Bhajan 7", file: "assets/audio/bhajan 7.mp3" }
+            { id: 7, title: "Bhajan 7", file: "assets/audio/bhajan 7.mp3" },
+            { id: 8, title: "Bhajan 8", file: "assets/audio/bhajan 8.mp3" },
+            { id: 9, title: "Bhajan 9", file: "assets/audio/bhajan 9.mp3" },
+            { id: 10, title: "Bhajan 10", file: "assets/audio/bhajan 10.mp3" }
         ];
 
         this.currentTrackIndex = 0;
