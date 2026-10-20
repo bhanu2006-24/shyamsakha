@@ -641,29 +641,8 @@ export class VrindavanPastures {
                 ctx.restore();
 
             } else if (obs.type === 'rock') {
-                // Govardhan Boulder
-                ctx.save();
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
-                ctx.beginPath();
-                ctx.ellipse(obs.x + 4, obs.y + 6, obs.visualRadius * 0.9, obs.visualRadius * 0.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                const rockGrad = ctx.createRadialGradient(
-                    obs.x - obs.visualRadius * 0.3, obs.y - obs.visualRadius * 0.3, 4,
-                    obs.x, obs.y, obs.visualRadius
-                );
-                rockGrad.addColorStop(0, '#a8a29e');
-                rockGrad.addColorStop(0.5, '#78716c');
-                rockGrad.addColorStop(1, '#44403c');
-                ctx.fillStyle = rockGrad;
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.strokeStyle = '#292524';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.restore();
+                // Organic Sacred Boulder / Braj Shila
+                EnvironmentRenderer.drawRock(ctx, obs);
 
             } else if (obs.type === 'bush') {
                 // Fragrant Jasmine/Malati Bush

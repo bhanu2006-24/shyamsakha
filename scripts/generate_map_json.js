@@ -42,23 +42,28 @@ function addTree(x, y, type, r, res) {
 
 function addBush(x, y, r = 40, res = 'flower') {
     if (!isSafeZone(x, y)) return;
-    // Don't overlap directly on tree trunks (keep >= 55px)
+    // Don't overlap tree trunks or canopies
     for (const t of trees) {
-        if (Math.hypot(x - t.x, y - t.y) < 55) return;
+        if (Math.hypot(x - t.x, y - t.y) < t.r + r + 20) return;
+        const canY = t.type === 'palm' ? t.y - 120 : t.y - 50;
+        if (Math.hypot(x - t.x, y - canY) < t.r + r + 20) return;
     }
     for (const b of bushes) {
-        if (Math.hypot(x - b.x, y - b.y) < 70) return;
+        if (Math.hypot(x - b.x, y - b.y) < b.r + r + 20) return;
     }
     bushes.push({ x, y, r, res });
 }
 
 function addRock(x, y, r = 46) {
     if (!isSafeZone(x, y)) return;
+    // Don't overlap tree trunks or canopies (palm canopies are at y - 120)
     for (const t of trees) {
-        if (Math.hypot(x - t.x, y - t.y) < 55) return;
+        if (Math.hypot(x - t.x, y - t.y) < t.r + r + 30) return;
+        const canY = t.type === 'palm' ? t.y - 120 : t.y - 50;
+        if (Math.hypot(x - t.x, y - canY) < t.r + r + 30) return;
     }
     for (const rk of rocks) {
-        if (Math.hypot(x - rk.x, y - rk.y) < 65) return;
+        if (Math.hypot(x - rk.x, y - rk.y) < rk.r + r + 25) return;
     }
     rocks.push({ x, y, r });
 }
@@ -234,9 +239,9 @@ for (let y = 1400; y <= 14800; y += 460) {
     // Right Sandbank Shore
     addTree(14260, y + 210, 'palm', 56, 'fruit');
 
-    // Sand reeds & beach boulders along the Yamuna water edge
-    addRock(14220, y + 100, 48);
-    addBush(12960, y + 50, 38, 'flower');
+    // River-washed beach stones along Yamuna water edge (x: 14380, y + 360)
+    addRock(14380, y + 360, 42);
+    addBush(12960, y + 230, 38, 'flower');
 }
 
 console.log(`Generated: ${trees.length} trees, ${bushes.length} bushes, ${rocks.length} rocks.`);

@@ -840,4 +840,114 @@ export class EnvironmentRenderer {
 
         ctx.restore();
     }
+
+    // ==========================================
+    // 5. BOULDER & ROCK RENDERERS
+    // Natural Braj & Govardhan Shila / River Stones
+    // ==========================================
+
+    /**
+     * Draw Organic Sacred Boulder / Stone (NOT a geometric sphere!)
+     * Styled with multi-faceted silhouette, sunlight top planes, shadow crevice lines, and grounding.
+     */
+    static drawRock(ctx, obs) {
+        const x = obs.x;
+        const y = obs.y;
+        const r = obs.visualRadius || 42;
+        const isSandbank = x >= 12700;
+
+        ctx.save();
+        ctx.translate(x, y);
+
+        // 1. Soft Ground Ambient Occlusion Shadow
+        ctx.fillStyle = isSandbank ? 'rgba(120, 53, 15, 0.28)' : 'rgba(15, 23, 42, 0.26)';
+        ctx.beginPath();
+        ctx.ellipse(3, r * 0.45, r * 1.15, r * 0.52, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Multi-faceted Organic Boulder Silhouette (Asymmetrical rounded polygon)
+        // Deterministic offset based on coordinates so each boulder has unique natural contours
+        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+        const var1 = ((seed - Math.floor(seed)) - 0.5) * 0.15;
+        const var2 = (((seed * 1.3) - Math.floor(seed * 1.3)) - 0.5) * 0.15;
+
+        // Base Boulder Body
+        const baseGrad = ctx.createLinearGradient(-r * 0.4, -r * 0.8, r * 0.3, r * 0.7);
+        if (isSandbank) {
+            // Warm Sandbank River Stone (Yamuna Beach Shila)
+            baseGrad.addColorStop(0, '#d6d3d1');
+            baseGrad.addColorStop(0.35, '#a8a29e');
+            baseGrad.addColorStop(0.75, '#78716c');
+            baseGrad.addColorStop(1, '#57534e');
+        } else {
+            // Govardhan Ochre-Slate Shila
+            baseGrad.addColorStop(0, '#cbd5e1');
+            baseGrad.addColorStop(0.2, '#94a3b8');
+            baseGrad.addColorStop(0.55, '#64748b');
+            baseGrad.addColorStop(0.85, '#475569');
+            baseGrad.addColorStop(1, '#334155');
+        }
+
+        ctx.fillStyle = baseGrad;
+        ctx.beginPath();
+        // Flattened bottom resting on earth, organic angled top facets
+        ctx.moveTo(-r * 0.95, r * 0.35);
+        ctx.quadraticCurveTo(-r * (1.05 + var1), -r * 0.2, -r * 0.75, -r * (0.65 + var2));
+        ctx.quadraticCurveTo(-r * 0.35, -r * (0.95 - var1), 0, -r * 0.85);
+        ctx.quadraticCurveTo(r * 0.5, -r * (0.9 + var2), r * (0.85 + var1), -r * 0.45);
+        ctx.quadraticCurveTo(r * 1.05, r * 0.1, r * 0.9, r * 0.4);
+        ctx.quadraticCurveTo(r * 0.4, r * 0.65, 0, r * 0.62);
+        ctx.quadraticCurveTo(-r * 0.5, r * 0.65, -r * 0.95, r * 0.35);
+        ctx.closePath();
+        ctx.fill();
+
+        // 3. Sunlight Top Highlight Facet
+        const sunGrad = ctx.createLinearGradient(-r * 0.5, -r * 0.9, r * 0.3, -r * 0.2);
+        sunGrad.addColorStop(0, 'rgba(255, 255, 255, 0.42)');
+        sunGrad.addColorStop(0.6, 'rgba(255, 255, 255, 0.1)');
+        sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = sunGrad;
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.7, -r * (0.55 + var2));
+        ctx.quadraticCurveTo(-r * 0.3, -r * 0.88, 0, -r * 0.82);
+        ctx.quadraticCurveTo(r * 0.45, -r * 0.85, r * 0.75, -r * 0.4);
+        ctx.quadraticCurveTo(r * 0.3, -r * 0.25, -r * 0.1, -r * 0.35);
+        ctx.closePath();
+        ctx.fill();
+
+        // 4. Subtle Rock Crevice & Striation Lines
+        ctx.strokeStyle = isSandbank ? 'rgba(68, 64, 60, 0.45)' : 'rgba(30, 41, 59, 0.5)';
+        ctx.lineWidth = Math.max(1.2, r * 0.035);
+        ctx.lineCap = 'round';
+
+        ctx.beginPath();
+        ctx.moveTo(-r * 0.5, -r * 0.1);
+        ctx.quadraticCurveTo(-r * 0.1, -r * 0.05, r * 0.4, -r * 0.25);
+        ctx.moveTo(-r * 0.2, r * 0.15);
+        ctx.quadraticCurveTo(r * 0.15, r * 0.22, r * 0.6, r * 0.1);
+        ctx.stroke();
+
+        // 5. Moss or Sand Dust Accumulation at the Base
+        if (isSandbank) {
+            // Golden sand dust along bottom curve
+            ctx.fillStyle = 'rgba(253, 224, 71, 0.35)';
+            ctx.beginPath();
+            ctx.ellipse(0, r * 0.48, r * 0.85, r * 0.18, 0, 0, Math.PI);
+            ctx.fill();
+        } else {
+            // Sacred Green Moss patch on shaded side
+            ctx.fillStyle = 'rgba(22, 101, 52, 0.45)';
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.35, r * 0.35, r * 0.4, r * 0.18, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 6. Crisp Natural Silhouette Outline
+        ctx.strokeStyle = isSandbank ? '#44403c' : '#1e293b';
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+
+        ctx.restore();
+    }
 }
+
