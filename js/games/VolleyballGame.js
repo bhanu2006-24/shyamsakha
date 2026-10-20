@@ -240,6 +240,24 @@ export class VolleyballGame {
         // 6. East Opponents AI (Krishna, Dao Balram + Sakhas)
         const eastTeammates = [sakhas[2], sakhas[4]].filter(Boolean);
         this.updateOpponentAI(krishna, balram, eastTeammates, ball, c, dt);
+
+        // 7. Strictly constrain Player to West Court (Player's Side - never wander off!)
+        player.x = Math.max(c.x + 15, Math.min(c.netX - 25, player.x));
+        player.y = Math.max(c.y + 15, Math.min(c.y + c.h - 15, player.y));
+
+        // 8. Sideline Cheerleaders (Sakhas 5+) stay on sidelines, watch ball, cheer
+        for (let i = 5; i < sakhas.length; i++) {
+            const cs = sakhas[i];
+            if (!cs) continue;
+            const cdx = ball.x - cs.x;
+            const cdy = ball.y - cs.y;
+            const clen = Math.hypot(cdx, cdy) || 1;
+            cs.dx = cdx / clen;
+            cs.dy = cdy / clen;
+            cs.x = cs.courtHomeX || cs.x;
+            cs.y = cs.courtHomeY || cs.y;
+            cs.isMoving = false;
+        }
     }
 
     handleHit(team) {
@@ -281,10 +299,14 @@ export class VolleyballGame {
                     reaction.targetY = ball.y + (Math.random() - 0.5) * 15;
                 }
             } else {
-                // Return to home zone (front court setter vs back court receiver)
-                reaction.targetX = sakha.homeX || (c.x + c.w * 0.3);
-                reaction.targetY = sakha.homeY || (c.y + c.h * 0.5);
+                // Return to home zone on west court (never run away to glade!)
+                reaction.targetX = sakha.courtHomeX || (c.x + c.w * 0.32);
+                reaction.targetY = sakha.courtHomeY || (c.y + c.h * 0.5);
             }
+
+            // Strictly clamp West Teammate to Player's Court (West Side)
+            reaction.targetX = Math.max(c.x + 25, Math.min(c.netX - 25, reaction.targetX));
+            reaction.targetY = Math.max(c.y + 25, Math.min(c.y + c.h - 25, reaction.targetY));
         }
         this.aiReactionTimers.set(sakha, reaction);
 
@@ -294,6 +316,8 @@ export class VolleyballGame {
 
         if (dist > 16) {
             sakha.moveWithAnim((dx / dist) * reaction.speed * dt, (dy / dist) * reaction.speed * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight(), dt);
+        } else {
+            sakha.isMoving = false;
         }
 
         // Cooperative Hit / Pass
@@ -363,10 +387,15 @@ export class VolleyballGame {
                         reaction.targetX = c.x + c.w * 0.82;
                         reaction.targetY = c.y + c.h * 0.5;
                     } else {
-                        reaction.targetX = opp.homeX || (c.x + c.w * 0.78);
-                        reaction.targetY = opp.homeY || (c.y + c.h * 0.5);
+                        // East Sakha stays on East Court (never runs to glade!)
+                        reaction.targetX = opp.courtHomeX || (c.x + c.w * 0.78);
+                        reaction.targetY = opp.courtHomeY || (c.y + c.h * 0.5);
                     }
                 }
+
+                // Strictly clamp East Opponents to East Court
+                reaction.targetX = Math.max(c.netX + 25, Math.min(c.x + c.w - 25, reaction.targetX));
+                reaction.targetY = Math.max(c.y + 25, Math.min(c.y + c.h - 25, reaction.targetY));
             }
             this.aiReactionTimers.set(opp, reaction);
 
