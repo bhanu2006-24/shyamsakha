@@ -37,6 +37,11 @@ function addTree(x, y, type, r, res) {
     for (const t of trees) {
         if (Math.hypot(x - t.x, y - t.y) < 145) return;
     }
+    for (const rk of rocks) {
+        const canY = type === 'palm' ? y - 120 : y - 50;
+        if (Math.hypot(x - rk.x, y - rk.y) < r + rk.r + 30) return;
+        if (Math.hypot(x - rk.x, canY - rk.y) < r + rk.r + 30) return;
+    }
     trees.push({ x, y, type, r, res });
 }
 

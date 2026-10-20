@@ -1,7 +1,7 @@
 /**
  * Vrindavan Pastures Hardcoded Map Data (16,000 x 16,000)
  * 100% Handcrafted Layout - ZERO Randomness for perfect deterministic gameplay.
- * Features 430 majestic trees, 107 flowering bushes, 92 rocks, and sacred landmarks.
+ * Features 425 majestic trees, 109 flowering bushes, 96 rocks, and sacred landmarks.
  */
 export const VRINDAVAN_PASTURES_DATA = {
   "name": "Vrindavan Pastures",
@@ -1959,27 +1959,6 @@ export const VRINDAVAN_PASTURES_DATA = {
       "res": "flower"
     },
     {
-      "x": 8000,
-      "y": 12480,
-      "type": "parijat",
-      "r": 82,
-      "res": "flower"
-    },
-    {
-      "x": 7782,
-      "y": 12378,
-      "type": "parijat",
-      "r": 82,
-      "res": "flower"
-    },
-    {
-      "x": 7622,
-      "y": 12218,
-      "type": "parijat",
-      "r": 82,
-      "res": "flower"
-    },
-    {
       "x": 7520,
       "y": 12000,
       "type": "parijat",
@@ -2008,20 +1987,6 @@ export const VRINDAVAN_PASTURES_DATA = {
       "res": "flower"
     },
     {
-      "x": 8218,
-      "y": 11622,
-      "type": "parijat",
-      "r": 82,
-      "res": "flower"
-    },
-    {
-      "x": 8378,
-      "y": 11782,
-      "type": "parijat",
-      "r": 82,
-      "res": "flower"
-    },
-    {
       "x": 6500,
       "y": 10400,
       "type": "kadamba",
@@ -2106,11 +2071,11 @@ export const VRINDAVAN_PASTURES_DATA = {
       "res": "flower"
     },
     {
-      "x": 7800,
+      "x": 8450,
       "y": 11700,
-      "type": "kadamba",
+      "type": "parijat",
       "r": 88,
-      "res": null
+      "res": "flower"
     },
     {
       "x": 9100,
@@ -3439,6 +3404,12 @@ export const VRINDAVAN_PASTURES_DATA = {
       "res": "flower"
     },
     {
+      "x": 7913,
+      "y": 12573,
+      "r": 42,
+      "res": "flower"
+    },
+    {
       "x": 7638,
       "y": 12453,
       "r": 42,
@@ -3548,6 +3519,12 @@ export const VRINDAVAN_PASTURES_DATA = {
     },
     {
       "x": 7270,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
       "y": 12440,
       "r": 40,
       "res": "flower"
@@ -4132,6 +4109,21 @@ export const VRINDAVAN_PASTURES_DATA = {
       "r": 28
     },
     {
+      "x": 7906,
+      "y": 12353,
+      "r": 28
+    },
+    {
+      "x": 7742,
+      "y": 12258,
+      "r": 28
+    },
+    {
+      "x": 7647,
+      "y": 12094,
+      "r": 28
+    },
+    {
       "x": 7742,
       "y": 11742,
       "r": 28
@@ -4144,6 +4136,11 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 8094,
       "y": 11647,
+      "r": 28
+    },
+    {
+      "x": 8258,
+      "y": 11742,
       "r": 28
     },
     {
