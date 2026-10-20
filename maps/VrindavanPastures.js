@@ -1,43 +1,56 @@
 import { TreeRenderer } from './TreeRenderer.js';
+import { EnvironmentRenderer } from '../js/assets/EnvironmentRenderer.js';
+import { VRINDAVAN_PASTURES_DATA } from './vrindavan_pastures_data.js';
 
 /**
  * Vrindavan Pastures Map (गोचारण लीला व दिव्य वृन्दावन महाप्रांगण)
- * Epic 8000x8000 Grand Pastoral Expanse.
- * 100% Handcrafted Layout - ZERO Randomness for perfect deterministic gameplay.
+ * Grand 16,000 x 16,000 Hardcoded Vedic Expanse.
+ * 100% Deterministic Handcrafted Layout - ZERO Randomness.
  * Features:
- * - Central Sacred Glade with Ancient Kadamba & Divine Resting Asana
- * - Interactive One-Way Floral Wind Streams (पवन मार्ग) with speed boosts & petal flows
- * - 6 Grand Strategic Speed-Boost Flower Carpets (पुष्प वाटिकाएं)
- * - 8 Distinct Hardcoded Pastoral Regions with wide 200px+ galloping avenues
- * - Sacred Kamal Sarovar (Lotus Lake) with stepping stone crossings
- * - Sandy Yamuna shoreline with Tall Palm Tala Vana & sacred Ghats
- * - Govardhan Rocky Glades, Mango Orchards, and Banyan Sanctuaries
+ * - Central Sacred Glade at (8000, 8000) with Ancient Kadamba & Divine Resting Asana
+ * - Yamuna Sandbanks with Kanduka Kridha (Volleyball) Court at (13200, 7720)
+ * - Flowing Sacred Yamuna River on East Border (x: 14400 to 16000)
+ * - 4 Strategic One-Way Floral Wind Streams (पवन मार्ग) with speed boosts
+ * - 10 Grand Speed-Boost Flower Carpets (पुष्प वाटिकाएं)
+ * - Sacred Kamal Sarovar (Lotus Lake) at (8000, 12000)
+ * - Govardhan Boulder Groves, Sweet Mango Orchards, Parijat Nikunjas, and Tall Tala Palm Groves
  */
 export class VrindavanPastures {
     constructor() {
-        this.name = "Vrindavan Pastures";
-        this.hindiName = "वृन्दावन गोचारण";
-        this.width = 8000;
-        this.height = 8000;
-        this.centerX = 4000;
-        this.centerY = 4000;
-        this.riverWidth = 800;
+        const data = VRINDAVAN_PASTURES_DATA;
+        this.name = data.name || "Vrindavan Pastures";
+        this.hindiName = data.hindiName || "वृन्दावन गोचारण";
+        this.width = data.width || 16000;
+        this.height = data.height || 16000;
+        this.centerX = data.centerX || 8000;
+        this.centerY = data.centerY || 8000;
+        this.riverWidth = data.riverWidth || 1600;
+        this.court = data.court || {
+            x: 13200,
+            y: 7720,
+            w: 900,
+            h: 560,
+            netX: 13650,
+            playerSide: { minX: 13200, maxX: 13640 },
+            krishnaSide: { minX: 13660, maxX: 14100 }
+        };
         this.obstacles = [];
-        this.windStreams = [];
+        this.windStreams = data.windStreams || [];
         this.riverWaveOffset = 0;
         this.swayTime = 0;
     }
 
     init() {
         this.obstacles = [];
-        const border = 80;
+        const border = 100;
+        const data = VRINDAVAN_PASTURES_DATA;
 
         // 1. Map Perimeter Boundaries
         this.obstacles.push({ shape: 'rect', type: 'wall', x: -border, y: -border, w: this.width + border * 2, h: border, radius: 0 });
         this.obstacles.push({ shape: 'rect', type: 'wall', x: -border, y: this.height, w: this.width + border * 2, h: border, radius: 0 });
         this.obstacles.push({ shape: 'rect', type: 'wall', x: -border, y: 0, w: border, h: this.height, radius: 0 });
 
-        // 2. Yamuna River on East Border (x: 7200 to 8000)
+        // 2. Yamuna River on East Border (x: 14400 to 16000)
         this.obstacles.push({
             shape: 'rect',
             type: 'river',
@@ -49,453 +62,251 @@ export class VrindavanPastures {
             hasResource: 'water'
         });
 
-        // 3. Central Ancient Kadamba Tree (Northern Crown of the Central Glade)
-        // Positioned safely North at (4000, 3600), leaving the Central Glade at (4000, 4000) wide open!
+        // 3. Volleyball Net Barrier (Collides with players, ball flies right over!)
         this.obstacles.push({
-            shape: 'circle',
-            type: 'tree',
-            treeType: 'kadamba',
-            x: 4000,
-            y: 3600,
-            radius: 46,
-            visualRadius: 150,
-            hasResource: null
+            shape: 'rect',
+            type: 'net',
+            x: this.court.netX - 8,
+            y: this.court.y,
+            w: 16,
+            h: this.court.h,
+            radius: 0
         });
 
-        // 4. Grand Speed-Boost Flower Carpets (पुष्प वाटिकाएं - 100% Walkthrough, +35% Speed)
-        const flowerCarpets = [
-            { name: "Central Kadamba Flower Carpet", x: 4000, y: 3100, r: 135 },
-            { name: "West Mango Orchard Flower Carpet", x: 2500, y: 4000, r: 140 },
-            { name: "South Kamal Sarovar Shore Carpet", x: 4000, y: 5200, r: 140 },
-            { name: "East Yamuna Sands Flower Carpet", x: 6600, y: 4000, r: 140 },
-            { name: "North-West Nikunja Flower Carpet", x: 2400, y: 2400, r: 130 },
-            { name: "South-West Govardhan Glade Carpet", x: 2500, y: 5600, r: 130 }
-        ];
-
-        flowerCarpets.forEach(c => {
-            this.obstacles.push({
-                shape: 'circle',
-                type: 'flower_carpet',
-                name: c.name,
-                x: c.x,
-                y: c.y,
-                radius: c.r,
-                visualRadius: c.r,
-                hasResource: null
-            });
-        });
-
-        // 5. Sacred Kamal Sarovar (Lotus Pond at 4000, 6100)
-        this.obstacles.push({
-            shape: 'circle',
-            type: 'pond',
-            x: 4000,
-            y: 6100,
-            radius: 170,
-            visualRadius: 170,
-            hasResource: 'lotus',
-            resourceRegenTimer: 0
-        });
-
-        // 6. Interactive One-Way Floral Wind Streams (पवन मार्ग)
-        // Specific grove corridors where sweet Vrindavan breeze carries flower petals and accelerates runners!
-        this.windStreams = [
-            {
-                id: "north_zephyr",
-                name: "Kadamba Zephyr Stream",
-                hindi: "कदम्ब पावन समीर (उत्तर से दक्षिण)",
-                x: 3860, y: 1600, w: 280, h: 1700,
-                dirX: 0, dirY: 1, speedBoost: 220,
-                color: "#fde047"
-            },
-            {
-                id: "west_floral_rush",
-                name: "Nikunja Floral Rush",
-                hindi: "निकुंज पुष्प प्रवाह (पश्चिम से पूर्व)",
-                x: 1800, y: 3860, w: 1800, h: 280,
-                dirX: 1, dirY: 0, speedBoost: 220,
-                color: "#f472b6"
-            },
-            {
-                id: "yamuna_beach_gale",
-                name: "Yamuna Sandbank Gale",
-                hindi: "यमुना बालुका समीर (दक्षिण से उत्तर)",
-                x: 6860, y: 2000, w: 280, h: 4200,
-                dirX: 0, dirY: -1, speedBoost: 240,
-                color: "#38bdf8"
-            }
-        ];
-
-        // 7. 100% Handcrafted Tree Groves (ZERO RANDOMNESS!)
-        // All coordinates spaced with minimum 220px to 320px corridors so no one ever gets stuck!
-        const hardcodedTrees = [
-            // NORTH: Kadamba Kusum Forest (कदम्ब कानन)
-            { x: 3400, y: 1600, type: 'kadamba', r: 85, res: null },
-            { x: 4000, y: 1300, type: 'kadamba', r: 90, res: null },
-            { x: 4600, y: 1600, type: 'kadamba', r: 85, res: null },
-            { x: 3300, y: 2200, type: 'kadamba', r: 80, res: null },
-            { x: 4700, y: 2200, type: 'kadamba', r: 80, res: null },
-            { x: 3400, y: 2750, type: 'kadamba', r: 80, res: null },
-            { x: 4600, y: 2750, type: 'kadamba', r: 80, res: null },
-            { x: 3700, y: 2000, type: 'kadamba', r: 75, res: null },
-            { x: 4300, y: 2000, type: 'kadamba', r: 75, res: null },
-
-            // WEST: Sweet Mango Orchards (रसीले आम की अमराई)
-            { x: 1800, y: 3300, type: 'mango', r: 80, res: 'fruit' },
-            { x: 2300, y: 3300, type: 'mango', r: 80, res: 'fruit' },
-            { x: 2800, y: 3300, type: 'mango', r: 80, res: 'fruit' },
-            { x: 3300, y: 3300, type: 'mango', r: 80, res: 'fruit' },
-
-            { x: 1600, y: 4000, type: 'mango', r: 85, res: 'fruit' },
-            { x: 2050, y: 4000, type: 'mango', r: 85, res: 'fruit' },
-            { x: 2950, y: 4000, type: 'mango', r: 85, res: 'fruit' },
-
-            { x: 1800, y: 4700, type: 'mango', r: 80, res: 'fruit' },
-            { x: 2300, y: 4700, type: 'mango', r: 80, res: 'fruit' },
-            { x: 2800, y: 4700, type: 'mango', r: 80, res: 'fruit' },
-            { x: 3300, y: 4700, type: 'mango', r: 80, res: 'fruit' },
-
-            // NORTH-WEST: Nikunja & Malati Groves (दिव्य निकुंज)
-            { x: 1800, y: 1600, type: 'parijat', r: 70, res: 'flower' },
-            { x: 2400, y: 1500, type: 'parijat', r: 75, res: 'flower' },
-            { x: 2900, y: 1700, type: 'parijat', r: 70, res: 'flower' },
-            { x: 1900, y: 2200, type: 'parijat', r: 70, res: 'flower' },
-            { x: 2900, y: 2300, type: 'parijat', r: 70, res: 'flower' },
-            { x: 1800, y: 2800, type: 'parijat', r: 75, res: 'flower' },
-            { x: 2400, y: 2950, type: 'parijat', r: 75, res: 'flower' },
-            { x: 2900, y: 2800, type: 'parijat', r: 70, res: 'flower' },
-
-            // NORTH-EAST: Akshay Vat Banyan Sanctuary (अक्षय वट कुंज)
-            { x: 5100, y: 1600, type: 'banyan', r: 105, res: null },
-            { x: 5800, y: 1500, type: 'banyan', r: 110, res: null },
-            { x: 6500, y: 1700, type: 'banyan', r: 105, res: null },
-            { x: 5300, y: 2300, type: 'banyan', r: 100, res: null },
-            { x: 6100, y: 2200, type: 'banyan', r: 105, res: null },
-            { x: 5200, y: 3000, type: 'banyan', r: 100, res: null },
-            { x: 5900, y: 2950, type: 'banyan', r: 105, res: null },
-            { x: 6500, y: 2800, type: 'banyan', r: 100, res: null },
-
-            // SOUTH-WEST: Govardhan Banyan & Hill Groves (गिरिराज कानन)
-            { x: 1800, y: 5300, type: 'banyan', r: 105, res: null },
-            { x: 2500, y: 5150, type: 'banyan', r: 100, res: null },
-            { x: 3100, y: 5350, type: 'banyan', r: 100, res: null },
-            { x: 1800, y: 6200, type: 'banyan', r: 105, res: null },
-            { x: 2500, y: 6400, type: 'banyan', r: 105, res: null },
-            { x: 3100, y: 6200, type: 'banyan', r: 100, res: null },
-
-            // SOUTH: Kamal Sarovar Guardian Trees (सरोवर कुंज)
-            { x: 3400, y: 5600, type: 'parijat', r: 70, res: 'flower' },
-            { x: 4600, y: 5600, type: 'parijat', r: 70, res: 'flower' },
-            { x: 3400, y: 6600, type: 'kadamba', r: 85, res: null },
-            { x: 4600, y: 6600, type: 'kadamba', r: 85, res: null },
-
-            // SOUTH-EAST: Pastures & Shade Trees (चारागाह उपवन)
-            { x: 5200, y: 5200, type: 'mango', r: 80, res: 'fruit' },
-            { x: 5800, y: 5100, type: 'kadamba', r: 85, res: null },
-            { x: 6400, y: 5300, type: 'mango', r: 80, res: 'fruit' },
-            { x: 5300, y: 6100, type: 'banyan', r: 100, res: null },
-            { x: 6000, y: 6150, type: 'kadamba', r: 85, res: null },
-
-            // EAST: Yamuna Sandbank Shore & Tall Palm Tala Vana (ताल वन)
-            { x: 6850, y: 1500, type: 'palm', r: 52, res: 'fruit' },
-            { x: 6850, y: 2200, type: 'palm', r: 54, res: 'fruit' },
-            { x: 6850, y: 2900, type: 'palm', r: 52, res: 'fruit' },
-            { x: 6850, y: 3600, type: 'palm', r: 54, res: 'fruit' },
-            { x: 6850, y: 4400, type: 'palm', r: 52, res: 'fruit' },
-            { x: 6850, y: 5200, type: 'palm', r: 54, res: 'fruit' },
-            { x: 6850, y: 6000, type: 'palm', r: 52, res: 'fruit' },
-            { x: 6850, y: 6700, type: 'palm', r: 54, res: 'fruit' }
-        ];
-
-        hardcodedTrees.forEach(t => {
+        // 4. Central Ancient Kadamba Tree
+        if (data.centralKadamba) {
             this.obstacles.push({
                 shape: 'circle',
                 type: 'tree',
-                treeType: t.type,
-                x: t.x,
-                y: t.y,
-                radius: 28, // Trunk collision radius
-                visualRadius: t.r,
-                hasResource: t.res,
-                resourceRegenTimer: 0
-            });
-        });
-
-        // 8. 100% Handcrafted Sacred Govardhan Boulders (Soft Collision, Hopping Speed Boost)
-        const hardcodedRocks = [
-            { x: 1900, y: 5750, r: 42 },
-            { x: 2300, y: 5750, r: 45 },
-            { x: 2800, y: 5750, r: 44 },
-            { x: 2000, y: 6550, r: 45 },
-            { x: 2700, y: 6550, r: 48 },
-            { x: 3800, y: 6250, r: 38 }, // Stepping post near sarovar
-            { x: 4200, y: 6250, r: 38 }, // Stepping post near sarovar
-            { x: 7100, y: 2700, r: 45 }, // Kaliya Ghat landing boulder
-            { x: 7100, y: 5300, r: 45 }  // Keshi Ghat landing boulder
-        ];
-
-        hardcodedRocks.forEach(rk => {
-            this.obstacles.push({
-                shape: 'circle',
-                type: 'rock',
-                x: rk.x,
-                y: rk.y,
-                radius: rk.r * 0.65,
-                visualRadius: rk.r,
+                treeType: data.centralKadamba.treeType || 'kadamba',
+                x: data.centralKadamba.x,
+                y: data.centralKadamba.y,
+                radius: data.centralKadamba.radius || 52,
+                visualRadius: data.centralKadamba.visualRadius || 160,
                 hasResource: null
             });
-        });
+        }
 
-        // 9. 100% Handcrafted Fragrant Malati & Jasmine Flower Bushes (Soft Obstacles)
-        const hardcodedBushes = [
-            // Central Glade Outer Accents
-            { x: 3600, y: 3750, r: 38 },
-            { x: 4400, y: 3750, r: 38 },
-            { x: 3550, y: 4350, r: 38 },
-            { x: 4450, y: 4350, r: 38 },
+        // 5. Grand Speed-Boost Flower Carpets (पुष्प वाटिकाएं - Walkthrough, +35% Speed)
+        if (data.flowerCarpets) {
+            data.flowerCarpets.forEach(c => {
+                this.obstacles.push({
+                    shape: 'circle',
+                    type: 'flower_carpet',
+                    name: c.name,
+                    x: c.x,
+                    y: c.y,
+                    radius: c.r,
+                    visualRadius: c.r,
+                    hasResource: null
+                });
+            });
+        }
 
-            // North Kadamba Trails
-            { x: 3700, y: 2600, r: 36 },
-            { x: 4300, y: 2600, r: 36 },
-
-            // West Mango Crossings
-            { x: 2100, y: 3650, r: 38 },
-            { x: 2700, y: 3650, r: 38 },
-            { x: 2100, y: 4350, r: 38 },
-            { x: 2700, y: 4350, r: 38 },
-
-            // North-West Nikunja Shrubbery
-            { x: 2100, y: 1900, r: 40 },
-            { x: 2650, y: 1900, r: 40 },
-            { x: 2100, y: 2600, r: 40 },
-            { x: 2650, y: 2600, r: 40 },
-
-            // South Lake Flower Shrubbery
-            { x: 3700, y: 5450, r: 40 },
-            { x: 4300, y: 5450, r: 40 },
-            { x: 3700, y: 6450, r: 40 },
-            { x: 4300, y: 6450, r: 40 },
-
-            // East Yamuna Shoreline
-            { x: 6700, y: 2400, r: 42 },
-            { x: 6700, y: 3800, r: 42 },
-            { x: 6700, y: 5000, r: 42 },
-            { x: 6700, y: 6200, r: 42 }
-        ];
-
-        hardcodedBushes.forEach(b => {
+        // 6. Sacred Kamal Sarovar (Lotus Pond at 8000, 12000)
+        if (data.sarovar) {
             this.obstacles.push({
                 shape: 'circle',
-                type: 'bush',
-                x: b.x,
-                y: b.y,
-                radius: 18,
-                visualRadius: b.r,
-                hasResource: 'flower',
+                type: 'pond',
+                x: data.sarovar.x,
+                y: data.sarovar.y,
+                radius: data.sarovar.radius || 340,
+                visualRadius: data.sarovar.visualRadius || 340,
+                hasResource: 'lotus',
                 resourceRegenTimer: 0
             });
-        });
+        }
+
+        // 7. Handcrafted Trees across Vrindavan (ZERO RANDOMNESS!)
+        if (data.trees) {
+            data.trees.forEach(t => {
+                this.obstacles.push({
+                    shape: 'circle',
+                    type: 'tree',
+                    treeType: t.type,
+                    x: t.x,
+                    y: t.y,
+                    radius: 30, // Trunk collision radius
+                    visualRadius: t.r,
+                    hasResource: t.res,
+                    resourceRegenTimer: 0
+                });
+            });
+        }
+
+        // 8. Handcrafted Govardhan Rocks & Stepping Boulders
+        if (data.rocks) {
+            data.rocks.forEach(rk => {
+                this.obstacles.push({
+                    shape: 'circle',
+                    type: 'rock',
+                    x: rk.x,
+                    y: rk.y,
+                    radius: rk.r * 0.7,
+                    visualRadius: rk.r,
+                    hasResource: null
+                });
+            });
+        }
+
+        // 9. Handcrafted Fragrant Malati & Jasmine Flower Bushes
+        if (data.bushes) {
+            data.bushes.forEach(b => {
+                this.obstacles.push({
+                    shape: 'circle',
+                    type: 'bush',
+                    x: b.x,
+                    y: b.y,
+                    radius: b.r * 0.55,
+                    visualRadius: b.r,
+                    hasResource: b.res || 'flower',
+                    resourceRegenTimer: 0
+                });
+            });
+        }
     }
 
     update(dt) {
-        this.riverWaveOffset += dt * 38;
-        this.swayTime += dt * 2.2;
+        this.swayTime += dt;
+        this.riverWaveOffset += dt * 45;
 
         // Resource regeneration
         for (const obs of this.obstacles) {
-            if (!obs.hasResource && obs.resourceRegenTimer > 0) {
+            if (obs.resourceRegenTimer > 0) {
                 obs.resourceRegenTimer -= dt;
-                if (obs.resourceRegenTimer <= 0) {
-                    if (obs.type === 'bush') obs.hasResource = 'flower';
-                    if (obs.type === 'pond') obs.hasResource = 'lotus';
-                    if (obs.type === 'tree' && obs.treeType === 'mango') obs.hasResource = 'fruit';
-                    if (obs.type === 'tree' && obs.treeType === 'parijat') obs.hasResource = 'flower';
-                }
             }
         }
-    }
-
-    /**
-     * Checks if an entity is inside any active One-Way Floral Wind Stream
-     * Returns { inStream: true, fx, fy, boost } or null
-     */
-    getWindStreamEffect(x, y) {
-        for (const ws of this.windStreams) {
-            if (x >= ws.x && x <= ws.x + ws.w && y >= ws.y && y <= ws.y + ws.h) {
-                return {
-                    inStream: true,
-                    name: ws.name,
-                    hindi: ws.hindi,
-                    fx: ws.dirX * ws.speedBoost,
-                    fy: ws.dirY * ws.speedBoost
-                };
-            }
-        }
-        return null;
     }
 
     drawGround(ctx, camera) {
-        // Lush Vrindavan Meadow Base across the grand 8000x8000 canvas
-        ctx.fillStyle = '#86efac';
+        // 1. Base Pastoral Vrindavan Turf
+        ctx.fillStyle = '#2d6a4f';
         ctx.fillRect(camera.x, camera.y, camera.width, camera.height);
 
-        // Soft natural grass grid texture (140px intervals)
-        ctx.strokeStyle = 'rgba(21, 128, 61, 0.07)';
+        // Subtle organic grass texture grid
+        ctx.strokeStyle = 'rgba(45, 106, 79, 0.45)';
         ctx.lineWidth = 1;
+        const gridSpacing = 280;
+        const startX = Math.floor(camera.x / gridSpacing) * gridSpacing;
+        const startY = Math.floor(camera.y / gridSpacing) * gridSpacing;
+
         ctx.beginPath();
-        const startX = Math.floor(camera.x / 140) * 140;
-        const startY = Math.floor(camera.y / 140) * 140;
-        for (let x = startX; x < camera.x + camera.width + 140; x += 140) {
+        for (let x = startX; x < camera.x + camera.width + gridSpacing; x += gridSpacing) {
             ctx.moveTo(x, camera.y);
             ctx.lineTo(x, camera.y + camera.height);
         }
-        for (let y = startY; y < camera.y + camera.height + 140; y += 140) {
+        for (let y = startY; y < camera.y + camera.height + gridSpacing; y += gridSpacing) {
             ctx.moveTo(camera.x, y);
             ctx.lineTo(camera.x + camera.width, y);
         }
         ctx.stroke();
 
-        // 1. One-Way Floral Wind Streams (पवन मार्ग) Ground Rendering
+        // 2. Durva Grass Tufts scattered naturally
+        const sway = Math.sin(this.swayTime * 2.0) * 0.5;
+        const grassTuftSpacing = 400;
+        const grassStartX = Math.floor(camera.x / grassTuftSpacing) * grassTuftSpacing;
+        const grassStartY = Math.floor(camera.y / grassTuftSpacing) * grassTuftSpacing;
+
+        for (let gx = grassStartX; gx < camera.x + camera.width + grassTuftSpacing; gx += grassTuftSpacing) {
+            for (let gy = grassStartY; gy < camera.y + camera.height + grassTuftSpacing; gy += grassTuftSpacing) {
+                // Keep grass away from river & volleyball court
+                if (gx < 12800) {
+                    EnvironmentRenderer.drawDurvaGrassTuft(ctx, gx + 60, gy + 80, sway, 13);
+                }
+            }
+        }
+
+        // 3. Interactive Floral Wind Streams (पवन मार्ग)
         for (const ws of this.windStreams) {
-            if (camera.x + camera.width > ws.x && camera.x < ws.x + ws.w &&
-                camera.y + camera.height > ws.y && camera.y < ws.y + ws.h) {
+            if (camera.isInView(ws.x + ws.w / 2, ws.y + ws.h / 2, Math.max(ws.w, ws.h) / 2 + 50)) {
                 ctx.save();
-                // Breezy translucent lane aura
-                ctx.fillStyle = 'rgba(254, 240, 138, 0.14)';
+                ctx.fillStyle = ws.color + '18';
                 ctx.fillRect(ws.x, ws.y, ws.w, ws.h);
 
-                // Dashed border edges of the breeze stream
-                ctx.strokeStyle = 'rgba(250, 204, 21, 0.45)';
+                ctx.strokeStyle = ws.color + '55';
                 ctx.lineWidth = 2;
-                ctx.setLineDash([12, 10]);
+                ctx.setLineDash([16, 12]);
                 ctx.strokeRect(ws.x, ws.y, ws.w, ws.h);
                 ctx.setLineDash([]);
 
-                // Flowing stream arrows and petals
-                ctx.fillStyle = ws.color;
-                ctx.strokeStyle = ws.color;
-                ctx.lineWidth = 2;
-                const flowOffset = (this.swayTime * 65) % 80;
+                // Flowing breeze streaks & petals
+                const isVertical = ws.h > ws.w;
+                const flowOffset = (this.swayTime * 140) % (isVertical ? ws.h : ws.w);
 
-                if (ws.dirY !== 0) {
-                    for (let cy = ws.y + flowOffset; cy < ws.y + ws.h; cy += 80) {
-                        for (let cx = ws.x + 40; cx < ws.x + ws.w - 20; cx += 70) {
-                            ctx.beginPath();
-                            ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            // Direction pointer
-                            ctx.beginPath();
-                            ctx.moveTo(cx - 5, cy);
-                            ctx.lineTo(cx, cy + (ws.dirY > 0 ? 8 : -8));
-                            ctx.lineTo(cx + 5, cy);
-                            ctx.stroke();
-                        }
-                    }
-                } else if (ws.dirX !== 0) {
-                    for (let cx = ws.x + flowOffset; cx < ws.x + ws.w; cx += 80) {
-                        for (let cy = ws.y + 40; cy < ws.y + ws.h - 20; cy += 70) {
-                            ctx.beginPath();
-                            ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-                            ctx.fill();
-                            // Direction pointer
-                            ctx.beginPath();
-                            ctx.moveTo(cx, cy - 5);
-                            ctx.lineTo(cx + (ws.dirX > 0 ? 8 : -8), cy);
-                            ctx.lineTo(cx, cy + 5);
-                            ctx.stroke();
-                        }
+                ctx.fillStyle = ws.color;
+                ctx.strokeStyle = ws.color + '88';
+                ctx.lineWidth = 1.8;
+
+                for (let i = 0; i < 7; i++) {
+                    if (isVertical) {
+                        const py = ws.dirY > 0 ? ws.y + (flowOffset + i * (ws.h / 7)) % ws.h : ws.y + ws.h - ((flowOffset + i * (ws.h / 7)) % ws.h);
+                        const px = ws.x + 35 + (i * 37) % (ws.w - 70);
+                        ctx.beginPath();
+                        ctx.moveTo(px, py - 18 * ws.dirY);
+                        ctx.lineTo(px, py + 18 * ws.dirY);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(px, py, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        const px = ws.dirX > 0 ? ws.x + (flowOffset + i * (ws.w / 7)) % ws.w : ws.x + ws.w - ((flowOffset + i * (ws.w / 7)) % ws.w);
+                        const py = ws.y + 35 + (i * 37) % (ws.h - 70);
+                        ctx.beginPath();
+                        ctx.moveTo(px - 18 * ws.dirX, py);
+                        ctx.lineTo(px + 18 * ws.dirX, py);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.arc(px, py, 3, 0, Math.PI * 2);
+                        ctx.fill();
                     }
                 }
 
-                // Corridor Name Badge
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+                // Stream Name Tag
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
                 ctx.beginPath();
-                ctx.roundRect(ws.x + ws.w / 2 - 90, ws.y + 15, 180, 24, 12);
+                ctx.roundRect(ws.x + ws.w / 2 - 110, ws.y + ws.h / 2 - 13, 220, 26, 13);
                 ctx.fill();
+
                 ctx.fillStyle = '#fef08a';
                 ctx.font = 'bold 11px Outfit, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(`💨 ${ws.hindi}`, ws.x + ws.w / 2, ws.y + 27);
+                ctx.fillText(`💨 ${ws.hindi}`, ws.x + ws.w / 2, ws.y + ws.h / 2);
 
                 ctx.restore();
             }
         }
 
-        // 2. Natural Shaded Ground Under Central Kadamba Tree (4000, 3600)
-        const kadambaY = 3600;
-        if (camera.isInView(this.centerX, kadambaY, 260)) {
-            ctx.save();
-            ctx.fillStyle = 'rgba(20, 83, 45, 0.12)';
-            ctx.beginPath();
-            ctx.ellipse(this.centerX, kadambaY + 14, 140, 80, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Scattered golden Kadamba blossoms on the shaded turf
-            ctx.fillStyle = '#facc15';
-            const blossomPetals = [
-                [-65, 10], [55, -5], [-40, -25], [45, 20],
-                [-80, 25], [75, 15], [-20, 35], [25, -30],
-                [-95, -10], [90, -15], [0, 42]
-            ];
-            for (const [bx, by] of blossomPetals) {
-                ctx.beginPath();
-                ctx.arc(this.centerX + bx, kadambaY + by, 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.restore();
-        }
-
-        // 3. Open Sunlit Pastoral Glade (गोचारण महाप्रांगण at 4000, 4000)
-        const clearingY = 4000;
-        if (camera.isInView(this.centerX, clearingY, 360)) {
+        // 4. Central Sacred Glade at (8000, 8000)
+        if (camera.isInView(this.centerX, this.centerY, 450)) {
             ctx.save();
             const sunGlow = ctx.createRadialGradient(
-                this.centerX, clearingY, 60,
-                this.centerX, clearingY, 340
+                this.centerX, this.centerY, 80,
+                this.centerX, this.centerY, 420
             );
-            sunGlow.addColorStop(0, 'rgba(254, 240, 138, 0.24)');
-            sunGlow.addColorStop(0.6, 'rgba(254, 240, 138, 0.08)');
+            sunGlow.addColorStop(0, 'rgba(254, 240, 138, 0.28)');
+            sunGlow.addColorStop(0.65, 'rgba(254, 240, 138, 0.08)');
             sunGlow.addColorStop(1, 'rgba(254, 240, 138, 0)');
             ctx.fillStyle = sunGlow;
             ctx.beginPath();
-            ctx.arc(this.centerX, clearingY, 340, 0, Math.PI * 2);
+            ctx.arc(this.centerX, this.centerY, 420, 0, Math.PI * 2);
             ctx.fill();
 
-            // Delicate wild flower specks scattered naturally on the grass
-            const gladeFlowers = [
-                { dx: -100, dy: -60, col: '#f472b6' },
-                { dx: 95, dy: -55, col: '#facc15' },
-                { dx: -160, dy: 50, col: '#ffffff' },
-                { dx: 155, dy: 60, col: '#f472b6' },
-                { dx: -70, dy: 140, col: '#facc15' },
-                { dx: 75, dy: 135, col: '#ffffff' },
-                { dx: -190, dy: 120, col: '#38bdf8' },
-                { dx: 190, dy: 115, col: '#facc15' }
-            ];
-            for (const f of gladeFlowers) {
-                ctx.fillStyle = f.col;
-                ctx.beginPath();
-                ctx.arc(this.centerX + f.dx, clearingY + f.dy, 2.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // Decorated Divine Resting Asana (Peetambari silk carpet, bolsters, and Makhan handi)
+            // Decorated Divine Resting Asana
             TreeRenderer.drawDivineAsana(ctx, this.centerX, this.centerY + 40);
 
             ctx.restore();
         }
 
-        // 4. Sacred Speed-Boost Flower Carpets (पुष्प वाटिका)
+        // 5. Grand Speed-Boost Flower Carpets (पुष्प वाटिकाएं)
         for (const obs of this.obstacles) {
-            if (obs.type === 'flower_carpet' && camera.isInView(obs.x, obs.y, obs.visualRadius + 50)) {
+            if (obs.type === 'flower_carpet' && camera.isInView(obs.x, obs.y, obs.visualRadius + 60)) {
                 ctx.save();
-                const pulse = Math.sin(this.swayTime * 2.5) * 5;
+                const pulse = Math.sin(this.swayTime * 2.5) * 6;
                 const vR = obs.visualRadius + pulse;
 
-                // Glowing floral aura gradient
                 const grad = ctx.createRadialGradient(obs.x, obs.y, 10, obs.x, obs.y, vR);
-                grad.addColorStop(0, 'rgba(244, 114, 182, 0.45)');
+                grad.addColorStop(0, 'rgba(244, 114, 182, 0.48)');
                 grad.addColorStop(0.65, 'rgba(251, 191, 36, 0.28)');
                 grad.addColorStop(1, 'rgba(244, 114, 182, 0)');
                 ctx.fillStyle = grad;
@@ -503,27 +314,22 @@ export class VrindavanPastures {
                 ctx.arc(obs.x, obs.y, vR, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Concentric floral dashed ring
-                ctx.strokeStyle = 'rgba(251, 191, 36, 0.65)';
-                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.7)';
+                ctx.lineWidth = 2.5;
                 ctx.setLineDash([8, 6]);
                 ctx.beginPath();
                 ctx.arc(obs.x, obs.y, obs.visualRadius * 0.75, 0, Math.PI * 2);
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // Floating blossom petals
-                ctx.fillStyle = '#f472b6';
+                // Floating petals
                 for (let a = 0; a < 8; a++) {
                     const ang = a * (Math.PI / 4) + this.swayTime * 0.6;
                     const px = obs.x + Math.cos(ang) * (obs.visualRadius * 0.52);
                     const py = obs.y + Math.sin(ang) * (obs.visualRadius * 0.52);
-                    ctx.beginPath();
-                    ctx.arc(px, py, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
+                    EnvironmentRenderer.drawParijatFlower(ctx, px, py, 6, ang);
                 }
 
-                // Speed icon & label badge
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
                 ctx.beginPath();
                 ctx.roundRect(obs.x - 75, obs.y - 11, 150, 22, 11);
@@ -538,45 +344,106 @@ export class VrindavanPastures {
             }
         }
 
-        // 5. Yamuna River on the East border (x: 7200 to 8000)
-        const riverX = this.width - this.riverWidth;
-        if (camera.x + camera.width > riverX - 100) {
-            // Golden Sandbank shoreline
+        // 6. Yamuna Sandbank Shoreline (x: 12800 to 14400)
+        const sandStartX = 12800;
+        const riverStartX = this.width - this.riverWidth; // 14400
+        if (camera.x + camera.width > sandStartX) {
+            // Golden sandbank expanse
             ctx.fillStyle = '#fef08a';
-            ctx.fillRect(riverX - 80, camera.y, 80, camera.height);
+            ctx.fillRect(sandStartX, camera.y, riverStartX - sandStartX, camera.height);
 
-            // River Water
-            ctx.fillStyle = '#2563eb';
-            ctx.fillRect(riverX, camera.y, this.riverWidth + 100, camera.height);
-
-            // Water current waves
-            ctx.strokeStyle = 'rgba(147, 197, 253, 0.65)';
-            ctx.lineWidth = 2;
+            // Sand ripples
+            ctx.strokeStyle = 'rgba(234, 179, 8, 0.25)';
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             for (let y = startY; y < camera.y + camera.height + 100; y += 70) {
-                const wx = riverX + 25 + ((y * 1.5 + this.riverWaveOffset) % (this.riverWidth - 90));
-                ctx.moveTo(wx, y);
-                ctx.quadraticCurveTo(wx + 30, y - 8, wx + 60, y);
+                ctx.moveTo(sandStartX, y);
+                ctx.bezierCurveTo(sandStartX + 500, y - 8, sandStartX + 1000, y + 8, riverStartX, y);
             }
             ctx.stroke();
 
-            // Kaliya Ghat & Keshi Ghat stone banners
+            // Sand reeds along shoreline
+            for (let ry = startY; ry < camera.y + camera.height + 140; ry += 140) {
+                EnvironmentRenderer.drawSandReeds(ctx, riverStartX - 35, ry, sway, 26);
+            }
+        }
+
+        // 7. OFFICIAL VOLLEYBALL / KANDUKA COURT (Located by the Yamuna Sandbank at 13200, 7720)
+        const c = this.court;
+        if (camera.isInView(c.x + c.w / 2, c.y + c.h / 2, c.w / 2 + 80)) {
+            ctx.save();
+            // Court Sand Bed
+            ctx.fillStyle = '#fde047';
+            ctx.fillRect(c.x, c.y, c.w, c.h);
+
+            // Court Outer Boundary Lines (Crisp White Lime Marks)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 5;
+            ctx.strokeRect(c.x, c.y, c.w, c.h);
+
+            // Center Net Line
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.setLineDash([10, 8]);
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(c.netX, c.y);
+            ctx.lineTo(c.netX, c.y + c.h);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Attack / 3-meter lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(c.netX - 160, c.y);
+            ctx.lineTo(c.netX - 160, c.y + c.h);
+            ctx.moveTo(c.netX + 160, c.y);
+            ctx.lineTo(c.netX + 160, c.y + c.h);
+            ctx.stroke();
+
+            // Court Side Labels
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.42)';
+            ctx.font = 'bold 22px Cinzel, serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("SAKHA TEAM (YOU)", c.x + c.w * 0.25, c.y + c.h * 0.5);
+            ctx.fillText("KRISHNA & BALRAM", c.x + c.w * 0.75, c.y + c.h * 0.5);
+
+            ctx.restore();
+        }
+
+        // 8. Sacred Yamuna River Waters (x: 14400 to 16000)
+        if (camera.x + camera.width > riverStartX) {
+            ctx.fillStyle = '#2563eb';
+            ctx.fillRect(riverStartX, camera.y, this.riverWidth + 100, camera.height);
+
+            // Water wave currents
+            ctx.strokeStyle = 'rgba(147, 197, 253, 0.7)';
+            ctx.lineWidth = 2.2;
+            ctx.beginPath();
+            for (let y = startY; y < camera.y + camera.height + 100; y += 75) {
+                const wx = riverStartX + 30 + ((y * 1.5 + this.riverWaveOffset) % (this.riverWidth - 100));
+                ctx.moveTo(wx, y);
+                ctx.quadraticCurveTo(wx + 35, y - 9, wx + 70, y);
+            }
+            ctx.stroke();
+
+            // Sacred Ghat Banners
             const ghats = [
-                { name: "Kaliya Ghat (कालिया दह)", y: 2700 },
-                { name: "Keshi Ghat (केशी घाट)", y: 5300 }
+                { name: "Kaliya Ghat (कालिया दह)", y: 5400 },
+                { name: "Keshi Ghat (केशी घाट)", y: 10600 }
             ];
             for (const g of ghats) {
-                if (camera.isInView(riverX - 35, g.y, 100)) {
+                if (camera.isInView(riverStartX - 40, g.y, 120)) {
                     ctx.save();
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
                     ctx.beginPath();
-                    ctx.roundRect(riverX - 120, g.y - 12, 115, 24, 12);
+                    ctx.roundRect(riverStartX - 130, g.y - 13, 125, 26, 13);
                     ctx.fill();
                     ctx.fillStyle = '#fef08a';
                     ctx.font = 'bold 11px Outfit, sans-serif';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText(`🌊 ${g.name}`, riverX - 62, g.y);
+                    ctx.fillText(`🌊 ${g.name}`, riverStartX - 68, g.y);
                     ctx.restore();
                 }
             }
@@ -584,13 +451,42 @@ export class VrindavanPastures {
     }
 
     drawProps(ctx, camera) {
-        // Draw Trunks, Roots, Rocks, Bushes, Lotus Pond, and Flower blossoms
-        for (const obs of this.obstacles) {
-            if (!camera.isInView(obs.x, obs.y, obs.visualRadius || obs.w)) continue;
+        // Draw Net Poles & Flower Garland Net in the Volleyball Court
+        const c = this.court;
+        if (camera.isInView(c.netX, c.y + c.h / 2, c.h / 2 + 60)) {
+            ctx.save();
+            // Wooden Poles
+            ctx.fillStyle = '#78350f';
+            ctx.fillRect(c.netX - 6, c.y - 20, 12, 24);
+            ctx.fillRect(c.netX - 6, c.y + c.h - 4, 12, 24);
 
-            if (obs.type === 'tree' || obs.type === 'kadamba') {
-                TreeRenderer.drawTrunk(ctx, obs);
+            // Flower Garland Net (Marigold, Parijat & Tulasi braided net)
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            ctx.moveTo(c.netX, c.y);
+            ctx.lineTo(c.netX, c.y + c.h);
+            ctx.stroke();
+
+            // Floral Garland Net Beads
+            for (let ny = c.y + 12; ny < c.y + c.h; ny += 22) {
+                ctx.fillStyle = (Math.floor(ny / 22) % 2 === 0) ? '#f97316' : '#fef08a';
+                ctx.beginPath();
+                ctx.arc(c.netX, ny, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        // Draw Trunks, Rocks, Bushes, and Kamal Sarovar
+        for (const obs of this.obstacles) {
+            if (!camera.isInView(obs.x, obs.y, obs.visualRadius || obs.w || 60)) continue;
+
+            if (obs.type === 'tree') {
+                EnvironmentRenderer.drawTreeTrunk(ctx, obs, this.swayTime);
             } else if (obs.type === 'pond') {
+                // Sacred Kamal Sarovar
                 ctx.save();
                 // Pebble bank border
                 ctx.fillStyle = '#94a3b8';
@@ -598,138 +494,105 @@ export class VrindavanPastures {
                 ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Clear sacred lotus pond water
-                const waterGrad = ctx.createRadialGradient(obs.x, obs.y, 10, obs.x, obs.y, obs.visualRadius - 8);
-                waterGrad.addColorStop(0, '#60a5fa');
-                waterGrad.addColorStop(0.7, '#2563eb');
-                waterGrad.addColorStop(1, '#1d4ed8');
+                // Clear Turquoise-Blue Sarovar Water
+                const waterGrad = ctx.createRadialGradient(obs.x, obs.y, 40, obs.x, obs.y, obs.visualRadius - 15);
+                waterGrad.addColorStop(0, '#06b6d4');
+                waterGrad.addColorStop(0.7, '#0284c7');
+                waterGrad.addColorStop(1, '#0369a1');
                 ctx.fillStyle = waterGrad;
                 ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius - 8, 0, Math.PI * 2);
+                ctx.arc(obs.x, obs.y, obs.visualRadius - 14, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Gentle water sheen
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(obs.x - 16, obs.y - 16, obs.visualRadius * 0.45, 0.9 * Math.PI, 1.4 * Math.PI);
-                ctx.stroke();
-
-                // Floating Lily pads and blooming Sacred Lotuses
-                const pondLotuses = [
-                    { dx: -45, dy: -28 },
-                    { dx: 42, dy: -35 },
-                    { dx: -35, dy: 45 },
-                    { dx: 50, dy: 38 },
-                    { dx: 5, dy: 10 },
-                    { dx: -15, dy: -50 },
-                    { dx: 25, dy: 55 }
+                // Blooming Lotuses & Lily Pads
+                const lilyPads = [
+                    { dx: -120, dy: -60 }, { dx: 110, dy: -80 },
+                    { dx: -80, dy: 90 }, { dx: 95, dy: 85 },
+                    { dx: 0, dy: -130 }, { dx: -140, dy: 10 },
+                    { dx: 140, dy: -10 }, { dx: 0, dy: 120 }
                 ];
-                pondLotuses.forEach((lp, idx) => {
-                    const hasBloom = obs.hasResource === 'lotus' || idx < 4;
-                    TreeRenderer.drawLilyPadLotus(ctx, obs.x + lp.dx, obs.y + lp.dy, hasBloom);
-                });
-
-                ctx.restore();
-            } else if (obs.type === 'rock') {
-                ctx.save();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                ctx.beginPath();
-                ctx.ellipse(obs.x + 3, obs.y + 4, obs.visualRadius, obs.visualRadius * 0.65, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#64748b';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#94a3b8';
-                ctx.beginPath();
-                ctx.arc(obs.x - obs.visualRadius * 0.25, obs.y - obs.visualRadius * 0.25, obs.visualRadius * 0.55, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.restore();
-            } else if (obs.type === 'bush') {
-                ctx.save();
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-                ctx.beginPath();
-                ctx.ellipse(obs.x + 2, obs.y + 3, obs.visualRadius, obs.visualRadius * 0.6, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#4d7c0f';
-                ctx.beginPath();
-                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#65a30d';
-                ctx.beginPath();
-                ctx.arc(obs.x - 3, obs.y - 4, obs.visualRadius * 0.75, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (obs.hasResource === 'flower') {
-                    const flowerOffsets = [
-                        { dx: -obs.visualRadius * 0.35, dy: -obs.visualRadius * 0.2 },
-                        { dx: obs.visualRadius * 0.3, dy: -obs.visualRadius * 0.25 },
-                        { dx: 0, dy: obs.visualRadius * 0.3 }
-                    ];
-                    flowerOffsets.forEach(pt => {
-                        TreeRenderer.drawForestBlossoms(ctx, obs.x + pt.dx, obs.y + pt.dy);
-                    });
+                for (let i = 0; i < lilyPads.length; i++) {
+                    const lp = lilyPads[i];
+                    EnvironmentRenderer.drawLotus(ctx, obs.x + lp.dx, obs.y + lp.dy, 22, 1.0);
                 }
+
+                // Title Banner
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+                ctx.beginPath();
+                ctx.roundRect(obs.x - 110, obs.y - 14, 220, 28, 14);
+                ctx.fill();
+                ctx.fillStyle = '#fef08a';
+                ctx.font = 'bold 12px Outfit, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText("🪷 कमल सरोवर (Kamal Sarovar)", obs.x, obs.y);
+
+                ctx.restore();
+
+            } else if (obs.type === 'rock') {
+                // Govardhan Boulder
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.22)';
+                ctx.beginPath();
+                ctx.ellipse(obs.x + 4, obs.y + 6, obs.visualRadius * 0.9, obs.visualRadius * 0.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                const rockGrad = ctx.createRadialGradient(
+                    obs.x - obs.visualRadius * 0.3, obs.y - obs.visualRadius * 0.3, 4,
+                    obs.x, obs.y, obs.visualRadius
+                );
+                rockGrad.addColorStop(0, '#a8a29e');
+                rockGrad.addColorStop(0.5, '#78716c');
+                rockGrad.addColorStop(1, '#44403c');
+                ctx.fillStyle = rockGrad;
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#292524';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
+
+            } else if (obs.type === 'bush') {
+                // Fragrant Jasmine/Malati Bush
+                ctx.save();
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(obs.x + 3, obs.y + 4, obs.visualRadius * 0.85, obs.visualRadius * 0.45, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#15803d';
+                ctx.beginPath();
+                ctx.arc(obs.x, obs.y, obs.visualRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#22c55e';
+                ctx.beginPath();
+                ctx.arc(obs.x - obs.visualRadius * 0.25, obs.y - obs.visualRadius * 0.2, obs.visualRadius * 0.55, 0, Math.PI * 2);
+                ctx.arc(obs.x + obs.visualRadius * 0.25, obs.y - obs.visualRadius * 0.2, obs.visualRadius * 0.55, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Sweet starry blossoms on bush
+                const petals = [
+                    { dx: -12, dy: -8 }, { dx: 14, dy: -6 },
+                    { dx: -4, dy: 10 }, { dx: 10, dy: 12 }, { dx: 0, dy: -14 }
+                ];
+                for (const p of petals) {
+                    EnvironmentRenderer.drawMalatiFlower(ctx, obs.x + p.dx, obs.y + p.dy, 6, 0);
+                }
+
                 ctx.restore();
             }
         }
     }
 
     drawCanopy(ctx, camera, player = null) {
-        // Draw Elevated Tree Canopies with organic cloud foliage, fruits, and blossoms
+        // Draw tree canopies with proximity transparency
         for (const obs of this.obstacles) {
-            if ((obs.type === 'tree' || obs.type === 'kadamba') && camera.isInView(obs.x, obs.y - obs.visualRadius * 0.75, obs.visualRadius + 40)) {
-                const vRad = obs.visualRadius;
-                const canopyY = obs.y - vRad * 0.75;
-
-                let isPlayerNear = false;
-                if (player) {
-                    const distToCanopyCenter = Math.hypot(player.x - obs.x, player.y - canopyY);
-                    if (distToCanopyCenter < vRad * 0.85) {
-                        isPlayerNear = true;
-                    }
-                }
-
-                TreeRenderer.drawCanopy(ctx, obs, isPlayerNear, this.swayTime);
+            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y - 60, obs.visualRadius + 120)) {
+                EnvironmentRenderer.drawTreeCanopy(ctx, obs, this.swayTime, player);
             }
         }
-    }
-
-    /**
-     * Sacred Parikrama Perimeter Loop (8000x8000)
-     * Smoothly curves runners along outer perimeter tracks back into pastures.
-     */
-    getBoundaryFlowVector(x, y) {
-        let bx = 0;
-        let by = 0;
-        const pad = 550;
-        const riverEdge = this.width - this.riverWidth - 90;
-
-        if (x < pad) {
-            const factor = Math.pow((pad - x) / pad, 1.4);
-            bx += factor * 5.2;
-            by += (y < this.centerY ? 1 : -1) * factor * 3.4;
-        } else if (x > riverEdge - pad) {
-            const factor = Math.pow((x - (riverEdge - pad)) / pad, 1.4);
-            bx -= factor * 5.2;
-            by += (y < this.centerY ? 1 : -1) * factor * 3.4;
-        }
-
-        if (y < pad) {
-            const factor = Math.pow((pad - y) / pad, 1.4);
-            by += factor * 5.2;
-            bx += (x < this.centerX ? 1 : -1) * factor * 3.4;
-        } else if (y > this.height - pad) {
-            const factor = Math.pow((y - (this.height - pad)) / pad, 1.4);
-            by -= factor * 5.2;
-            bx += (x < this.centerX ? 1 : -1) * factor * 3.4;
-        }
-
-        return { x: bx, y: by };
     }
 }

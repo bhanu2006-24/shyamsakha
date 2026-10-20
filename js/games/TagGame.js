@@ -24,25 +24,15 @@ export class TagGame {
         const cx = map.centerX;
         const cy = map.centerY;
 
-        // Player & Sakhas start at the central gathering meadow
-        player.x = cx;
-        player.y = cy + 140;
-
-        this.game.sakhas.forEach((s, idx) => {
+        // Organic Start: Characters play from wherever they currently are in Vrindavan!
+        this.game.sakhas.forEach((s) => {
             s.isCaught = false;
-            s.x = player.x + ((idx % 4) - 1.5) * 80;
-            s.y = player.y + 60 + Math.floor(idx / 4) * 45;
             s.currentSpeed = 260;
         });
 
-        // Krishna & Dao Balram get a grand head start in scenic groves!
-        krishna.x = cx + 380;
-        krishna.y = cy - 280;
         krishna.isCaught = false;
         krishna.currentSpeed = 380; // Divine agile speed!
 
-        balram.x = cx - 420;
-        balram.y = cy - 220;
         balram.isCaught = false;
         balram.currentSpeed = 360; // Powerful stride!
 
@@ -133,7 +123,7 @@ export class TagGame {
         // 1. Divine Border Escape Vault & Massive Speed Boost (User request!)
         // If cornered or stuck near any map border, Krishna or Balram perform a massive acrobatic vault
         // high in the air and surge with 2.2x speed directly back into the open pastures!
-        const isNearBorder = (target.x < 360 || target.x > mapW - 780 || target.y < 360 || target.y > mapH - 360);
+        const isNearBorder = (target.x < 550 || target.x > mapW - 1050 || target.y < 550 || target.y > mapH - 550);
         const isCornered = isNearBorder && (distToPlayer < 260 || ai.stuckTimer > 0.16);
 
         if (isCornered && (ai.escapeCooldown || 0) <= 0) {

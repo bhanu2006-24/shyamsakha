@@ -75,6 +75,22 @@ export class Player extends Entity {
             if (Math.random() < 0.25 && particles) {
                 particles.createDust(this.x, this.y + 4, '#86efac');
             }
+        } else {
+            this.walkTimer = 0;
+        }
+
+        // One-Way Floral Wind Stream Acceleration (पवन मार्ग)
+        if (window.game && window.game.mapManager && window.game.mapManager.currentMap) {
+            const curMap = window.game.mapManager.currentMap;
+            if (curMap.getWindStreamEffect) {
+                const ws = curMap.getWindStreamEffect(this.x, this.y);
+                if (ws) {
+                    this.move(ws.fx * dt, ws.fy * dt, obstacles, mapWidth, mapHeight);
+                    if (particles && Math.random() < 0.35) {
+                        particles.createPetals(this.x, this.y, '#facc15', 1);
+                    }
+                }
+            }
         }
     }
 

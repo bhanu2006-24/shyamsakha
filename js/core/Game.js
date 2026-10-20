@@ -7,14 +7,14 @@ import { Balram } from '../entities/Balram.js';
 import { Sakha } from '../entities/Sakhas.js';
 import { GauMata } from '../entities/GauMata.js';
 import { ParticleSystem } from '../entities/ParticleSystem.js';
+import { Monkey } from '../entities/Monkey.js';
 import { MapManager } from '../../maps/MapManager.js';
 import { VrindavanPastures } from '../../maps/VrindavanPastures.js';
-import { YamunaBeach } from '../../maps/YamunaBeach.js';
-import { GovardhanFoothills } from '../../maps/GovardhanFoothills.js';
 import { UIManager } from '../ui/UIManager.js';
 import { Minimap } from '../ui/Minimap.js';
 import { VolleyballGame } from '../games/VolleyballGame.js';
 import { TagGame } from '../games/TagGame.js';
+import { DennerTagGame } from '../games/DennerTagGame.js';
 import { HoliGame } from '../games/HoliGame.js';
 import { RaceGame } from '../games/RaceGame.js';
 import { assetLoader } from './AssetLoader.js';
@@ -33,15 +33,10 @@ export class Game {
         this.ui = new UIManager(this);
         this.minimap = new Minimap(document.getElementById('minimapCanvas'));
 
-        // Map Manager
+        // Map Manager - Single Unified 16,000x16,000 Vrindavan Pastures Map
         this.mapManager = new MapManager();
         this.vrindavanMap = new VrindavanPastures();
-        this.yamunaMap = new YamunaBeach();
-        this.govardhanMap = new GovardhanFoothills();
-
         this.mapManager.registerMap('vrindavan', this.vrindavanMap);
-        this.mapManager.registerMap('yamuna', this.yamunaMap);
-        this.mapManager.registerMap('govardhan', this.govardhanMap);
 
         // Entities
         this.player = null;
@@ -49,14 +44,16 @@ export class Game {
         this.balram = null;
         this.sakhas = [];
         this.cows = [];
+        this.monkeys = [];
 
         // Mini-Games
         this.volleyballGame = new VolleyballGame(this);
         this.tagGame = new TagGame(this);
+        this.dennerTagGame = new DennerTagGame(this);
         this.holiGame = new HoliGame(this);
         this.raceGame = new RaceGame(this);
 
-        this.state = 'hub'; // 'hub', 'volleyball', 'tag', 'holi', 'race', 'gameover'
+        this.state = 'hub'; // 'hub', 'volleyball', 'tag', 'dennertag', 'holi', 'race', 'gameover'
         this.inventory = { flowers: 0, lotus: 0, fruits: 0, water: 0, butter: 1, garlands: 0 };
         this.lastTime = 0;
         this.interactableTarget = null;
@@ -183,6 +180,14 @@ export class Game {
         pastureCowPositions.forEach(cp => {
             this.cows.push(new GauMata(cp.x, cp.y, cp.color));
         });
+
+        // Playful Vrindavan Monkeys in Pastoral Groves
+        this.monkeys = [
+            new Monkey(cx - 260, cy - 220, 1),
+            new Monkey(cx + 280, cy - 180, 2),
+            new Monkey(cx - 380, cy + 90, 3),
+            new Monkey(cx + 360, cy + 120, 4)
+        ];
 
         this.state = 'hub';
         this.ui.setPhase("🌿 Resting", "tag-resting");
@@ -566,6 +571,7 @@ export class Game {
         const pastimesNames = {
             volleyball: "Kanduka Kridha (Volleyball)",
             tag: "Pakad Pakdai (Tag Chase)",
+            dennertag: "Dām Denā (Tag with Denner / दाम देना)",
             holi: "Rangotsav (Holi Pichkari)",
             race: "Dhaavan Spardha (Footrace / दौड़)"
         };
@@ -573,15 +579,33 @@ export class Game {
         this.ui.showToast(`✨ Started ${pastimesNames[mode] || mode}! (Press ESC or Return to Hub anytime)`);
     }
 
-    travelFromBalram(mapKey) {
+    travelFromBalram(location) {
         this.ui.closeDialogue();
-        const mapNames = {
-            vrindavan: "Vrindavan Pastures (वृन्दावन गोचारण)",
-            yamuna: "Yamuna Sandbanks (यमुना तट)",
-            govardhan: "Govardhan Foothills (गिरिराज गोवर्धन)"
-        };
-        this.loadMap(mapKey);
-        this.ui.showToast(`🌿 Guided friends to ${mapNames[mapKey] || mapKey}!`);
+        if (location === 'volleyball') {
+            this.startGameMode('volleyball');
+        } else if (location === 'dennertag') {
+            this.startGameMode('dennertag');
+        } else if (location === 'yamuna') {
+            this.player.x = 13200;
+            this.player.y = 8000;
+            this.camera.setTarget(this.player);
+            this.ui.showToast("🌊 Guided friends to Yamuna Sandbanks & Volleyball Court!");
+        } else if (location === 'govardhan') {
+            this.player.x = 4800;
+            this.player.y = 11200;
+            this.camera.setTarget(this.player);
+            this.ui.showToast("⛰️ Guided friends to Govardhan Boulder Groves!");
+        } else if (location === 'sarovar') {
+            this.player.x = 8000;
+            this.player.y = 11600;
+            this.camera.setTarget(this.player);
+            this.ui.showToast("🪷 Guided friends to Sacred Kamal Sarovar!");
+        } else {
+            this.player.x = 8000;
+            this.player.y = 8120;
+            this.camera.setTarget(this.player);
+            this.ui.showToast("🌿 Returned to Central Kadamba Glade!");
+        }
     }
 
     talkToFriends() {
@@ -606,13 +630,14 @@ export class Game {
         if (hubBtn) hubBtn.classList.remove('hidden');
 
         if (mode === 'volleyball') {
-            // Switch to Yamuna Beach map where the volleyball court is set
-            this.loadMap('yamuna');
             this.ui.setPhase("🏐 Volleyball", "tag-volleyball");
-            this.volleyballGame.start(this.yamunaMap.court);
+            this.volleyballGame.start(this.vrindavanMap.court);
         } else if (mode === 'tag') {
             this.ui.setPhase("🏃 Tag Chase", "tag-playing");
             this.tagGame.start();
+        } else if (mode === 'dennertag') {
+            this.ui.setPhase("🎯 Dām Denā", "tag-playing");
+            this.dennerTagGame.start();
         } else if (mode === 'holi') {
             this.ui.setPhase("💦 Holi Battle", "tag-playing");
             this.holiGame.start();
@@ -633,6 +658,7 @@ export class Game {
             if (this.volleyballGame.scoreboardEl) this.volleyballGame.scoreboardEl.classList.add('hidden');
         }
         if (this.tagGame) this.tagGame.isActive = false;
+        if (this.dennerTagGame) this.dennerTagGame.isActive = false;
         if (this.holiGame) this.holiGame.isActive = false;
         if (this.raceGame) this.raceGame.isActive = false;
 
@@ -641,7 +667,6 @@ export class Game {
 
         this.state = 'hub';
         this.ui.hideGameOver();
-        this.loadMap('vrindavan');
         this.initEntitiesHub();
         this.ui.setPhase("🌿 Resting", "tag-resting");
     }
@@ -686,6 +711,11 @@ export class Game {
             cow.update(dt, obstacles, mapW, mapH, this.krishna);
         }
 
+        // Update Playful Monkeys
+        for (const monkey of this.monkeys) {
+            monkey.update(dt, obstacles, mapW, mapH, this.sakhas, this.player, this);
+        }
+
         // Update Camera
         this.camera.update(dt, mapW, mapH);
         this.input.updateWorldMouse(this.camera);
@@ -695,7 +725,7 @@ export class Game {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             for (const s of this.sakhas) {
-                // Autonomous pastoral routines: gather sweet fruits, offer to Krishna/Dau, initiate polls
+                // Autonomous pastoral routines: gather sweet fruits, offer to Krishna/Dau, water pranks, petting cows
                 s.updateRoutine(dt, obstacles, mapW, mapH, this.krishna, this.balram, this);
             }
         } else if (this.state === 'volleyball') {
@@ -706,6 +736,10 @@ export class Game {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
             this.tagGame.update(dt);
+        } else if (this.state === 'dennertag') {
+            if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
+            if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
+            this.dennerTagGame.update(dt);
         } else if (this.state === 'holi') {
             if (this.krishna) this.krishna.update(dt, obstacles, mapW, mapH, this.particles);
             if (this.balram) this.balram.update(dt, obstacles, mapW, mapH, this.particles);
@@ -735,15 +769,17 @@ export class Game {
         // 3. Ground Props (Trunks, Rocks, Bushes, Volleyball Net)
         this.mapManager.drawProps(ctx, this.camera);
 
-        // 4. Entities
+        // 4. Entities (Cows, Monkeys, Sakhas, Divine Brothers, Player)
         for (const cow of this.cows) cow.draw(ctx);
+        for (const m of this.monkeys) m.draw(ctx);
         for (const s of this.sakhas) s.draw(ctx);
         if (this.balram) this.balram.draw(ctx);
         if (this.krishna) this.krishna.draw(ctx);
         if (this.player) this.player.draw(ctx);
 
-        // 5. Mini-Game Projectiles / Volleyball Ball / Race Checkpoints (World Space)
+        // 5. Mini-Game Projectiles / Volleyball Ball / Denner Tag / Race Checkpoints (World Space)
         if (this.state === 'volleyball') this.volleyballGame.draw(ctx);
+        if (this.state === 'dennertag') this.dennerTagGame.draw(ctx);
         if (this.state === 'holi') this.holiGame.draw(ctx);
         if (this.state === 'race') this.raceGame.drawWorld(ctx);
 

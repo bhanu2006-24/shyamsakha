@@ -53,10 +53,10 @@ export class MapManager {
     }
 
     getWidth() {
-        return this.currentMap ? this.currentMap.width : 4500;
+        return this.currentMap ? this.currentMap.width : 16000;
     }
 
     getHeight() {
-        return this.currentMap ? this.currentMap.height : 4500;
+        return this.currentMap ? this.currentMap.height : 16000;
     }
 }

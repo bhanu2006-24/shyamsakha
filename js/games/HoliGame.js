@@ -83,27 +83,16 @@ export class HoliGame {
         b.isCaught = false;
         p.isCaught = false;
 
-        // Player & Sakhas start in the south clearing
-        p.x = cx;
-        p.y = cy + 140;
-
-        // Krishna & Dao Balram get a grand head start in scenic groves!
-        k.x = cx + 380;
-        k.y = cy - 280;
+        // Organic Start: Characters play from wherever they currently are in Vrindavan!
         k.currentSpeed = 350; // Divine agile speed!
-
-        b.x = cx - 420;
-        b.y = cy - 220;
         b.currentSpeed = 330;
 
         this.krishnaAi = { state: 'flee', timer: 2.5, stuckTimer: 0, lastX: k.x, lastY: k.y, bombCooldown: 2.2, telegraphTimer: 0 };
         this.balramAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: b.x, lastY: b.y, bombCooldown: 2.8, telegraphTimer: 0 };
 
         this.sakhaShootCooldowns = [];
-        this.game.sakhas.forEach((s, idx) => {
+        this.game.sakhas.forEach((s) => {
             s.isCaught = false;
-            s.x = p.x + ((idx % 4) - 1.5) * 80;
-            s.y = p.y + 60 + Math.floor(idx / 4) * 45;
             this.sakhaShootCooldowns.push(1.5 + Math.random() * 2.0);
             s.currentSpeed = 260;
         });
@@ -340,7 +329,7 @@ export class HoliGame {
         const cx = curMap ? curMap.centerX : mapW / 2;
         const cy = curMap ? curMap.centerY : mapH / 2;
 
-        const isNearBorder = (target.x < 360 || target.x > mapW - 780 || target.y < 360 || target.y > mapH - 360);
+        const isNearBorder = (target.x < 550 || target.x > mapW - 1050 || target.y < 550 || target.y > mapH - 550);
         const isCornered = isNearBorder && (distToPlayer < 260 || ai.stuckTimer > 0.16);
 
         if (isCornered && (ai.escapeCooldown || 0) <= 0) {

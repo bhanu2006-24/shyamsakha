@@ -504,63 +504,19 @@ export class UIManager {
 
         const actions = [
             {
-                label: "🏃‍♂️ Dhaavan Spardha (Footrace / दौड़)",
-                onClick: () => this.game.startPastimeFromKrishna('race')
+                label: "💬 Talk & Bansuri (संवाद व बांसुरी)",
+                onClick: () => this.handleKrishnaTalk()
             },
             {
-                label: "🏐 Kanduka Kridha (Volleyball)",
-                onClick: () => this.game.startPastimeFromKrishna('volleyball')
+                label: "🍯 Offer Seva (भेंट / सेवा)",
+                onClick: () => this.handleKrishnaOfferMenu()
             },
             {
-                label: "🏃‍♂️ Pakad Pakdai (Tag Chase)",
-                onClick: () => this.game.startPastimeFromKrishna('tag')
+                label: "🎮 Play Pastimes (खेल / लीला)",
+                onClick: () => this.handlePlayMenu('krishna')
             },
             {
-                label: "💦 Rangotsav (Holi Pichkari)",
-                onClick: () => this.game.startPastimeFromKrishna('holi')
-            },
-            {
-                label: `🍯 Offer Fresh Makhan (${this.game.inventory.butter || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.butter || 0) > 0) {
-                        this.game.offerToKrishna('butter');
-                        this.startDialogueWithKrishna("Aha! Sweet freshly churned butter from Maiya! Nothing in all three worlds brings Me greater joy, my beloved Sakha! Take some to share with everyone!");
-                    } else {
-                        this.showToast("No Makhan in pot! Feed Gau Mata a sweet mango first! 🐮");
-                    }
-                }
-            },
-            {
-                label: `📿 Offer Vaijayanti Garland (${this.game.inventory.garlands || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.garlands || 0) > 0) {
-                        this.game.offerToKrishna('garland');
-                        this.startDialogueWithKrishna("This sacred garland smells of the divine love of Vrindavan! How lovingly you strung it!");
-                    } else {
-                        this.showToast("Weave a garland from 3 forest flowers in your Bag (B) first! 📿");
-                    }
-                }
-            },
-            {
-                label: `🪷 Offer Sacred Lotus (${this.game.inventory.lotus || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.lotus || 0) > 0) {
-                        this.game.offerToKrishna('lotus');
-                        this.startDialogueWithKrishna("A fresh blooming lotus from the Kamal Sarovar pond! Pure and radiant like your loving heart, Sakha.");
-                    } else {
-                        this.showToast("Gather a blooming lotus from the Kamal Sarovar lily pond first! 🪷");
-                    }
-                }
-            },
-            {
-                label: "🪈 Listen to Bansuri Melody",
-                onClick: () => {
-                    this.game.playFluteMelody();
-                    this.startDialogueWithKrishna("Listen, my dear Sakha... The cows and calves listen with joy as My flute sounds through the groves!");
-                }
-            },
-            {
-                label: "↩ Cancel / Leave (वापस जाएं)",
+                label: "↩ Cancel (वापस जाएं)",
                 isCancel: true,
                 onClick: () => this.closeDialogue()
             }
@@ -570,7 +526,154 @@ export class UIManager {
             title: "🦚 Shree Krishna (श्री कृष्ण)",
             avatar: "🦚",
             portraitKey: "krishna",
-            text: customText || 'You stand beside Shree Krishna (श्री कृष्ण). He smiles with divine love and holds His Bansuri:\n"Sakha! What pastime shall we play today in the sacred groves?"',
+            text: customText || 'You stand beside Shree Krishna (श्री कृष्ण). He smiles with divine love and holds His Bansuri:\n"Sakha! What fills your loving heart today in the sacred pastures?"',
+            actions: actions
+        });
+    }
+
+    handleKrishnaTalk() {
+        this.game.playFluteMelody();
+        const quotes = [
+            '"Listen, my dear Sakha... The sweet Yamuna breeze carries the song of My Bansuri through the Kadamba groves! Every cow and calf rejoices to hear it!" 🪈',
+            '"Whenever we are together, the whole of Vrindavan becomes an ocean of divine love! Nothing is dearer to Me than the friendship of My Sakhas." 🌸',
+            '"Look at Dao Dada resting peacefully by the Yamuna sandbank. Let us celebrate this day with endless pastimes!" 🦚',
+            '"Maiya\'s sweet fresh butter and your warm embrace make every moment in Braj complete." 🍯'
+        ];
+        const text = quotes[Math.floor(Math.random() * quotes.length)];
+
+        this.showDialogue({
+            title: "🦚 Shree Krishna (श्री कृष्ण)",
+            avatar: "🦚",
+            portraitKey: "krishna",
+            text: text,
+            actions: [
+                {
+                    label: "🪈 Play Another Bansuri Melody (बांसुरी धुन)",
+                    onClick: () => this.handleKrishnaTalk()
+                },
+                {
+                    label: "↩ Back (मुख्य विकल्प)",
+                    onClick: () => this.startDialogueWithKrishna()
+                }
+            ]
+        });
+    }
+
+    handleKrishnaOfferMenu() {
+        const inv = this.game.inventory;
+        const actions = [
+            {
+                label: `🍯 Offer Fresh Makhan (${inv.butter || 0})`,
+                onClick: () => {
+                    if ((inv.butter || 0) > 0) {
+                        this.game.offerToKrishna('butter');
+                        this.showDialogue({
+                            title: "🦚 Shree Krishna (श्री कृष्ण)",
+                            avatar: "🦚",
+                            portraitKey: "krishna",
+                            text: 'Shree Krishna\'s eyes dance with supreme joy as He tastes the sweet butter:\n"Aha! Fresh Makhan churned by Maiya! Pure nectar of Vrindavan! Blessed is your loving devotion, Sakha!" 🍯',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleKrishnaOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("No Makhan pot! Feed Gau Mata a sweet mango first! 🐮");
+                    }
+                }
+            },
+            {
+                label: `📿 Offer Vaijayanti Garland (${inv.garlands || 0})`,
+                onClick: () => {
+                    if ((inv.garlands || 0) > 0) {
+                        this.game.offerToKrishna('garland');
+                        this.showDialogue({
+                            title: "🦚 Shree Krishna (श्री कृष्ण)",
+                            avatar: "🦚",
+                            portraitKey: "krishna",
+                            text: 'You lovingly garland Kanha. The fragrance of sacred blossoms surrounds Him:\n"This Vaijayanti garland carries the very breath of Vrindavan! How tenderly you strung it, Sakha!" 📿',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleKrishnaOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Weave a garland from 3 forest flowers in your Bag (B) first! 📿");
+                    }
+                }
+            },
+            {
+                label: `🪷 Offer Sacred Lotus (${inv.lotus || 0})`,
+                onClick: () => {
+                    if ((inv.lotus || 0) > 0) {
+                        this.game.offerToKrishna('lotus');
+                        this.showDialogue({
+                            title: "🦚 Shree Krishna (श्री कृष्ण)",
+                            avatar: "🦚",
+                            portraitKey: "krishna",
+                            text: 'Kanha smiles tenderly holding the blooming lotus:\n"A fragrant lotus from Kamal Sarovar! Pure and radiant like your bhakti, my dear friend." 🪷',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleKrishnaOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Gather a blooming lotus from Kamal Sarovar pond first! 🪷");
+                    }
+                }
+            },
+            {
+                label: `🥭 Offer Sweet Mango (${inv.fruits || 0})`,
+                onClick: () => {
+                    if ((inv.fruits || 0) > 0) {
+                        this.game.offerToKrishna('fruit');
+                        this.showDialogue({
+                            title: "🦚 Shree Krishna (श्री कृष्ण)",
+                            avatar: "🦚",
+                            portraitKey: "krishna",
+                            text: 'Kanha relishes the sweet golden mango:\n"Mmm! Golden ripe mango from the orchards! Let us share with all our friends!" 🥭',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleKrishnaOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Pick sweet mangoes from orchard trees first! 🥭");
+                    }
+                }
+            },
+            {
+                label: `💧 Offer Yamuna Jal (${inv.water || 0})`,
+                onClick: () => {
+                    if ((inv.water || 0) > 0) {
+                        this.game.offerToKrishna('water');
+                        this.showDialogue({
+                            title: "🦚 Shree Krishna (श्री कृष्ण)",
+                            avatar: "🦚",
+                            portraitKey: "krishna",
+                            text: 'Kanha drinks the cool Yamuna water with bliss:\n"Cool, sweet Yamuna Jal! Nothing quenches the heart like the sacred waters of Kalindi!" 💧',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleKrishnaOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Fill water at the Yamuna riverbank first! 💧");
+                    }
+                }
+            },
+            {
+                label: "↩ Back (मुख्य विकल्प)",
+                isCancel: true,
+                onClick: () => this.startDialogueWithKrishna()
+            }
+        ];
+
+        this.showDialogue({
+            title: "🦚 Offer Seva to Krishna",
+            avatar: "🍯",
+            portraitKey: "krishna",
+            text: "Select a loving offering from your Sakha Potli to present to Shree Krishna:",
             actions: actions
         });
     }
@@ -580,41 +683,19 @@ export class UIManager {
 
         const actions = [
             {
-                label: "🌳 Vrindavan Pastures (वृन्दावन गोचारण)",
-                onClick: () => this.game.travelFromBalram('vrindavan')
+                label: "💬 Talk (संवाद)",
+                onClick: () => this.handleBalramTalk()
             },
             {
-                label: "🏐 Yamuna Sandbanks (यमुना तट)",
-                onClick: () => this.game.travelFromBalram('yamuna')
+                label: "🍯 Offer Seva (भेंट / सेवा)",
+                onClick: () => this.handleBalramOfferMenu()
             },
             {
-                label: "⛰️ Govardhan Foothills (गिरिराज गोवर्धन)",
-                onClick: () => this.game.travelFromBalram('govardhan')
+                label: "🎮 Play Pastimes (खेल / लीला)",
+                onClick: () => this.handlePlayMenu('balram')
             },
             {
-                label: `🥭 Offer Sweet Mangoes (${this.game.inventory.fruits || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.fruits || 0) > 0) {
-                        this.game.offerToBalram('fruit');
-                        this.startDialogueWithBalram("Ha ha! Splendid, little brother! These sweet Vrindavan mangoes give immense strength for tending the cows!");
-                    } else {
-                        this.showToast("Pick some sweet mangoes from the trees first! 🥭");
-                    }
-                }
-            },
-            {
-                label: `💧 Offer Yamuna Jal (${this.game.inventory.water || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.water || 0) > 0) {
-                        this.game.offerToBalram('water');
-                        this.startDialogueWithBalram("Cool Yamuna Jal is nectar after herding the cows through the summer heat!");
-                    } else {
-                        this.showToast("Fill pure water from the Yamuna river first! 💧");
-                    }
-                }
-            },
-            {
-                label: "↩ Cancel / Leave (वापस जाएं)",
+                label: "↩ Cancel (वापस जाएं)",
                 isCancel: true,
                 onClick: () => this.closeDialogue()
             }
@@ -624,7 +705,111 @@ export class UIManager {
             title: "🌾 Dao Balaram (दाऊ बलराम)",
             avatar: "🌾",
             portraitKey: "balram",
-            text: customText || 'You stand beside Dao Balaram (दाऊ बलराम). He claps you warmly on the shoulder:\n"Chhote Sakha! Where shall we guide the cows and friends today?"',
+            text: customText || 'You stand beside Dao Balaram (दाऊ बलराम). He claps you warmly on the shoulder:\n"Chhote Sakha! What pastime or service shall we do today in the pastures?"',
+            actions: actions
+        });
+    }
+
+    handleBalramTalk() {
+        const quotes = [
+            '"Ha ha! Little brother! Tending cows across these lush Vrindavan pastures with Kanha is our greatest joy! Always stay fearless and full of love!" 🌾',
+            '"Look at how wide and vast our pasture is! Running, jumping, and playing with our Sakhas gives immense strength!" 💪',
+            '"Kanha\'s flute makes even the wild deer freeze in ecstasy. Never leave His side, Sakha!" 🦚'
+        ];
+        const text = quotes[Math.floor(Math.random() * quotes.length)];
+
+        this.showDialogue({
+            title: "🌾 Dao Balaram (दाऊ बलराम)",
+            avatar: "🌾",
+            portraitKey: "balram",
+            text: text,
+            actions: [
+                {
+                    label: "↩ Back (मुख्य विकल्प)",
+                    onClick: () => this.startDialogueWithBalram()
+                }
+            ]
+        });
+    }
+
+    handleBalramOfferMenu() {
+        const inv = this.game.inventory;
+        const actions = [
+            {
+                label: `🥭 Offer Sweet Mangoes (${inv.fruits || 0})`,
+                onClick: () => {
+                    if ((inv.fruits || 0) > 0) {
+                        this.game.offerToBalram('fruit');
+                        this.showDialogue({
+                            title: "🌾 Dao Balaram (दाऊ बलराम)",
+                            avatar: "🌾",
+                            portraitKey: "balram",
+                            text: 'Dao Balram bites into the mango and laughs with delight:\n"Ha ha! Splendid, little brother! These sweet Vrindavan mangoes give immense strength for herding the cows!" 🥭',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleBalramOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Pick some sweet mangoes from the trees first! 🥭");
+                    }
+                }
+            },
+            {
+                label: `💧 Offer Yamuna Jal (${inv.water || 0})`,
+                onClick: () => {
+                    if ((inv.water || 0) > 0) {
+                        this.game.offerToBalram('water');
+                        this.showDialogue({
+                            title: "🌾 Dao Balaram (दाऊ बलराम)",
+                            avatar: "🌾",
+                            portraitKey: "balram",
+                            text: 'Dao drinks deeply with a satisfied smile:\n"Cool Yamuna Jal is pure nectar after herding the cows through the summer heat!" 💧',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleBalramOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Fill pure water from the Yamuna river first! 💧");
+                    }
+                }
+            },
+            {
+                label: `🍯 Share Fresh Makhan (${inv.butter || 0})`,
+                onClick: () => {
+                    if ((inv.butter || 0) > 0) {
+                        this.game.inventory.butter--;
+                        this.game.particles.createSparkle(this.game.balram.x, this.game.balram.y - 20, '#fde047', 25);
+                        this.game.sound.playCheer();
+                        this.updateBagUI(this.game.inventory);
+                        this.showDialogue({
+                            title: "🌾 Dao Balaram (दाऊ बलराम)",
+                            avatar: "🌾",
+                            portraitKey: "balram",
+                            text: 'Dao Balram enjoys Maiya\'s butter with hearty laughter:\n"Nothing compares to Mother Yashoda\'s Makhan! Thank you, my dear Sakha!" 🍯',
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleBalramOfferMenu() },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("No Makhan in pot! Feed Gau Mata a sweet mango first! 🐮");
+                    }
+                }
+            },
+            {
+                label: "↩ Back (मुख्य विकल्प)",
+                isCancel: true,
+                onClick: () => this.startDialogueWithBalram()
+            }
+        ];
+
+        this.showDialogue({
+            title: "🌾 Offer Seva to Dao Balram",
+            avatar: "🥭",
+            portraitKey: "balram",
+            text: "Select a refreshing offering for Dao Balaram:",
             actions: actions
         });
     }
@@ -632,36 +817,80 @@ export class UIManager {
     startDialogueWithSakha(sakha) {
         this.closeAllModals();
 
+        const actions = [
+            {
+                label: "💬 Talk & Banter (वार्तालाप)",
+                onClick: () => this.handleSakhaTalk(sakha)
+            },
+            {
+                label: "🍯 Offer & Share (भेंट / प्रसाद)",
+                onClick: () => this.handleSakhaOfferMenu(sakha)
+            },
+            {
+                label: "🎮 Play Pastimes (खेल / लीला)",
+                onClick: () => this.handlePlayMenu(sakha)
+            },
+            {
+                label: "↩ Cancel (वापस जाएं)",
+                isCancel: true,
+                onClick: () => this.closeDialogue()
+            }
+        ];
+
+        this.showDialogue({
+            title: `🌿 ${sakha.name} (सखा)`,
+            avatar: "🌿",
+            portraitKey: sakha.spriteKey || "sakha1",
+            text: `You stand beside ${sakha.name}.\n"${sakha.dialogue || 'Sakha! Playing here in Vrindavan with Krishna brings boundless happiness!'}"`,
+            actions: actions
+        });
+    }
+
+    handleSakhaTalk(sakha) {
+        const quotes = [
+            `"${sakha.name} smiles warmly: 'Sakha! As long as we are in Vrindavan with Kanha, every day is a festival of joy!'\"`,
+            `"${sakha.name} laughs: 'Have you seen how playfully the monkeys chase each other through the Kadamba branches?'\"`,
+            `"${sakha.name}: 'Whenever Kanha plays His Bansuri, even the cows forget to chew grass!'\"`
+        ];
+        const text = quotes[Math.floor(Math.random() * quotes.length)];
+
+        this.showDialogue({
+            title: `🌿 ${sakha.name} (सखा)`,
+            avatar: "🌿",
+            portraitKey: sakha.spriteKey || "sakha1",
+            text: text,
+            actions: [
+                {
+                    label: "↩ Back (मुख्य विकल्प)",
+                    onClick: () => this.startDialogueWithSakha(sakha)
+                }
+            ]
+        });
+    }
+
+    handleSakhaOfferMenu(sakha) {
+        const inv = this.game.inventory;
         const actions = [];
 
-        // 1. Subal's Footrace Challenge!
-        if (sakha.name === "Subal") {
-            actions.push({
-                label: "🏃‍♂️ Accept Subal's Footrace Challenge (गोचारण दौड़)!",
-                onClick: () => {
-                    this.game.startPastimeFromKrishna('race');
-                }
-            });
-        }
-
-        // 2. Madhumangal's Mango Quest for Kanha!
+        // Special Madhumangal Mango Quest!
         if (sakha.name === "Madhumangal") {
             actions.push({
-                label: `🥭 Give 2 Ripe Mangoes for Kanha (${this.game.inventory.fruits || 0}/2)`,
+                label: `🥭 Give 2 Ripe Mangoes for Kanha (${inv.fruits || 0}/2)`,
                 onClick: () => {
-                    if ((this.game.inventory.fruits || 0) >= 2) {
-                        this.game.inventory.fruits -= 2;
-                        this.game.inventory.butter = (this.game.inventory.butter || 0) + 1;
+                    if ((inv.fruits || 0) >= 2) {
+                        inv.fruits -= 2;
+                        inv.butter = (inv.butter || 0) + 1;
                         this.game.particles.createSparkle(sakha.x, sakha.y - 20, '#facc15', 35);
                         this.game.sound.playCheer();
-                        this.updateBagUI(this.game.inventory);
+                        this.updateBagUI(inv);
                         this.showDialogue({
                             title: "🥭 Madhumangal (मधुमंगल)",
                             avatar: "🥭",
                             portraitKey: "sakha3",
                             text: "Madhumangal's face beams with sheer delight!\n\"Aha Sakha! Kanha will be so overjoyed with these ripe mangoes! Maiya always blesses us with plenty of Makhan, take this fresh pot of sweet butter in return!\" 🍯",
                             actions: [
-                                { label: "↩ Done (सादर प्रणाम)", isCancel: true, onClick: () => this.closeDialogue() }
+                                { label: "↩ Back to Offers", onClick: () => this.handleSakhaOfferMenu(sakha) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
                             ]
                         });
                     } else {
@@ -673,46 +902,85 @@ export class UIManager {
 
         actions.push(
             {
-                label: "💬 Talk & Laugh (वार्तालाप)",
+                label: `🍯 Share Makhan Prasad (${inv.butter || 0})`,
                 onClick: () => {
-                    this.showToast(`✨ ${sakha.name} shares joyful laughter with you!`);
-                    this.closeDialogue();
-                }
-            },
-            {
-                label: `🍯 Share Makhan Prasad (${this.game.inventory.butter || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.butter || 0) > 0) {
-                        this.game.inventory.butter--;
+                    if ((inv.butter || 0) > 0) {
+                        inv.butter--;
                         this.game.particles.createSparkle(sakha.x, sakha.y - 20, '#fde047', 25);
                         this.game.sound.playCheer();
-                        this.updateBagUI(this.game.inventory);
+                        this.updateBagUI(inv);
                         this.showDialogue({
                             title: `🌿 ${sakha.name} (सखा)`,
                             avatar: "🌿",
-                            portraitKey: "sakha1",
-                            text: `"${sakha.name} relishes the sweet Makhan with great joy: 'Sakha, Mother Yashoda\'s butter is the nectar of the universe!'\"`,
+                            portraitKey: sakha.spriteKey || "sakha1",
+                            text: `"${sakha.name} relishes the sweet Makhan with great joy: 'Sakha, Mother Yashoda\'s butter is the nectar of the universe!'\" 🍯`,
                             actions: [
-                                { label: "↩ Done (ठीक है)", isCancel: true, onClick: () => this.closeDialogue() }
+                                { label: "↩ Back to Offers", onClick: () => this.handleSakhaOfferMenu(sakha) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
                             ]
                         });
                     } else {
-                        this.showToast("Feed Gau Mata a sweet mango first to receive fresh Makhan! 🍯");
+                        this.showToast("Feed Gau Mata a sweet mango first to receive fresh Makhan! 🐮");
                     }
                 }
             },
             {
-                label: "↩ Cancel / Leave (वापस जाएं)",
+                label: `🥭 Share Sweet Mango (${inv.fruits || 0})`,
+                onClick: () => {
+                    if ((inv.fruits || 0) > 0) {
+                        inv.fruits--;
+                        this.game.particles.createPetals(sakha.x, sakha.y - 20, '#facc15', 20);
+                        this.game.sound.playCheer();
+                        this.updateBagUI(inv);
+                        this.showDialogue({
+                            title: `🌿 ${sakha.name} (सखा)`,
+                            avatar: "🌿",
+                            portraitKey: sakha.spriteKey || "sakha1",
+                            text: `"${sakha.name} happily enjoys the juicy mango: 'Such sweetness! Only Vrindavan trees bear fruits like this!'\" 🥭`,
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleSakhaOfferMenu(sakha) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Pick sweet mangoes from trees first! 🥭");
+                    }
+                }
+            },
+            {
+                label: `💧 Share Cool Yamuna Jal (${inv.water || 0})`,
+                onClick: () => {
+                    if ((inv.water || 0) > 0) {
+                        inv.water--;
+                        this.game.particles.createSparkle(sakha.x, sakha.y - 20, '#38bdf8', 20);
+                        this.updateBagUI(inv);
+                        this.showDialogue({
+                            title: `🌿 ${sakha.name} (सखा)`,
+                            avatar: "🌿",
+                            portraitKey: sakha.spriteKey || "sakha1",
+                            text: `"${sakha.name} drinks cool Yamuna Jal: 'Ah, so refreshing! Thank you, my dear friend!'\" 💧`,
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleSakhaOfferMenu(sakha) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Fill water from the Yamuna riverbank first! 💧");
+                    }
+                }
+            },
+            {
+                label: "↩ Back (मुख्य विकल्प)",
                 isCancel: true,
-                onClick: () => this.closeDialogue()
+                onClick: () => this.startDialogueWithSakha(sakha)
             }
         );
 
         this.showDialogue({
-            title: `🌿 ${sakha.name} (सखा)`,
-            avatar: "🌿",
-            portraitKey: "sakha1",
-            text: `You stand beside ${sakha.name}.\n"${sakha.dialogue || 'Sakha! Playing here in Vrindavan with Krishna brings boundless happiness!'}"`,
+            title: `🌿 Offer & Share with ${sakha.name}`,
+            avatar: "🍯",
+            portraitKey: sakha.spriteKey || "sakha1",
+            text: `Share food and prasad with your dear friend ${sakha.name}:`,
             actions: actions
         });
     }
@@ -722,59 +990,31 @@ export class UIManager {
 
         const actions = [
             {
-                label: `🥭 Feed Sweet Mango (${this.game.inventory.fruits || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.fruits || 0) > 0) {
-                        this.game.inventory.fruits--;
-                        this.game.inventory.butter = (this.game.inventory.butter || 0) + 1;
-                        this.game.particles.createSparkle(cow.x, cow.y - 15, '#f472b6', 25);
-                        this.game.sound.playCowBell();
-                        this.updateBagUI(this.game.inventory);
-                        this.showDialogue({
-                            title: "🐮 Gau Mata (सुरभि)",
-                            avatar: "🐮",
-                            portraitKey: "cow",
-                            text: "Gau Mata happily relishes the sweet mango! She blesses you with loving eyes and gifts you a pot of fresh sweet Makhan (butter)! 🍯",
-                            actions: [
-                                { label: "↩ Loving Pranam (सादर प्रणाम)", isCancel: true, onClick: () => this.closeDialogue() }
-                            ]
-                        });
-                    } else {
-                        this.showToast("Pick some sweet mangoes from the trees first! 🥭");
-                    }
-                }
+                label: "💬 Talk & Pet (सहलाएं व दुलार)",
+                onClick: () => this.handleCowPet(cow)
             },
             {
-                label: `🌸 Adorn with Forest Flowers (${this.game.inventory.flowers || 0})`,
-                onClick: () => {
-                    if ((this.game.inventory.flowers || 0) > 0) {
-                        this.game.inventory.flowers--;
-                        this.game.particles.createPetals(cow.x, cow.y - 15, '#f472b6', 25);
-                        this.game.sound.playCowBell();
-                        this.updateBagUI(this.game.inventory);
-                        this.showDialogue({
-                            title: "🐮 Gau Mata (सुरभि)",
-                            avatar: "🐮",
-                            portraitKey: "cow",
-                            text: "You lovingly adorn Gau Mata's forehead with fresh Vrindavan forest blossoms. She licks your hand gently: \"Mooo...\"",
-                            actions: [
-                                { label: "↩ Loving Pranam (सादर प्रणाम)", isCancel: true, onClick: () => this.closeDialogue() }
-                            ]
-                        });
-                    } else {
-                        this.showToast("Gather wild forest flowers from bushes first! 🌸");
-                    }
-                }
+                label: "🍯 Offer Treats (घास व फल)",
+                onClick: () => this.handleCowOfferMenu(cow)
             },
             {
-                label: "🪈 Krishna Calls with Bansuri",
+                label: "🎮 Play Bansuri (बांसुरी धुन)",
                 onClick: () => {
                     this.game.playFluteMelody();
-                    this.closeDialogue();
+                    this.showDialogue({
+                        title: "🐮 Gau Mata (सुरभि)",
+                        avatar: "🐮",
+                        portraitKey: "cow",
+                        text: "Gau Mata stops grazing, lifts her gentle head, and listens with closed eyes to the sweet sound of Krishna's Bansuri. Complete peace fills the pastures.",
+                        actions: [
+                            { label: "↩ Back (मुख्य विकल्प)", onClick: () => this.startDialogueWithCow(cow) },
+                            { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                        ]
+                    });
                 }
             },
             {
-                label: "↩ Pet & Leave (वापस जाएं)",
+                label: "↩ Cancel (वापस जाएं)",
                 isCancel: true,
                 onClick: () => this.closeDialogue()
             }
@@ -784,9 +1024,185 @@ export class UIManager {
             title: "🐮 Gau Mata (सुरभि)",
             avatar: "🐮",
             portraitKey: "cow",
-            text: "You stand gently beside Gau Mata. She turns her loving eyes toward you and softly nuzzles your shoulder: \"Mooo...\"",
+            text: "Gau Mata grazes peacefully on the tender meadow grass. She looks at you with gentle, affectionate eyes.",
             actions: actions
         });
+    }
+
+    handleCowPet(cow) {
+        this.game.sound.playCowBell();
+        this.game.particles.createSparkle(cow.x, cow.y - 20, '#f472b6', 15);
+        this.showDialogue({
+            title: "🐮 Gau Mata (सुरभि)",
+            avatar: "🐮",
+            portraitKey: "cow",
+            text: "You gently stroke Gau Mata's warm, soft neck. She closes her eyes, flickers her ears, and lets out a sweet, contented \"Moooo...\" ❤️",
+            actions: [
+                {
+                    label: "↩ Back (मुख्य विकल्प)",
+                    onClick: () => this.startDialogueWithCow(cow)
+                }
+            ]
+        });
+    }
+
+    handleCowOfferMenu(cow) {
+        const inv = this.game.inventory;
+        const actions = [
+            {
+                label: `🥭 Feed Sweet Mango (${inv.fruits || 0})`,
+                onClick: () => {
+                    if ((inv.fruits || 0) > 0) {
+                        inv.fruits--;
+                        inv.butter = (inv.butter || 0) + 1;
+                        this.game.particles.createSparkle(cow.x, cow.y - 15, '#f472b6', 25);
+                        this.game.sound.playCowBell();
+                        this.updateBagUI(inv);
+                        this.showDialogue({
+                            title: "🐮 Gau Mata (सुरभि)",
+                            avatar: "🐮",
+                            portraitKey: "cow",
+                            text: "Gau Mata happily relishes the sweet mango! She blesses you with loving eyes and gifts you a fresh pot of sweet Makhan (butter)! 🍯",
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleCowOfferMenu(cow) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Pick some sweet mangoes from the trees first! 🥭");
+                    }
+                }
+            },
+            {
+                label: `🌸 Adorn with Forest Flowers (${inv.flowers || 0})`,
+                onClick: () => {
+                    if ((inv.flowers || 0) > 0) {
+                        inv.flowers--;
+                        this.game.particles.createPetals(cow.x, cow.y - 15, '#f472b6', 25);
+                        this.game.sound.playCowBell();
+                        this.updateBagUI(inv);
+                        this.showDialogue({
+                            title: "🐮 Gau Mata (सुरभि)",
+                            avatar: "🐮",
+                            portraitKey: "cow",
+                            text: "You lovingly adorn Gau Mata's forehead with fresh Vrindavan forest blossoms. She licks your hand gently: \"Mooo...\"",
+                            actions: [
+                                { label: "↩ Back to Offers", onClick: () => this.handleCowOfferMenu(cow) },
+                                { label: "↩ Done", isCancel: true, onClick: () => this.closeDialogue() }
+                            ]
+                        });
+                    } else {
+                        this.showToast("Gather wild forest flowers from bushes first! 🌸");
+                    }
+                }
+            },
+            {
+                label: "↩ Back (मुख्य विकल्प)",
+                isCancel: true,
+                onClick: () => this.startDialogueWithCow(cow)
+            }
+        ];
+
+        this.showDialogue({
+            title: "🐮 Offer Treats to Gau Mata",
+            avatar: "🥭",
+            portraitKey: "cow",
+            text: "Select a gentle offering for Gau Mata:",
+            actions: actions
+        });
+    }
+
+    /**
+     * UNIFIED PASTIMES (PLAY) SUBMENU
+     * When requested from ANY Sakha anywhere in Vrindavan (like on the riverbanks or in mango orchards),
+     * the Sakha calls out to Krishna and the game begins right where you are!
+     */
+    handlePlayMenu(initiator) {
+        const isSakha = initiator && initiator !== 'krishna' && initiator !== 'balram';
+        const actions = [
+            {
+                label: "🎯 Dām Denā (Tag with Denner / पकड़ा-पकड़ी)",
+                onClick: () => this.triggerPastimeWithNpc('dennertag', initiator)
+            },
+            {
+                label: "🏃‍♂️ Pakad Pakdai (Tag Chase)",
+                onClick: () => this.triggerPastimeWithNpc('tag', initiator)
+            },
+            {
+                label: "💦 Rangotsav (Holi Battle)",
+                onClick: () => this.triggerPastimeWithNpc('holi', initiator)
+            },
+            {
+                label: "🏐 Kanduka Kridha (Volleyball on Sandbanks)",
+                onClick: () => this.triggerPastimeWithNpc('volleyball', initiator)
+            },
+            {
+                label: "🏁 Dhaavan Spardha (Footrace / दौड़)",
+                onClick: () => this.triggerPastimeWithNpc('race', initiator)
+            },
+            {
+                label: "↩ Back (मुख्य विकल्प)",
+                isCancel: true,
+                onClick: () => {
+                    if (initiator === 'krishna') this.startDialogueWithKrishna();
+                    else if (initiator === 'balram') this.startDialogueWithBalram();
+                    else if (isSakha) this.startDialogueWithSakha(initiator);
+                    else this.closeDialogue();
+                }
+            }
+        ];
+
+        const title = isSakha ? `🎮 Play with ${initiator.name}` : "🎮 Choose Sacred Pastime";
+        const desc = isSakha
+            ? `Ask ${initiator.name} to start a game! He will run to Kanha to start it, and we can play right here from wherever we are!`
+            : "Choose which transcendental pastime to enjoy across Vrindavan:";
+
+        this.showDialogue({
+            title: title,
+            avatar: "🎮",
+            portraitKey: isSakha ? initiator.spriteKey : (initiator === 'balram' ? 'balram' : 'krishna'),
+            text: desc,
+            actions: actions
+        });
+    }
+
+    triggerPastimeWithNpc(mode, initiator) {
+        this.closeDialogue();
+        const pastimesNames = {
+            volleyball: "Kanduka Kridha (Volleyball)",
+            dennertag: "Dām Denā (Tag with Denner / पकड़ा-पकड़ी)",
+            tag: "Pakad Pakdai (Tag Chase)",
+            holi: "Rangotsav (Holi Battle)",
+            race: "Dhaavan Spardha (Footrace / दौड़)"
+        };
+        const gameName = pastimesNames[mode] || mode;
+
+        if (initiator && initiator !== 'krishna' && initiator !== 'balram') {
+            // SAKHA SMAX: Joyfully runs to Krishna to ask Him to start the game!
+            initiator.bubbleIcon = '🗣️';
+            initiator.bubbleTimer = 4.0;
+            initiator.routineState = 'ask_krishna';
+            initiator.askGameMode = mode;
+            initiator.askTimer = 0;
+
+            this.showToast(`🏃‍♂️ ${initiator.name} runs to Kanha: "Kanha! Let's start ${gameName} right here from the banks!" 🌸`, 4000);
+            if (this.game.sound) this.game.sound.playCheer();
+        } else if (initiator === 'balram') {
+            // DAO BALRAM CALLS OUT TO KRISHNA
+            if (this.game.sound) this.game.sound.playCheer();
+            this.showToast(`🌾 Dao Balram calls out: "Kanha! Little brother wants to play ${gameName}! Let's begin!"`, 3000);
+            this.game.playFluteMelody();
+            setTimeout(() => {
+                this.game.startGameMode(mode);
+            }, 600);
+        } else {
+            // KRISHNA DIRECTLY STARTS WITH BANSURI
+            this.game.playFluteMelody();
+            this.showToast(`🦚 Shree Krishna plays His Bansuri: "Let ${gameName} begin right where everyone stands!" 🪈`, 3500);
+            setTimeout(() => {
+                this.game.startGameMode(mode);
+            }, 600);
+        }
     }
 
     openHelp() {

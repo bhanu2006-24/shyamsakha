@@ -22,51 +22,66 @@ export class RaceGame {
         this.raceTime = 0;
         this.finishedRacers = [];
 
-        const map = this.game.mapManager.currentMap;
-        const cx = map.centerX;
-        const cy = map.centerY;
-        const riverEdge = map.width - map.riverWidth;
-
-        // Sacred Checkpoints across Vrindavan pastures
-        this.checkpoints = [
-            { id: 0, name: "Start Line", hindi: "प्रारंभ रेखा", x: cx, y: cy + 180, radius: 85, icon: "🚩" },
-            { id: 1, name: "Ancient Kadamba Tree", hindi: "प्राचीन कदम्ब वृक्ष", x: cx, y: cy - 230, radius: 95, icon: "🌳" },
-            { id: 2, name: "Kamal Sarovar Lily Pond", hindi: "कमल सरोवर", x: cx - 420, y: cy + 200, radius: 95, icon: "🪷" },
-            { id: 3, name: "Kadamba Kusum Flower Carpet", hindi: "पुष्प वाटिका", x: cx + 340, y: cy - 320, radius: 95, icon: "🌸" },
-            { id: 4, name: "Yamuna Sandbank Shore", hindi: "यमुना तट", x: riverEdge - 180, y: cy + 140, radius: 95, icon: "🌊" },
-            { id: 5, name: "Sacred Torana Finish Arch", hindi: "विजय तोरण (लक्ष्य)", x: cx, y: cy + 60, radius: 80, icon: "🏁" }
-        ];
-
         const player = this.game.player;
         const krishna = this.game.krishna;
         const balram = this.game.balram;
         const subal = this.game.sakhas.find(s => s.name === "Subal") || this.game.sakhas[1];
         const sudama = this.game.sakhas.find(s => s.name === "Sudama") || this.game.sakhas[0];
 
-        // Line up side-by-side at Start Line
-        player.x = cx - 90;
-        player.y = cy + 180;
+        const startX = player.x;
+        const startY = player.y;
+
+        // Racers assemble side-by-side right where the race is started! No global teleport!
         player.isCaught = false;
 
-        krishna.x = cx - 30;
-        krishna.y = cy + 180;
+        krishna.x = startX + 50;
+        krishna.y = startY;
         krishna.isCaught = false;
 
-        balram.x = cx + 30;
-        balram.y = cy + 180;
+        balram.x = startX + 100;
+        balram.y = startY;
         balram.isCaught = false;
 
         if (subal) {
-            subal.x = cx + 80;
-            subal.y = cy + 180;
+            subal.x = startX - 50;
+            subal.y = startY;
             subal.isCaught = false;
         }
 
         if (sudama) {
-            sudama.x = cx + 130;
-            sudama.y = cy + 180;
+            sudama.x = startX - 100;
+            sudama.y = startY;
             sudama.isCaught = false;
         }
+
+        // Available Vrindavan landmark waypoints in the 16000x16000 world
+        const allLandmarks = [
+            { name: "Ancient Kadamba Glade", hindi: "प्राचीन कदम्ब कुंज", x: 8000, y: 7600, icon: "🌳" },
+            { name: "West Mango Orchards", hindi: "आम्र वाटिका", x: 4800, y: 8000, icon: "🥭" },
+            { name: "Sacred Kamal Sarovar", hindi: "कमल सरोवर", x: 8000, y: 11600, icon: "🪷" },
+            { name: "Yamuna Sandbank Shore", hindi: "यमुना बालुका तट", x: 13200, y: 7720, icon: "🌊" },
+            { name: "North Kadamba Groves", hindi: "उत्तरी कदम्ब वन", x: 8000, y: 4200, icon: "🌸" },
+            { name: "Govardhan Boulder Foothills", hindi: "गोवर्धन तलहटी", x: 4800, y: 11200, icon: "⛰️" },
+            { name: "East Flower Carpet", hindi: "पुष्प वाटिका", x: 10800, y: 8000, icon: "🌼" }
+        ];
+
+        // Sort landmarks by distance from start position, select distinct scenic waypoints
+        const sorted = allLandmarks
+            .map(l => ({ ...l, dist: Math.hypot(l.x - startX, l.y - startY) }))
+            .filter(l => l.dist > 350)
+            .sort((a, b) => a.dist - b.dist);
+
+        const cp1 = sorted[0] || { name: "Ancient Kadamba Tree", hindi: "प्राचीन कदम्ब", x: startX + 800, y: startY, icon: "🌳" };
+        const cp2 = sorted[1] || { name: "Sacred Groves", hindi: "पवित्र कुंज", x: startX, y: startY + 800, icon: "🌸" };
+        const cp3 = sorted[2] || { name: "Flower Meadows", hindi: "पुष्प वाटिका", x: startX - 800, y: startY, icon: "🌼" };
+
+        this.checkpoints = [
+            { id: 0, name: "Start Line", hindi: "प्रारंभ रेखा", x: startX, y: startY, radius: 95, icon: "🚩" },
+            { id: 1, name: cp1.name, hindi: cp1.hindi, x: cp1.x, y: cp1.y, radius: 120, icon: cp1.icon },
+            { id: 2, name: cp2.name, hindi: cp2.hindi, x: cp2.x, y: cp2.y, radius: 120, icon: cp2.icon },
+            { id: 3, name: cp3.name, hindi: cp3.hindi, x: cp3.x, y: cp3.y, radius: 120, icon: cp3.icon },
+            { id: 4, name: "Sacred Torana Finish Arch", hindi: "विजय तोरण (लक्ष्य)", x: startX + 40, y: startY + 40, radius: 100, icon: "🏁" }
+        ];
 
         // Initialize competitors list
         this.racers = [
@@ -168,19 +183,79 @@ export class RaceGame {
                 let fx = dx / dist;
                 let fy = dy / dist;
 
-                // Tangent glide obstacle avoidance
+                // Intelligent Bidirectional Tangent Glide Obstacle Avoidance
                 for (const obs of obstacles) {
-                    if (obs.shape === 'circle') {
+                    if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
                         const odx = racer.entity.x - obs.x;
                         const ody = racer.entity.y - obs.y;
                         const oDist = Math.hypot(odx, ody);
-                        const safeZone = (obs.radius || 25) + racer.entity.radius + 38;
+                        const safeZone = (obs.radius || 28) + racer.entity.radius + 45;
 
                         if (oDist < safeZone && oDist > 0) {
-                            const push = Math.pow((safeZone - oDist) / safeZone, 2) * 4.0;
-                            fx += (odx / oDist) * push;
-                            fy += (ody / oDist) * push;
+                            const push = Math.pow((safeZone - oDist) / safeZone, 1.8);
+                            
+                            // Radial push
+                            fx += (odx / oDist) * push * 2.2;
+                            fy += (ody / oDist) * push * 2.2;
+
+                            // Tangent steer: effortlessly glide around the side that matches the target heading!
+                            const t1x = -ody / oDist;
+                            const t1y = odx / oDist;
+                            const t2x = ody / oDist;
+                            const t2y = -odx / oDist;
+                            const dot1 = fx * t1x + fy * t1y;
+                            const dot2 = fx * t2x + fy * t2y;
+                            const bestTx = dot1 >= dot2 ? t1x : t2x;
+                            const bestTy = dot1 >= dot2 ? t1y : t2y;
+
+                            fx += bestTx * push * 4.2;
+                            fy += bestTy * push * 4.2;
                         }
+                    }
+                }
+
+                // Racer Anti-Stuck Watchdog (never get stuck against trees!)
+                if (!racer.stuckTimer) racer.stuckTimer = 0;
+                if (!racer.lastX) { racer.lastX = racer.entity.x; racer.lastY = racer.entity.y; }
+                const movedDist = Math.hypot(racer.entity.x - racer.lastX, racer.entity.y - racer.lastY);
+                racer.lastX = racer.entity.x;
+                racer.lastY = racer.entity.y;
+
+                if (movedDist < 0.8) {
+                    racer.stuckTimer += dt;
+                    if (racer.stuckTimer > 0.16) {
+                        const dodgeAngle = (racer.entity.dodgeSide || 1) * Math.PI * 0.55;
+                        const origFx = fx;
+                        fx = origFx * Math.cos(dodgeAngle) - fy * Math.sin(dodgeAngle);
+                        fy = origFx * Math.sin(dodgeAngle) + fy * Math.cos(dodgeAngle);
+                        if (racer.stuckTimer > 0.5) {
+                            racer.entity.dodgeSide = -(racer.entity.dodgeSide || 1);
+                            racer.stuckTimer = 0;
+                        }
+                    }
+                } else {
+                    racer.stuckTimer = 0;
+                }
+
+                // Racer vs Racer Mutual Separation (no overlapping!)
+                for (const other of this.racers) {
+                    if (other === racer || other.finishRank !== null) continue;
+                    const rdx = racer.entity.x - other.entity.x;
+                    const rdy = racer.entity.y - other.entity.y;
+                    const rDist = Math.hypot(rdx, rdy);
+                    if (rDist < 48 && rDist > 0) {
+                        const rPush = ((48 - rDist) / 48) * 2.8;
+                        fx += (rdx / rDist) * rPush;
+                        fy += (rdy / rDist) * rPush;
+                    }
+                }
+
+                // One-Way Wind Stream Acceleration
+                if (curMap && curMap.getWindStreamEffect) {
+                    const ws = curMap.getWindStreamEffect(racer.entity.x, racer.entity.y);
+                    if (ws) {
+                        fx += (ws.fx / 220) * 1.5;
+                        fy += (ws.fy / 220) * 1.5;
                     }
                 }
 

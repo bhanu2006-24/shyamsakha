@@ -1,0 +1,4463 @@
+/**
+ * Vrindavan Pastures Hardcoded Map Data (16,000 x 16,000)
+ * 100% Handcrafted Layout - ZERO Randomness for perfect deterministic gameplay.
+ * Features 439 majestic trees, 167 flowering bushes, 40 rocks, and sacred landmarks.
+ */
+export const VRINDAVAN_PASTURES_DATA = {
+  "name": "Vrindavan Pastures",
+  "hindiName": "वृन्दावन गोचारण",
+  "width": 16000,
+  "height": 16000,
+  "centerX": 8000,
+  "centerY": 8000,
+  "riverWidth": 1600,
+  "court": {
+    "x": 13200,
+    "y": 7720,
+    "w": 900,
+    "h": 560,
+    "netX": 13650,
+    "playerSide": {
+      "minX": 13200,
+      "maxX": 13640
+    },
+    "krishnaSide": {
+      "minX": 13660,
+      "maxX": 14100
+    }
+  },
+  "centralKadamba": {
+    "x": 8000,
+    "y": 7400,
+    "radius": 52,
+    "visualRadius": 160,
+    "treeType": "kadamba"
+  },
+  "restingAsana": {
+    "x": 8000,
+    "y": 8000,
+    "w": 320,
+    "h": 180
+  },
+  "sarovar": {
+    "x": 8000,
+    "y": 12000,
+    "radius": 340,
+    "visualRadius": 340
+  },
+  "flowerCarpets": [
+    {
+      "name": "Central Kadamba Flower Carpet",
+      "x": 8000,
+      "y": 6850,
+      "r": 180
+    },
+    {
+      "name": "Central Southern Glade Carpet",
+      "x": 8000,
+      "y": 8850,
+      "r": 180
+    },
+    {
+      "name": "West Mango Orchard Flower Carpet",
+      "x": 4400,
+      "y": 8000,
+      "r": 200
+    },
+    {
+      "name": "North-West Nikunja Flower Carpet",
+      "x": 4200,
+      "y": 4400,
+      "r": 190
+    },
+    {
+      "name": "North Kadamba Grove Flower Carpet",
+      "x": 8000,
+      "y": 4200,
+      "r": 190
+    },
+    {
+      "name": "North-East Banyan Sanctuary Carpet",
+      "x": 11400,
+      "y": 4400,
+      "r": 200
+    },
+    {
+      "name": "South Kamal Sarovar Shore Carpet",
+      "x": 8000,
+      "y": 10800,
+      "r": 190
+    },
+    {
+      "name": "South-West Govardhan Glade Carpet",
+      "x": 4400,
+      "y": 11400,
+      "r": 190
+    },
+    {
+      "name": "South-East Pasture Flower Carpet",
+      "x": 11400,
+      "y": 11400,
+      "r": 190
+    },
+    {
+      "name": "East Yamuna Sands Riverbank Carpet",
+      "x": 12600,
+      "y": 6800,
+      "r": 180
+    },
+    {
+      "name": "East Yamuna Sands Southern Carpet",
+      "x": 12600,
+      "y": 9200,
+      "r": 180
+    },
+    {
+      "name": "West Forest Pathway Carpet",
+      "x": 6200,
+      "y": 8000,
+      "r": 170
+    },
+    {
+      "name": "East Pasture Trail Carpet",
+      "x": 9800,
+      "y": 8000,
+      "r": 170
+    }
+  ],
+  "windStreams": [
+    {
+      "id": "north_zephyr",
+      "name": "Kadamba Zephyr Stream",
+      "hindi": "कदम्ब पावन समीर (उत्तर से दक्षिण)",
+      "x": 7850,
+      "y": 2400,
+      "w": 300,
+      "h": 4600,
+      "dirX": 0,
+      "dirY": 1,
+      "speedBoost": 220,
+      "color": "#fde047"
+    },
+    {
+      "id": "west_floral_rush",
+      "name": "Nikunja Floral Rush",
+      "hindi": "निकुंज पुष्प प्रवाह (पश्चिम से पूर्व)",
+      "x": 2800,
+      "y": 7850,
+      "w": 4600,
+      "h": 300,
+      "dirX": 1,
+      "dirY": 0,
+      "speedBoost": 220,
+      "color": "#f472b6"
+    },
+    {
+      "id": "south_sarovar_breeze",
+      "name": "Sarovar Lotus Breeze",
+      "hindi": "सरस्वती व कमल समीर (उत्तर से दक्षिण)",
+      "x": 7850,
+      "y": 9000,
+      "w": 300,
+      "h": 2600,
+      "dirX": 0,
+      "dirY": 1,
+      "speedBoost": 200,
+      "color": "#a7f3d0"
+    },
+    {
+      "id": "yamuna_beach_gale",
+      "name": "Yamuna Sandbank Gale",
+      "hindi": "यमुना बालुका समीर (दक्षिण से उत्तर)",
+      "x": 12850,
+      "y": 3200,
+      "w": 300,
+      "h": 8600,
+      "dirX": 0,
+      "dirY": -1,
+      "speedBoost": 240,
+      "color": "#38bdf8"
+    }
+  ],
+  "trees": [
+    {
+      "x": 8680,
+      "y": 7700,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 9156,
+      "y": 7934,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8679,
+      "y": 7981,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8959,
+      "y": 8346,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8511,
+      "y": 8211,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 8608,
+      "y": 8617,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8251,
+      "y": 8307,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8200,
+      "y": 8724,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8000,
+      "y": 8320,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7797,
+      "y": 8700,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7749,
+      "y": 8307,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7417,
+      "y": 8565,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7489,
+      "y": 8211,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7083,
+      "y": 8308,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7321,
+      "y": 7981,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 6865,
+      "y": 7921,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7320,
+      "y": 7700,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6844,
+      "y": 7466,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7423,
+      "y": 7461,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7041,
+      "y": 7054,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7549,
+      "y": 7249,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7392,
+      "y": 6783,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 7731,
+      "y": 7051,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7800,
+      "y": 6676,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8000,
+      "y": 6960,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 8203,
+      "y": 6700,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8269,
+      "y": 7051,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8583,
+      "y": 6835,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8451,
+      "y": 7249,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8917,
+      "y": 7092,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 8577,
+      "y": 7461,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9135,
+      "y": 7479,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 6400,
+      "y": 1420,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6980,
+      "y": 1440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7560,
+      "y": 1400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8140,
+      "y": 1420,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8720,
+      "y": 1440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9300,
+      "y": 1400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6660,
+      "y": 2020,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7240,
+      "y": 2040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7820,
+      "y": 2060,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8400,
+      "y": 2020,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8980,
+      "y": 2040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9560,
+      "y": 2060,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6400,
+      "y": 2660,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6980,
+      "y": 2680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7560,
+      "y": 2640,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8140,
+      "y": 2660,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8720,
+      "y": 2680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9300,
+      "y": 2640,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6660,
+      "y": 3260,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7240,
+      "y": 3280,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7820,
+      "y": 3300,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8400,
+      "y": 3260,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8980,
+      "y": 3280,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9560,
+      "y": 3300,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6400,
+      "y": 3900,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6980,
+      "y": 3920,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7560,
+      "y": 3880,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8140,
+      "y": 3900,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8720,
+      "y": 3920,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9300,
+      "y": 3880,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6660,
+      "y": 4500,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7240,
+      "y": 4520,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7820,
+      "y": 4540,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8400,
+      "y": 4500,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8980,
+      "y": 4520,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9560,
+      "y": 4540,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6400,
+      "y": 5140,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6980,
+      "y": 5160,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7560,
+      "y": 5120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8140,
+      "y": 5140,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8720,
+      "y": 5160,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9300,
+      "y": 5120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6660,
+      "y": 5740,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7240,
+      "y": 5760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7820,
+      "y": 5780,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8400,
+      "y": 5740,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8980,
+      "y": 5760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9560,
+      "y": 5780,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6400,
+      "y": 6380,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6980,
+      "y": 6400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 7560,
+      "y": 6360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8140,
+      "y": 6380,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8720,
+      "y": 6400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9300,
+      "y": 6360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 1400,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 1650,
+      "type": "kadamba",
+      "r": 82,
+      "res": null
+    },
+    {
+      "x": 2800,
+      "y": 1400,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 1650,
+      "type": "kadamba",
+      "r": 82,
+      "res": null
+    },
+    {
+      "x": 4000,
+      "y": 1400,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 1650,
+      "type": "kadamba",
+      "r": 82,
+      "res": null
+    },
+    {
+      "x": 5200,
+      "y": 1400,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 1650,
+      "type": "kadamba",
+      "r": 82,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 2040,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 2290,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 2040,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 2290,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 2040,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 2290,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 2040,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 2290,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 2680,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 2930,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 2680,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 2930,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 2680,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 2930,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 2680,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 2930,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 3320,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 3570,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 3320,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 3570,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 3320,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 3570,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 3320,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 3570,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 3960,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 4210,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 3960,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 4210,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 3960,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 4210,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 3960,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 4210,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 4600,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 4850,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 4600,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 4850,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 4600,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 4850,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 4600,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 4850,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 5240,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 5490,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 5240,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 5490,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 5240,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 5490,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 5240,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 5490,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 5880,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2200,
+      "y": 6130,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 2800,
+      "y": 5880,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 6130,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4000,
+      "y": 5880,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 4600,
+      "y": 6130,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5200,
+      "y": 5880,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 5800,
+      "y": 6130,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 1600,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2160,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2720,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3280,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3840,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4400,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4960,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5520,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6080,
+      "y": 6800,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1840,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2400,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2960,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3520,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4080,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4640,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5200,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5760,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6320,
+      "y": 7360,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1600,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2160,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2720,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3280,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3840,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4400,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4960,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5520,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6080,
+      "y": 7920,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1840,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2400,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2960,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3520,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4080,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4640,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5200,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5760,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6320,
+      "y": 8480,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1600,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2160,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2720,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3280,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3840,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4400,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4960,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5520,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6080,
+      "y": 9040,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1840,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2400,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 2960,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 3520,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4080,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 4640,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5200,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 5760,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 6320,
+      "y": 9600,
+      "type": "mango",
+      "r": 90,
+      "res": "fruit"
+    },
+    {
+      "x": 1600,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 10680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 10680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 10680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 10680,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 11080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 11360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 11080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 11360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 11080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 11360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 11080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 11360,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 11760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 12040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 11760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 12040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 11760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 12040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 11760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 12040,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 12440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 12720,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 12440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 12720,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 12440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 12720,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 12440,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 12720,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 13120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 13400,
+      "type": "banyan",
+      "r": 112,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 13120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 13400,
+      "type": "banyan",
+      "r": 112,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 13120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 13400,
+      "type": "banyan",
+      "r": 112,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 13120,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 13400,
+      "type": "banyan",
+      "r": 112,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 13800,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 14080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 13800,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 14080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 13800,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 14080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 13800,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 14080,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 1600,
+      "y": 14480,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2240,
+      "y": 14760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 2880,
+      "y": 14480,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 3520,
+      "y": 14760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4160,
+      "y": 14480,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 4800,
+      "y": 14760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 5440,
+      "y": 14480,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 6080,
+      "y": 14760,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 8480,
+      "y": 12000,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8453,
+      "y": 12262,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8262,
+      "y": 12453,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8000,
+      "y": 12480,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 7782,
+      "y": 12378,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 7622,
+      "y": 12218,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 7520,
+      "y": 12000,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 7547,
+      "y": 11738,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 7738,
+      "y": 11547,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8000,
+      "y": 11520,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8218,
+      "y": 11622,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 8378,
+      "y": 11782,
+      "type": "parijat",
+      "r": 82,
+      "res": "flower"
+    },
+    {
+      "x": 6500,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 10400,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8450,
+      "y": 10400,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 10400,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 11050,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 11050,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 11050,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8450,
+      "y": 11050,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 11050,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 11700,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 11700,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 11700,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 9100,
+      "y": 11700,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 12350,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 12350,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 12350,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 13000,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 13000,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 13000,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8450,
+      "y": 13000,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 13000,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 13650,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 13650,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 13650,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8450,
+      "y": 13650,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 13650,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 6500,
+      "y": 14300,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7150,
+      "y": 14300,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 7800,
+      "y": 14300,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 8450,
+      "y": 14300,
+      "type": "parijat",
+      "r": 88,
+      "res": "flower"
+    },
+    {
+      "x": 9100,
+      "y": 14300,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 10050,
+      "y": 10200,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10670,
+      "y": 10200,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11290,
+      "y": 10200,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11910,
+      "y": 10200,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12530,
+      "y": 10200,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 10860,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 10860,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 10860,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 10860,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 10860,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10050,
+      "y": 11520,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10670,
+      "y": 11520,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11290,
+      "y": 11520,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11910,
+      "y": 11520,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12530,
+      "y": 11520,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 12180,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 12180,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 12180,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 12180,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 12180,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10050,
+      "y": 12840,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10670,
+      "y": 12840,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11290,
+      "y": 12840,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11910,
+      "y": 12840,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12530,
+      "y": 12840,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 13500,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 13500,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 13500,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 13500,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 13500,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10050,
+      "y": 14160,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 10670,
+      "y": 14160,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11290,
+      "y": 14160,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 11910,
+      "y": 14160,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 12530,
+      "y": 14160,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 1660,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 1400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 1660,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 1400,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 1660,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 2310,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 2050,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 2310,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 2050,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 2310,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 2960,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 2700,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 2960,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 2700,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 2960,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 3610,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 3350,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 3610,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 3350,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 3610,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 4260,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 4000,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 4260,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 4000,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 4260,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 4910,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 4650,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 4910,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 4650,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 4910,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 5560,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 5300,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 5560,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 5300,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 5560,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 9800,
+      "y": 6210,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 10420,
+      "y": 5950,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11040,
+      "y": 6210,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 11660,
+      "y": 5950,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12280,
+      "y": 6210,
+      "type": "kadamba",
+      "r": 90,
+      "res": null
+    },
+    {
+      "x": 12920,
+      "y": 1400,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 1610,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 1860,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 2070,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 2320,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 2530,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 2780,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 2990,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 3240,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 3450,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 3700,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 3910,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 4160,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 4370,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 4620,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 4830,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 5080,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 5290,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 5540,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 5750,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 6000,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 6210,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 6460,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 6670,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 6920,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 7130,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 7380,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 7590,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 7840,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 8050,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 8300,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 8510,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 8760,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 8970,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 9220,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 9430,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 9680,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 9890,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 10140,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 10350,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 10600,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 10810,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 11060,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 11270,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 11520,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 11730,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 11980,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 12190,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 12440,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 12650,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 12900,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 13110,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 13360,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 13570,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 13820,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 14030,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 14280,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 14490,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 12920,
+      "y": 14740,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    },
+    {
+      "x": 14260,
+      "y": 14950,
+      "type": "palm",
+      "r": 56,
+      "res": "fruit"
+    }
+  ],
+  "bushes": [
+    {
+      "x": 8856,
+      "y": 7786,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8807,
+      "y": 8133,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8571,
+      "y": 8399,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8242,
+      "y": 8501,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 8496,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7604,
+      "y": 8437,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7301,
+      "y": 8271,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7124,
+      "y": 7964,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7144,
+      "y": 7614,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7291,
+      "y": 7319,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7482,
+      "y": 7067,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7745,
+      "y": 6855,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8092,
+      "y": 6785,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8418,
+      "y": 6922,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8633,
+      "y": 7182,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8770,
+      "y": 7468,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 6530,
+      "y": 6480,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7110,
+      "y": 6500,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7690,
+      "y": 6460,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8270,
+      "y": 6480,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8850,
+      "y": 6500,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9430,
+      "y": 6460,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1730,
+      "y": 1310,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 1480,
+      "y": 1490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2330,
+      "y": 1560,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 2080,
+      "y": 1740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2930,
+      "y": 1310,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 2680,
+      "y": 1490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3530,
+      "y": 1560,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 3280,
+      "y": 1740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4130,
+      "y": 1310,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 3880,
+      "y": 1490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4730,
+      "y": 1560,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 4480,
+      "y": 1740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5330,
+      "y": 1310,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 5080,
+      "y": 1490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5930,
+      "y": 1560,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 5680,
+      "y": 1740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1720,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2280,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2840,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3960,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4520,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5080,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5640,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6200,
+      "y": 6880,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1960,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2520,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3080,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3640,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4200,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4760,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5320,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5880,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6440,
+      "y": 7440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1720,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2280,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2840,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3960,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4520,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5080,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5640,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6200,
+      "y": 8000,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1960,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2520,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3080,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3640,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4200,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4760,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5320,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5880,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6440,
+      "y": 8560,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1720,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2280,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2840,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3400,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3960,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4520,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5080,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5640,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6200,
+      "y": 9120,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 1960,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 2520,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3080,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 3640,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4200,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 4760,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5320,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 5880,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6440,
+      "y": 9680,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8573,
+      "y": 12087,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8453,
+      "y": 12362,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8212,
+      "y": 12540,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7913,
+      "y": 12573,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7638,
+      "y": 12453,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7460,
+      "y": 12212,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7427,
+      "y": 11913,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7547,
+      "y": 11638,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 7788,
+      "y": 11460,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8087,
+      "y": 11427,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8362,
+      "y": 11547,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 8540,
+      "y": 11788,
+      "r": 42,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 10490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 10490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 10490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 10490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 10490,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 11140,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 11140,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 11140,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 11140,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 11140,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 11790,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 11790,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 11790,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 12440,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 13090,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 13090,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 13090,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 13090,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 13090,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 13740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 13740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 13740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 13740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 13740,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 6620,
+      "y": 14390,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7270,
+      "y": 14390,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 7920,
+      "y": 14390,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 8570,
+      "y": 14390,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 9220,
+      "y": 14390,
+      "r": 40,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 1450,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 1910,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 2370,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 2830,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 3290,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 3750,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 4210,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 4670,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 5130,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 5590,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 6050,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 6510,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 6970,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 7430,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 7890,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 8350,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 8810,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 9270,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 9730,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 10190,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 10650,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 11110,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 11570,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 12030,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 12490,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 12950,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 13410,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 13870,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 14330,
+      "r": 38,
+      "res": "flower"
+    },
+    {
+      "x": 12960,
+      "y": 14790,
+      "r": 38,
+      "res": "flower"
+    }
+  ],
+  "rocks": [
+    {
+      "x": 8378,
+      "y": 12096,
+      "r": 38
+    },
+    {
+      "x": 8279,
+      "y": 12272,
+      "r": 38
+    },
+    {
+      "x": 8105,
+      "y": 12375,
+      "r": 38
+    },
+    {
+      "x": 7904,
+      "y": 12378,
+      "r": 38
+    },
+    {
+      "x": 7728,
+      "y": 12279,
+      "r": 38
+    },
+    {
+      "x": 7625,
+      "y": 12105,
+      "r": 38
+    },
+    {
+      "x": 7622,
+      "y": 11904,
+      "r": 38
+    },
+    {
+      "x": 7721,
+      "y": 11728,
+      "r": 38
+    },
+    {
+      "x": 7895,
+      "y": 11625,
+      "r": 38
+    },
+    {
+      "x": 8096,
+      "y": 11622,
+      "r": 38
+    },
+    {
+      "x": 8272,
+      "y": 11721,
+      "r": 38
+    },
+    {
+      "x": 8375,
+      "y": 11895,
+      "r": 38
+    },
+    {
+      "x": 14220,
+      "y": 1500,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 1960,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 2420,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 2880,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 3340,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 3800,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 4260,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 4720,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 5180,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 5640,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 6100,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 6560,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 7020,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 7480,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 8860,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 9320,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 9780,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 10240,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 10700,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 11160,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 11620,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 12080,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 12540,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 13000,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 13460,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 13920,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 14380,
+      "r": 48
+    },
+    {
+      "x": 14220,
+      "y": 14840,
+      "r": 48
+    }
+  ]
+};
