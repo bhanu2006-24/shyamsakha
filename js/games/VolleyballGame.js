@@ -175,7 +175,8 @@ export class VolleyballGame {
         const isPlayerInCourt = player.x >= c.x - 30 && player.x <= c.x + c.w + 30 &&
                                 player.y >= c.y - 30 && player.y <= c.y + c.h + 30;
         if (isPlayerInCourt) {
-            player.currentSpeed = Math.min(155, player.baseSpeed * 0.5);
+            const bSpeed = player.baseSpeed || player.minSpeed || 280;
+            player.currentSpeed = Math.min(155, bSpeed * 0.5);
         }
 
         // 2. Update ball physics

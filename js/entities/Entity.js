@@ -9,7 +9,8 @@ export class Entity {
         this.color = color;
         this.minSpeed = minSpeed;
         this.maxSpeed = maxSpeed;
-        this.currentSpeed = (minSpeed + maxSpeed) / 2;
+        this.baseSpeed = (minSpeed + maxSpeed) / 2;
+        this.currentSpeed = this.baseSpeed;
         this.targetStrideSpeed = this.currentSpeed;
         this.cadenceTimer = 0.4 + Math.random() * 0.6; // Changes pace every ~0.8-1.4s
         this.surgeTimer = 0;
@@ -97,10 +98,13 @@ export class Entity {
     }
 
     move(dx, dy, obstacles, mapWidth, mapHeight) {
+        if (isNaN(dx) || isNaN(dy)) return;
         if (dx !== 0 || dy !== 0) {
             const mag = Math.hypot(dx, dy);
-            this.dx = dx / mag;
-            this.dy = dy / mag;
+            if (mag > 0) {
+                this.dx = dx / mag;
+                this.dy = dy / mag;
+            }
         }
 
         // Fast Bounding-Box Pre-Filter: Only check obstacles within 180px (sub-nanosecond, zero lag!)
