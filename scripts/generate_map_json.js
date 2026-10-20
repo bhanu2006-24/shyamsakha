@@ -67,16 +67,22 @@ function addRock(x, y, r = 46) {
 // 1. CENTRAL GLADE PERIMETER RING (Radius ~1150 - 1500 from 8000, 7800)
 // Stripped tight inner trees so the central meeting glade is wide open and peaceful!
 // ----------------------------------------------------------------------
-for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+for (let i = 0; i < 12; i++) {
+    const angle = i * (Math.PI / 6);
     const dist1 = 1180 + (Math.sin(angle * 3) * 60);
     const tx1 = Math.round(8000 + Math.cos(angle) * dist1);
     const ty1 = Math.round(7800 + Math.sin(angle) * dist1);
-    addTree(tx1, ty1, (Math.floor(angle * 2) % 2 === 0) ? 'kadamba' : 'parijat', 88, (Math.floor(angle * 2) % 2 !== 0) ? 'flower' : null);
+
+    // Varied trees: Ripe Mango Trees (fruit), Fragrant Parijat (flowers), and Ancient Kadamba
+    const typeCycle = ['mango', 'parijat', 'kadamba', 'mango', 'parijat', 'kadamba'];
+    const tType = typeCycle[i % typeCycle.length];
+    const res = tType === 'mango' ? 'fruit' : (tType === 'parijat' ? 'flower' : null);
+    addTree(tx1, ty1, tType, 88, res);
 
     const dist2 = 1450 + (Math.cos(angle * 2) * 80);
     const tx2 = Math.round(8000 + Math.cos(angle + 0.2) * dist2);
     const ty2 = Math.round(7800 + Math.sin(angle + 0.2) * dist2);
-    addTree(tx2, ty2, 'kadamba', 92, null);
+    addTree(tx2, ty2, (i % 2 === 0) ? 'kadamba' : 'mango', 92, (i % 2 !== 0) ? 'fruit' : null);
 
     // Accenting bushes on outer perimeter
     const bx = Math.round(8000 + Math.cos(angle + 0.1) * (dist1 + 180));

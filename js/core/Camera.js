@@ -38,6 +38,9 @@ export class Camera {
             this.y += (targetY - this.y) * this.smoothing;
         }
 
+        if (isNaN(this.x)) this.x = 0;
+        if (isNaN(this.y)) this.y = 0;
+
         // Clamp inside map boundaries
         this.x = Math.max(0, Math.min(this.x, Math.max(0, mapWidth - this.width)));
         this.y = Math.max(0, Math.min(this.y, Math.max(0, mapHeight - this.height)));

@@ -976,12 +976,14 @@ export class Game {
     }
 
     getOffscreenPosition(target) {
-        if (!target) return null;
+        if (!target || isNaN(target.x) || isNaN(target.y)) return null;
+        if (!this.player || isNaN(this.player.x) || isNaN(this.player.y)) return null;
 
         const w = this.canvas.width;
         const h = this.canvas.height;
         const screenX = target.x - this.camera.x;
         const screenY = target.y - this.camera.y;
+        if (isNaN(screenX) || isNaN(screenY)) return null;
 
         // On-screen boundary check (with comfortable margin)
         const pad = 45;
@@ -996,6 +998,7 @@ export class Game {
         const angle = Math.atan2(dy, dx);
 
         const dist = Math.hypot(this.player.x - target.x, this.player.y - target.y);
+        if (isNaN(dist)) return null;
         const distPaces = Math.max(1, Math.round(dist / 32));
 
         // Edge padding for pointer badge
@@ -1006,6 +1009,7 @@ export class Game {
         const tX = dx !== 0 ? Math.abs(halfW / dx) : Infinity;
         const tY = dy !== 0 ? Math.abs(halfH / dy) : Infinity;
         const t = Math.min(tX, tY);
+        if (isNaN(t) || !isFinite(t)) return null;
 
         return {
             x: cx + dx * t,
@@ -1016,6 +1020,7 @@ export class Game {
     }
 
     drawIndicatorBadge(ctx, pos, label, icon, primaryColor, glowColor, isDenner = false) {
+        if (!pos || isNaN(pos.x) || isNaN(pos.y)) return;
         const h = this.canvas.height;
         ctx.save();
         ctx.translate(pos.x, pos.y);

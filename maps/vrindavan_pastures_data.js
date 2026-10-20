@@ -183,9 +183,9 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 9180,
       "y": 7800,
-      "type": "kadamba",
+      "type": "mango",
       "r": 88,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 9500,
@@ -204,9 +204,9 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 9117,
       "y": 8787,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 8590,
@@ -225,23 +225,23 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 8000,
       "y": 8920,
-      "type": "parijat",
+      "type": "mango",
       "r": 88,
-      "res": "flower"
+      "res": "fruit"
     },
     {
       "x": 7728,
       "y": 9143,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 7410,
       "y": 8822,
-      "type": "kadamba",
+      "type": "parijat",
       "r": 88,
-      "res": null
+      "res": "flower"
     },
     {
       "x": 7066,
@@ -253,23 +253,23 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 6926,
       "y": 8420,
-      "type": "parijat",
+      "type": "kadamba",
       "r": 88,
-      "res": "flower"
+      "res": null
     },
     {
       "x": 6587,
       "y": 8274,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 6820,
       "y": 7800,
-      "type": "kadamba",
+      "type": "mango",
       "r": 88,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 6500,
@@ -288,9 +288,9 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 6883,
       "y": 6813,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 7410,
@@ -309,23 +309,23 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 8000,
       "y": 6560,
-      "type": "parijat",
+      "type": "mango",
       "r": 88,
-      "res": "flower"
+      "res": "fruit"
     },
     {
       "x": 8272,
       "y": 6457,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 8590,
       "y": 6778,
-      "type": "kadamba",
+      "type": "parijat",
       "r": 88,
-      "res": null
+      "res": "flower"
     },
     {
       "x": 8934,
@@ -337,16 +337,16 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 8970,
       "y": 7240,
-      "type": "parijat",
+      "type": "kadamba",
       "r": 88,
-      "res": "flower"
+      "res": null
     },
     {
       "x": 9413,
       "y": 7326,
-      "type": "kadamba",
+      "type": "mango",
       "r": 92,
-      "res": null
+      "res": "fruit"
     },
     {
       "x": 6400,

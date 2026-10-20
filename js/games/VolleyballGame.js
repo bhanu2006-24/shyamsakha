@@ -71,57 +71,76 @@ export class VolleyballGame {
 
         // --- WEST SIDE (TEAM SAKHA: Player + 2-3 Sakhas) ---
         // Player: Center backcourt
-        p.x = c.x + c.w * 0.18;
-        p.y = c.y + c.h * 0.5;
+        p.courtHomeX = c.x + c.w * 0.18;
+        p.courtHomeY = c.y + c.h * 0.5;
+        p.x = p.courtHomeX;
+        p.y = p.courtHomeY;
         p.dx = 1; p.dy = 0;
 
-        // Sakha 0 (Sudama/Subal): Front row top
+        // Sakha 0 (Sudama): Front row setter (always stays in court)
         if (sakhas.length > 0) {
-            sakhas[0].x = c.x + c.w * 0.35;
-            sakhas[0].y = c.y + c.h * 0.28;
+            sakhas[0].courtHomeX = c.x + c.w * 0.35;
+            sakhas[0].courtHomeY = c.y + c.h * 0.28;
+            sakhas[0].x = sakhas[0].courtHomeX;
+            sakhas[0].y = sakhas[0].courtHomeY;
             sakhas[0].dx = 1; sakhas[0].dy = 0;
+            sakhas[0].isMoving = false;
         }
 
-        // Sakha 1 (Madhumangal): Front row bottom
+        // Sakha 1 (Subal): Front row spiker (always stays in court)
         if (sakhas.length > 1) {
-            sakhas[1].x = c.x + c.w * 0.35;
-            sakhas[1].y = c.y + c.h * 0.72;
+            sakhas[1].courtHomeX = c.x + c.w * 0.35;
+            sakhas[1].courtHomeY = c.y + c.h * 0.72;
+            sakhas[1].x = sakhas[1].courtHomeX;
+            sakhas[1].y = sakhas[1].courtHomeY;
             sakhas[1].dx = 1; sakhas[1].dy = 0;
+            sakhas[1].isMoving = false;
         }
 
         // --- EAST SIDE (TEAM KRISHNA: Krishna, Balram + 1-2 Sakhas) ---
         // Krishna: Front court agile setter/spiker
-        k.x = c.x + c.w * 0.68;
-        k.y = c.y + c.h * 0.42;
+        k.courtHomeX = c.x + c.w * 0.68;
+        k.courtHomeY = c.y + c.h * 0.42;
+        k.x = k.courtHomeX;
+        k.y = k.courtHomeY;
         k.dx = -1; k.dy = 0;
 
         // Dao Balram: Back court power spiker
-        d.x = c.x + c.w * 0.82;
-        d.y = c.y + c.h * 0.65;
+        d.courtHomeX = c.x + c.w * 0.82;
+        d.courtHomeY = c.y + c.h * 0.65;
+        d.x = d.courtHomeX;
+        d.y = d.courtHomeY;
         d.dx = -1; d.dy = 0;
 
-        // Sakha 2 (Rishabh/Dama): East court back helper
+        // Sakha 2 (Madhumangal/Rishabh): East court back helper (stays in court)
         if (sakhas.length > 2) {
-            sakhas[2].x = c.x + c.w * 0.82;
-            sakhas[2].y = c.y + c.h * 0.28;
+            sakhas[2].courtHomeX = c.x + c.w * 0.82;
+            sakhas[2].courtHomeY = c.y + c.h * 0.28;
+            sakhas[2].x = sakhas[2].courtHomeX;
+            sakhas[2].y = sakhas[2].courtHomeY;
             sakhas[2].dx = -1; sakhas[2].dy = 0;
+            sakhas[2].isMoving = false;
         }
 
-        // Optional 4th player per side if enough Sakhas
+        // Optional 4th player per side
         if (sakhas.length > 3) {
-            // West back helper
-            sakhas[3].x = c.x + c.w * 0.16;
-            sakhas[3].y = c.y + c.h * 0.25;
+            sakhas[3].courtHomeX = c.x + c.w * 0.16;
+            sakhas[3].courtHomeY = c.y + c.h * 0.25;
+            sakhas[3].x = sakhas[3].courtHomeX;
+            sakhas[3].y = sakhas[3].courtHomeY;
             sakhas[3].dx = 1; sakhas[3].dy = 0;
+            sakhas[3].isMoving = false;
         }
         if (sakhas.length > 4) {
-            // East front helper
-            sakhas[4].x = c.x + c.w * 0.68;
-            sakhas[4].y = c.y + c.h * 0.72;
+            sakhas[4].courtHomeX = c.x + c.w * 0.68;
+            sakhas[4].courtHomeY = c.y + c.h * 0.72;
+            sakhas[4].x = sakhas[4].courtHomeX;
+            sakhas[4].y = sakhas[4].courtHomeY;
             sakhas[4].dx = -1; sakhas[4].dy = 0;
+            sakhas[4].isMoving = false;
         }
 
-        // Remaining Sakhas cheer along North and South sidelines
+        // Remaining Sakhas cheer along North and South sidelines (never leave sidelines)
         const sidelinePositions = [
             { x: c.x + c.w * 0.2, y: c.y - 45, dx: 0, dy: 1 },
             { x: c.x + c.w * 0.8, y: c.y - 45, dx: 0, dy: 1 },
@@ -129,10 +148,13 @@ export class VolleyballGame {
         ];
         for (let i = 5; i < sakhas.length; i++) {
             const sp = sidelinePositions[(i - 5) % sidelinePositions.length];
+            sakhas[i].courtHomeX = sp.x;
+            sakhas[i].courtHomeY = sp.y;
             sakhas[i].x = sp.x;
             sakhas[i].y = sp.y;
             sakhas[i].dx = sp.dx;
             sakhas[i].dy = sp.dy;
+            sakhas[i].isMoving = false;
         }
     }
 
