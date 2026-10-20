@@ -164,6 +164,87 @@ export class VrindavanPastures {
                 });
             });
         }
+
+        // 10. High-Performance Spatial Grid (Buckets obstacles into 600px cells for instantaneous rendering & 60fps physics)
+        this.gridCellSize = 600;
+        this.spatialGrid = new Map();
+        for (let i = 0; i < this.obstacles.length; i++) {
+            this.addToSpatialGrid(this.obstacles[i]);
+        }
+    }
+
+    addToSpatialGrid(obs) {
+        const cs = this.gridCellSize;
+        const rad = obs.visualRadius || obs.radius || Math.max(obs.w || 0, obs.h || 0) || 60;
+        const minC = Math.max(0, Math.floor((obs.x - rad) / cs));
+        const maxC = Math.min(Math.floor(this.width / cs), Math.floor((obs.x + (obs.w || rad)) / cs));
+        const minR = Math.max(0, Math.floor((obs.y - rad) / cs));
+        const maxR = Math.min(Math.floor(this.height / cs), Math.floor((obs.y + (obs.h || rad)) / cs));
+
+        for (let c = minC; c <= maxC; c++) {
+            for (let r = minR; r <= maxR; r++) {
+                const key = `${c},${r}`;
+                let list = this.spatialGrid.get(key);
+                if (!list) {
+                    list = [];
+                    this.spatialGrid.set(key, list);
+                }
+                list.push(obs);
+            }
+        }
+    }
+
+    getVisibleObstacles(camera) {
+        const cs = this.gridCellSize;
+        const pad = 240;
+        const minC = Math.max(0, Math.floor((camera.x - pad) / cs));
+        const maxC = Math.min(Math.floor(this.width / cs), Math.floor((camera.x + camera.width + pad) / cs));
+        const minR = Math.max(0, Math.floor((camera.y - pad) / cs));
+        const maxR = Math.min(Math.floor(this.height / cs), Math.floor((camera.y + camera.height + pad) / cs));
+
+        const visible = [];
+        const seen = new Set();
+        for (let c = minC; c <= maxC; c++) {
+            for (let r = minR; r <= maxR; r++) {
+                const list = this.spatialGrid.get(`${c},${r}`);
+                if (list) {
+                    for (let i = 0; i < list.length; i++) {
+                        const obs = list[i];
+                        if (!seen.has(obs)) {
+                            seen.add(obs);
+                            visible.push(obs);
+                        }
+                    }
+                }
+            }
+        }
+        return visible;
+    }
+
+    getNearbyObstacles(x, y, radius = 240) {
+        const cs = this.gridCellSize;
+        const minC = Math.max(0, Math.floor((x - radius) / cs));
+        const maxC = Math.min(Math.floor(this.width / cs), Math.floor((x + radius) / cs));
+        const minR = Math.max(0, Math.floor((y - radius) / cs));
+        const maxR = Math.min(Math.floor(this.height / cs), Math.floor((y + radius) / cs));
+
+        const nearby = [];
+        const seen = new Set();
+        for (let c = minC; c <= maxC; c++) {
+            for (let r = minR; r <= maxR; r++) {
+                const list = this.spatialGrid.get(`${c},${r}`);
+                if (list) {
+                    for (let i = 0; i < list.length; i++) {
+                        const obs = list[i];
+                        if (!seen.has(obs)) {
+                            seen.add(obs);
+                            nearby.push(obs);
+                        }
+                    }
+                }
+            }
+        }
+        return nearby;
     }
 
     update(dt) {
@@ -171,7 +252,8 @@ export class VrindavanPastures {
         this.riverWaveOffset += dt * 45;
 
         // Resource regeneration
-        for (const obs of this.obstacles) {
+        for (let i = 0; i < this.obstacles.length; i++) {
+            const obs = this.obstacles[i];
             if (obs.resourceRegenTimer > 0) {
                 obs.resourceRegenTimer -= dt;
             }
@@ -179,44 +261,14 @@ export class VrindavanPastures {
     }
 
     drawGround(ctx, camera) {
-        // 1. Base Pastoral Vrindavan Turf
+        const startY = Math.floor(camera.y / 70) * 70;
+        const sway = Math.sin(this.swayTime * 2.0) * 0.5;
+
+        // 1. Base Pastoral Vrindavan Turf (Lush, vibrant emerald green pasture)
         ctx.fillStyle = '#2d6a4f';
         ctx.fillRect(camera.x, camera.y, camera.width, camera.height);
 
-        // Subtle organic grass texture grid
-        ctx.strokeStyle = 'rgba(45, 106, 79, 0.45)';
-        ctx.lineWidth = 1;
-        const gridSpacing = 280;
-        const startX = Math.floor(camera.x / gridSpacing) * gridSpacing;
-        const startY = Math.floor(camera.y / gridSpacing) * gridSpacing;
-
-        ctx.beginPath();
-        for (let x = startX; x < camera.x + camera.width + gridSpacing; x += gridSpacing) {
-            ctx.moveTo(x, camera.y);
-            ctx.lineTo(x, camera.y + camera.height);
-        }
-        for (let y = startY; y < camera.y + camera.height + gridSpacing; y += gridSpacing) {
-            ctx.moveTo(camera.x, y);
-            ctx.lineTo(camera.x + camera.width, y);
-        }
-        ctx.stroke();
-
-        // 2. Durva Grass Tufts scattered naturally
-        const sway = Math.sin(this.swayTime * 2.0) * 0.5;
-        const grassTuftSpacing = 400;
-        const grassStartX = Math.floor(camera.x / grassTuftSpacing) * grassTuftSpacing;
-        const grassStartY = Math.floor(camera.y / grassTuftSpacing) * grassTuftSpacing;
-
-        for (let gx = grassStartX; gx < camera.x + camera.width + grassTuftSpacing; gx += grassTuftSpacing) {
-            for (let gy = grassStartY; gy < camera.y + camera.height + grassTuftSpacing; gy += grassTuftSpacing) {
-                // Keep grass away from river & volleyball court
-                if (gx < 12800) {
-                    EnvironmentRenderer.drawDurvaGrassTuft(ctx, gx + 60, gy + 80, sway, 13);
-                }
-            }
-        }
-
-        // 3. Interactive Floral Wind Streams (पवन मार्ग)
+        // 2. Interactive Floral Wind Streams (पवन मार्ग)
         for (const ws of this.windStreams) {
             if (camera.isInView(ws.x + ws.w / 2, ws.y + ws.h / 2, Math.max(ws.w, ws.h) / 2 + 50)) {
                 ctx.save();
@@ -347,6 +399,7 @@ export class VrindavanPastures {
         // 6. Yamuna Sandbank Shoreline (x: 12800 to 14400)
         const sandStartX = 12800;
         const riverStartX = this.width - this.riverWidth; // 14400
+
         if (camera.x + camera.width > sandStartX) {
             // Golden sandbank expanse
             ctx.fillStyle = '#fef08a';
@@ -479,9 +532,10 @@ export class VrindavanPastures {
             ctx.restore();
         }
 
-        // Draw Trunks, Rocks, Bushes, and Kamal Sarovar
-        for (const obs of this.obstacles) {
-            if (!camera.isInView(obs.x, obs.y, obs.visualRadius || obs.w || 60)) continue;
+        // Draw Trunks, Rocks, Bushes, and Kamal Sarovar (ONLY visible obstacles in camera view!)
+        const visibleObstacles = this.getVisibleObstacles(camera);
+        for (let i = 0; i < visibleObstacles.length; i++) {
+            const obs = visibleObstacles[i];
 
             if (obs.type === 'tree') {
                 EnvironmentRenderer.drawTreeTrunk(ctx, obs, this.swayTime);
@@ -511,8 +565,8 @@ export class VrindavanPastures {
                     { dx: 0, dy: -130 }, { dx: -140, dy: 10 },
                     { dx: 140, dy: -10 }, { dx: 0, dy: 120 }
                 ];
-                for (let i = 0; i < lilyPads.length; i++) {
-                    const lp = lilyPads[i];
+                for (let j = 0; j < lilyPads.length; j++) {
+                    const lp = lilyPads[j];
                     EnvironmentRenderer.drawLotus(ctx, obs.x + lp.dx, obs.y + lp.dy, 22, 1.0);
                 }
 
@@ -578,7 +632,8 @@ export class VrindavanPastures {
                     { dx: -12, dy: -8 }, { dx: 14, dy: -6 },
                     { dx: -4, dy: 10 }, { dx: 10, dy: 12 }, { dx: 0, dy: -14 }
                 ];
-                for (const p of petals) {
+                for (let k = 0; k < petals.length; k++) {
+                    const p = petals[k];
                     EnvironmentRenderer.drawMalatiFlower(ctx, obs.x + p.dx, obs.y + p.dy, 6, 0);
                 }
 
@@ -588,9 +643,11 @@ export class VrindavanPastures {
     }
 
     drawCanopy(ctx, camera, player = null) {
-        // Draw tree canopies with proximity transparency
-        for (const obs of this.obstacles) {
-            if (obs.type === 'tree' && camera.isInView(obs.x, obs.y - 60, obs.visualRadius + 120)) {
+        // Draw tree canopies with proximity transparency (ONLY visible trees!)
+        const visibleObstacles = this.getVisibleObstacles(camera);
+        for (let i = 0; i < visibleObstacles.length; i++) {
+            const obs = visibleObstacles[i];
+            if (obs.type === 'tree') {
                 EnvironmentRenderer.drawTreeCanopy(ctx, obs, this.swayTime, player);
             }
         }

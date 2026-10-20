@@ -231,25 +231,34 @@ export class VolleyballGame {
     }
 
     /**
-     * West Teammate AI with half speed & human-like reaction cadence
+     * West Teammate AI: Cooperative positioning, setting up high passes for the player, and yielding when player takes the shot
      */
     updateTeammateAI(sakha, ball, c, dt) {
         const isBallOnOurSide = ball.x < c.netX;
+        const player = this.game.player;
+        const playerDistToBall = Math.hypot(player.x - ball.x, player.y - ball.y);
+        const playerIsTakingIt = playerDistToBall < 110 && isBallOnOurSide && ball.z < 180;
 
-        // Reaction cadence timer to prevent robotic tracking
-        let reaction = this.aiReactionTimers.get(sakha) || { timer: 0, targetX: sakha.x, targetY: sakha.y, speed: 125 };
+        let reaction = this.aiReactionTimers.get(sakha) || { timer: 0, targetX: sakha.x, targetY: sakha.y, speed: 125, role: 'setter' };
         reaction.timer -= dt;
 
         if (reaction.timer <= 0) {
-            reaction.timer = 0.18 + Math.random() * 0.2; // 180-380ms cadence
-            reaction.speed = 110 + Math.random() * 45; // 110-155 px/s half speed
+            reaction.timer = 0.2 + Math.random() * 0.18; // Natural reaction cadence
+            reaction.speed = 115 + Math.random() * 40; // Halved court speed
 
-            if (isBallOnOurSide && ball.z < 200) {
-                // Anticipate landing with slight human offset
-                reaction.targetX = ball.x + (Math.random() - 0.5) * 25;
-                reaction.targetY = ball.y + (Math.random() - 0.5) * 25;
+            if (isBallOnOurSide && ball.z < 220) {
+                if (playerIsTakingIt) {
+                    // Back off and give the player room to strike!
+                    const backOffDir = sakha.y < player.y ? -1 : 1;
+                    reaction.targetX = c.x + c.w * 0.32;
+                    reaction.targetY = Math.max(c.y + 40, Math.min(c.y + c.h - 40, sakha.y + backOffDir * 60));
+                } else {
+                    // Move to receive the ball
+                    reaction.targetX = ball.x + (Math.random() - 0.5) * 15;
+                    reaction.targetY = ball.y + (Math.random() - 0.5) * 15;
+                }
             } else {
-                // Return to home zone on west court
+                // Return to home zone (front court setter vs back court receiver)
                 reaction.targetX = sakha.homeX || (c.x + c.w * 0.3);
                 reaction.targetY = sakha.homeY || (c.y + c.h * 0.5);
             }
@@ -260,55 +269,80 @@ export class VolleyballGame {
         const dy = reaction.targetY - sakha.y;
         const dist = Math.hypot(dx, dy);
 
-        if (dist > 18) {
+        if (dist > 16) {
             sakha.moveWithAnim((dx / dist) * reaction.speed * dt, (dy / dist) * reaction.speed * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight(), dt);
         }
 
-        // Hit ball if close and descending
+        // Cooperative Hit / Pass
         const ballDist = Math.hypot(ball.x - sakha.x, ball.y - sakha.y);
-        if (this.rallyActive && isBallOnOurSide && ballDist < sakha.radius + ball.radius + 22 && ball.z <= 55 && ball.lastHitter !== sakha) {
-            const targetX = c.x + c.w * (0.65 + Math.random() * 0.25);
-            const targetY = c.y + c.h * (0.2 + Math.random() * 0.6);
-            ball.hit(sakha, targetX, targetY, 350, false, this.game.sound);
+        if (this.rallyActive && isBallOnOurSide && ballDist < sakha.radius + ball.radius + 24 && ball.z <= 60 && ball.lastHitter !== sakha && !playerIsTakingIt) {
+            // If 1st touch on player's side: Set it up high near the net for the player!
+            if (this.touchCount === 1) {
+                const setTargetX = c.x + c.w * 0.38;
+                const setTargetY = player.y;
+                ball.hit(sakha, setTargetX, setTargetY, 320, false, this.game.sound);
+                this.game.ui.showToast(`🏐 ${sakha.name} sets it high! Sprint and Jump Spike with Shift+Space!`, 2500);
+            } else {
+                // 2nd/3rd touch: Bump or spike over the net
+                const isSpike = Math.random() < 0.35 && sakha.x > c.x + c.w * 0.28;
+                if (isSpike) sakha.vz = 340;
+
+                const targetX = c.x + c.w * (0.65 + Math.random() * 0.25);
+                const targetY = c.y + c.h * (0.18 + Math.random() * 0.64);
+                ball.hit(sakha, targetX, targetY, isSpike ? 470 : 350, isSpike, this.game.sound);
+            }
             this.handleHit('player');
         }
     }
 
     /**
-     * East Opponent AI (Krishna, Balram + Sakhas) with cadence and halved speed
+     * East Opponent AI: Krishna & Dao Balram distinct play styles & team strategies
      */
     updateOpponentAI(krishna, balram, eastSakhas, ball, c, dt) {
         const isBallOnTheirSide = ball.x > c.netX;
         const allOpponents = [krishna, balram, ...eastSakhas];
 
-        // Choose closest defender to the ball
-        let closestOpponent = krishna;
+        // Pick most qualified defender based on trajectory and proximity
+        let primaryDefender = krishna;
         let minDist = Infinity;
         for (const opp of allOpponents) {
             const d = Math.hypot(opp.x - ball.x, opp.y - ball.y);
             if (d < minDist) {
                 minDist = d;
-                closestOpponent = opp;
+                primaryDefender = opp;
             }
         }
 
         for (const opp of allOpponents) {
-            const isPrimary = opp === closestOpponent;
-            let reaction = this.aiReactionTimers.get(opp) || { timer: 0, targetX: opp.x, targetY: opp.y, speed: 130 };
+            const isPrimary = opp === primaryDefender;
+            let reaction = this.aiReactionTimers.get(opp) || { timer: 0, targetX: opp.x, targetY: opp.y, speed: 135 };
             reaction.timer -= dt;
 
             if (reaction.timer <= 0) {
-                reaction.timer = 0.16 + Math.random() * 0.22;
-                // Halved court speed: 115-165 px/s
-                reaction.speed = (opp === krishna || opp === balram) ? 140 + Math.random() * 30 : 115 + Math.random() * 30;
+                // Character-specific cadence: Krishna reacts quickest, Balram deliberate, Sakhas varied
+                const cadence = (opp === krishna) ? 0.12 + Math.random() * 0.12 : (opp === balram) ? 0.18 + Math.random() * 0.15 : 0.22 + Math.random() * 0.2;
+                reaction.timer = cadence;
 
-                if (isBallOnTheirSide && isPrimary && ball.z < 220) {
-                    reaction.targetX = ball.x + (Math.random() - 0.5) * 20;
-                    reaction.targetY = ball.y + (Math.random() - 0.5) * 20;
+                // Court speed (halved): Krishna agile (155), Balram steady (145), Sakhas (120)
+                reaction.speed = (opp === krishna) ? 155 : (opp === balram) ? 142 : 120;
+
+                if (isBallOnTheirSide && isPrimary && ball.z < 230) {
+                    reaction.targetX = ball.x + (Math.random() - 0.5) * 16;
+                    reaction.targetY = ball.y + (Math.random() - 0.5) * 16;
                 } else {
-                    // Spread across East court
-                    reaction.targetX = opp.homeX || (c.x + c.w * 0.78);
-                    reaction.targetY = opp.homeY || (c.y + c.h * 0.5);
+                    // Tactical spread across East Court
+                    if (opp === krishna) {
+                        // Krishna covers front court & net attacks
+                        reaction.targetX = c.x + c.w * 0.68;
+                        reaction.targetY = ball.y > c.y + c.h * 0.5 ? c.y + c.h * 0.35 : c.y + c.h * 0.65;
+                    } else if (opp === balram) {
+                        // Dao Balram anchors back-center for power spikes
+                        reaction.targetX = c.x + c.w * 0.82;
+                        reaction.targetY = c.y + c.h * 0.5;
+                    } else {
+                        reaction.targetX = opp.homeX || (c.x + c.w * 0.78);
+                        reaction.targetY = opp.homeY || (c.y + c.h * 0.5);
+                    }
                 }
             }
             this.aiReactionTimers.set(opp, reaction);
@@ -317,26 +351,52 @@ export class VolleyballGame {
             const dy = reaction.targetY - opp.y;
             const dist = Math.hypot(dx, dy);
 
-            if (dist > 18) {
+            if (dist > 16) {
                 opp.moveWithAnim((dx / dist) * reaction.speed * dt, (dy / dist) * reaction.speed * dt, [], this.game.mapManager.getWidth(), this.game.mapManager.getHeight(), dt);
             }
 
-            // Hit / spike the ball
+            // Hit / Play the ball
             const ballDist = Math.hypot(ball.x - opp.x, ball.y - opp.y);
-            if (this.rallyActive && isBallOnTheirSide && ballDist < opp.radius + ball.radius + 22 && ball.z <= 60 && ball.lastHitter !== opp) {
-                const isSpike = (opp === balram && Math.random() < 0.55) || (opp === krishna && Math.random() < 0.4);
-                if (isSpike) opp.vz = 320; // Jump spike!
-
-                const targetX = c.x + c.w * (0.12 + Math.random() * 0.28);
-                const targetY = c.y + c.h * (0.18 + Math.random() * 0.64);
-
-                ball.hit(opp, targetX, targetY, isSpike ? 510 : 360, isSpike, this.game.sound);
-                this.handleHit('krishna');
-
-                if (isSpike) {
-                    this.game.particles.createSparkle(ball.x, ball.y, '#facc15');
-                    this.game.camera.shake(5, 0.2);
+            if (this.rallyActive && isBallOnTheirSide && ballDist < opp.radius + ball.radius + 24 && ball.z <= 62 && ball.lastHitter !== opp) {
+                // 1. KRISHNA SPECIALTY: Playful Setter or Graceful Acrobatic Spike
+                if (opp === krishna) {
+                    const willSpike = (this.touchCount >= 2 || Math.random() < 0.45);
+                    if (willSpike) {
+                        opp.vz = 410; // Graceful celestial leap!
+                        const targetX = c.x + c.w * (0.08 + Math.random() * 0.32);
+                        const targetY = c.y + c.h * (0.15 + Math.random() * 0.7);
+                        ball.hit(opp, targetX, targetY, 490, true, this.game.sound);
+                        this.game.particles.createSparkle(opp.x, opp.y - 20, '#38bdf8', 25);
+                    } else {
+                        // Gentle divine set up for Dao Balram!
+                        const setTargetX = c.x + c.w * 0.78;
+                        const setTargetY = balram.y;
+                        ball.hit(opp, setTargetX, setTargetY, 330, false, this.game.sound);
+                        this.game.particles.createSparkle(ball.x, ball.y, '#fef08a', 15);
+                    }
+                // 2. DAO BALRAM SPECIALTY: Mighty Power Spike
+                } else if (opp === balram) {
+                    const willPowerSpike = Math.random() < 0.7;
+                    if (willPowerSpike) {
+                        opp.vz = 480; // Mighty leap!
+                        const targetX = c.x + c.w * (0.12 + Math.random() * 0.28);
+                        const targetY = c.y + c.h * (0.18 + Math.random() * 0.64);
+                        ball.hit(opp, targetX, targetY, 530, true, this.game.sound);
+                        this.game.camera.shake(6, 0.22);
+                        this.game.particles.createDust(opp.x, opp.y, '#facc15', 30);
+                    } else {
+                        const targetX = c.x + c.w * (0.15 + Math.random() * 0.25);
+                        const targetY = c.y + c.h * (0.2 + Math.random() * 0.6);
+                        ball.hit(opp, targetX, targetY, 360, false, this.game.sound);
+                    }
+                // 3. EAST SAKHA DEFENSE
+                } else {
+                    const targetX = c.x + c.w * (0.18 + Math.random() * 0.25);
+                    const targetY = c.y + c.h * (0.2 + Math.random() * 0.6);
+                    ball.hit(opp, targetX, targetY, 350, false, this.game.sound);
                 }
+
+                this.handleHit('krishna');
             }
         }
     }

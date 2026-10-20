@@ -52,6 +52,13 @@ export class MapManager {
         return this.currentMap ? this.currentMap.obstacles : [];
     }
 
+    getNearbyObstacles(x, y, radius = 240) {
+        if (this.currentMap && this.currentMap.getNearbyObstacles) {
+            return this.currentMap.getNearbyObstacles(x, y, radius);
+        }
+        return this.getObstacles();
+    }
+
     getWidth() {
         return this.currentMap ? this.currentMap.width : 16000;
     }

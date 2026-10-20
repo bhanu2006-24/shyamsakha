@@ -22,8 +22,6 @@ export class EnvironmentRenderer {
 
         // 5 Crisp white petals
         ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(251, 146, 60, 0.4)';
-        ctx.shadowBlur = 3;
         for (let i = 0; i < 5; i++) {
             ctx.save();
             ctx.rotate((i * Math.PI * 2) / 5);
@@ -57,8 +55,6 @@ export class EnvironmentRenderer {
         ctx.rotate(angle);
 
         ctx.fillStyle = '#f8fafc';
-        ctx.shadowColor = 'rgba(244, 114, 182, 0.3)';
-        ctx.shadowBlur = 2;
 
         for (let i = 0; i < 5; i++) {
             ctx.save();
@@ -167,8 +163,6 @@ export class EnvironmentRenderer {
         ctx.rotate(angle);
 
         ctx.fillStyle = '#facc15';
-        ctx.shadowColor = 'rgba(234, 179, 8, 0.4)';
-        ctx.shadowBlur = 3;
 
         // Long graceful recurving petals
         for (let i = 0; i < 6; i++) {

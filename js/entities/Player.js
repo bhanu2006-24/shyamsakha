@@ -121,8 +121,6 @@ export class Player extends Entity {
             ctx.fillStyle = '#facc15';
             ctx.font = 'bold 12px Outfit, sans-serif';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 4;
             ctx.fillText("⚡ SPIKE!", this.x, this.y - this.z - 85);
             ctx.restore();
         }

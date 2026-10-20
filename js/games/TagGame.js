@@ -16,36 +16,54 @@ export class TagGame {
     start() {
         this.isActive = true;
         this.gameTime = 0;
+        this.tagGraceTimer = 3.5; // 3.5 second immunity grace period so Krishna & Balram can scatter!
 
         const player = this.game.player;
         const krishna = this.game.krishna;
         const balram = this.game.balram;
-        const map = this.game.mapManager.currentMap;
-        const cx = map.centerX;
-        const cy = map.centerY;
+        const obstacles = this.game.mapManager.getObstacles();
 
-        // Organic Start: Characters play from wherever they currently are in Vrindavan!
-        this.game.sakhas.forEach((s) => {
+        // 1. Organic Head-Start Scatter: Krishna and Balram immediately surge into the groves!
+        // Krishna vaults North-West into the Kadamba groves
+        krishna.x = player.x - 280;
+        krishna.y = player.y - 200;
+        krishna.vz = 420;
+        krishna.z = 25;
+        krishna.isCaught = false;
+        krishna.currentSpeed = 390;
+
+        // Balram charges North-East into the pastures
+        balram.x = player.x + 280;
+        balram.y = player.y - 180;
+        balram.vz = 360;
+        balram.z = 20;
+        balram.isCaught = false;
+        balram.currentSpeed = 370;
+
+        // Visual and audio scatter effects
+        this.game.particles.createSparkle(krishna.x, krishna.y, '#38bdf8', 35);
+        this.game.particles.createDust(balram.x, balram.y, '#facc15', 30);
+        this.game.particles.createSmokescreen(player.x, player.y - 40, '#fef08a', 120, 2.8);
+
+        this.game.sakhas.forEach((s, idx) => {
             s.isCaught = false;
             s.currentSpeed = 260;
         });
 
-        krishna.isCaught = false;
-        krishna.currentSpeed = 380; // Divine agile speed!
-
-        balram.isCaught = false;
-        balram.currentSpeed = 360; // Powerful stride!
-
-        this.krishnaAi = { state: 'flee', timer: 3.0, stuckTimer: 0, lastX: krishna.x, lastY: krishna.y };
+        this.krishnaAi = { state: 'flee', timer: 3.5, stuckTimer: 0, lastX: krishna.x, lastY: krishna.y };
         this.balramAi = { state: 'flee', timer: 3.5, stuckTimer: 0, lastX: balram.x, lastY: balram.y };
 
-        this.game.ui.showToast("🏃‍♂️ Kanha & Dao Balram took off into the groves! Sprint with Shift and follow the pointers (🦚, 🌾)!", 5000);
+        this.game.ui.showToast("🏃‍♂️ 3... 2... 1... Kanha & Dao Balram took off! Sprint with SHIFT to chase them! (Follow 🦚 & 🌾)", 4500);
         this.game.sound.playCheer();
     }
 
     update(dt) {
         if (!this.isActive) return;
         this.gameTime += dt;
+
+        if (this.tagGraceTimer > 0) {
+            this.tagGraceTimer -= dt;
+        }
 
         const player = this.game.player;
         const krishna = this.game.krishna;
@@ -55,22 +73,25 @@ export class TagGame {
         const mapW = this.game.mapManager.getWidth();
         const mapH = this.game.mapManager.getHeight();
 
-        // 1. Check if PLAYER tags Krishna (Only the player's tag wins!)
-        const kDist = Math.hypot(player.x - krishna.x, player.y - krishna.y);
-        if (!krishna.isCaught && kDist < player.radius + krishna.radius + 28 && (krishna.z || 0) < 65) {
-            krishna.isCaught = true;
-            this.game.particles.createPetals(krishna.x, krishna.y, '#38bdf8', 55);
-            this.game.sound.playCheer();
-            this.game.ui.showToast("🌟 YOU tagged Shree Krishna! 🦚 Now sprint to catch Dao Balram!");
-        }
+        // Tags only register AFTER the head-start grace period expires!
+        if (this.tagGraceTimer <= 0) {
+            // 1. Check if PLAYER tags Krishna (Only the player's tag wins!)
+            const kDist = Math.hypot(player.x - krishna.x, player.y - krishna.y);
+            if (!krishna.isCaught && kDist < player.radius + krishna.radius + 26 && (krishna.z || 0) < 60) {
+                krishna.isCaught = true;
+                this.game.particles.createPetals(krishna.x, krishna.y, '#38bdf8', 55);
+                this.game.sound.playCheer();
+                this.game.ui.showToast("🌟 YOU tagged Shree Krishna! 🦚 Now sprint to catch Dao Balram!", 4000);
+            }
 
-        // 2. Check if PLAYER tags Dao Balram
-        const bDist = Math.hypot(player.x - balram.x, player.y - balram.y);
-        if (!balram.isCaught && bDist < player.radius + balram.radius + 28 && (balram.z || 0) < 65) {
-            balram.isCaught = true;
-            this.game.particles.createPetals(balram.x, balram.y, '#f8fafc', 55);
-            this.game.sound.playCheer();
-            this.game.ui.showToast("🌟 YOU tagged Dao Balram! Mighty sprint! 🌾");
+            // 2. Check if PLAYER tags Dao Balram
+            const bDist = Math.hypot(player.x - balram.x, player.y - balram.y);
+            if (!balram.isCaught && bDist < player.radius + balram.radius + 26 && (balram.z || 0) < 60) {
+                balram.isCaught = true;
+                this.game.particles.createPetals(balram.x, balram.y, '#f8fafc', 55);
+                this.game.sound.playCheer();
+                this.game.ui.showToast("🌟 YOU tagged Dao Balram! Mighty sprint! 🌾", 4000);
+            }
         }
 
         // 3. Smart & Agile AI for Targets (Krishna & Dao Balram)
@@ -212,8 +233,10 @@ export class TagGame {
             fy += Math.sin(target.wanderAngle || 0) * 0.8;
 
             // Tangent glide obstacle avoidance (Zero sticking!)
-            for (const obs of obstacles) {
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
                 if (obs.shape === 'circle') {
+                    if (Math.abs(target.x - obs.x) > 180 || Math.abs(target.y - obs.y) > 180) continue;
                     const odx = target.x - obs.x;
                     const ody = target.y - obs.y;
                     const oDist = Math.hypot(odx, ody);
@@ -349,8 +372,10 @@ export class TagGame {
                 let sx = fdx;
                 let sy = fdy;
 
-                for (const obs of obstacles) {
+                for (let i = 0; i < obstacles.length; i++) {
+                    const obs = obstacles[i];
                     if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
+                        if (Math.abs(s.x - obs.x) > 160 || Math.abs(s.y - obs.y) > 160) continue;
                         const odx = s.x - obs.x;
                         const ody = s.y - obs.y;
                         const oDist = Math.hypot(odx, ody);

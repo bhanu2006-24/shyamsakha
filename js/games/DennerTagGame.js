@@ -186,11 +186,22 @@ export class DennerTagGame {
     }
 
     /**
-     * AI Denner pursuit with dynamic speed and avoidance
+     * AI Denner pursuit: Tailored by character personality (Krishna anticipation, Balram power charge, Subal sprint bursts)
      */
     updateDennerAi(denner, target, obstacles, mapW, mapH, dt) {
-        const dx = target.x - denner.x;
-        const dy = target.y - denner.y;
+        const isKrishna = (denner === this.game.krishna);
+        const isBalram = (denner === this.game.balram);
+
+        // 1. Target prediction: Krishna and agile chasers anticipate where target is heading
+        let aimX = target.x;
+        let aimY = target.y;
+        if (isKrishna || denner.name === "Subal") {
+            aimX += (target.dx || 0) * 85;
+            aimY += (target.dy || 0) * 85;
+        }
+
+        const dx = aimX - denner.x;
+        const dy = aimY - denner.y;
         const dist = Math.hypot(dx, dy) || 1;
 
         let sx = dx / dist;
@@ -198,22 +209,45 @@ export class DennerTagGame {
 
         // Steer around obstacles
         if (denner.getAvoidanceForce) {
-            const avoid = denner.getAvoidanceForce(obstacles, 60);
-            sx += avoid.x * 2.2;
-            sy += avoid.y * 2.2;
+            const avoid = denner.getAvoidanceForce(obstacles, 65);
+            sx += avoid.x * 2.4;
+            sy += avoid.y * 2.4;
+        }
+
+        // Special divine chaser abilities:
+        if (isKrishna) {
+            // Krishna acrobatic leap over obstacles when closing in
+            if (dist < 180 && (denner.z || 0) <= 0 && Math.random() < 0.04) {
+                denner.vz = 360;
+                this.game.particles.createSparkle(denner.x, denner.y - 20, '#38bdf8', 15);
+            }
+        } else if (isBalram) {
+            // Dao Balram steady earth-shaking momentum
+            if (Math.random() < 0.08) {
+                this.game.particles.createDust(denner.x, denner.y, '#facc15', 6);
+            }
         }
 
         const sLen = Math.hypot(sx, sy) || 1;
         sx /= sLen;
         sy /= sLen;
 
-        const speed = (denner.currentSpeed || 280) * 1.05;
+        // Speed tailored to identity
+        let baseSpeed = 280;
+        if (isKrishna) baseSpeed = 365;
+        else if (isBalram) baseSpeed = 345;
+        else if (denner.name === "Subal") baseSpeed = 330;
+        else if (denner.name === "Madhumangal") baseSpeed = 265;
+
         denner.applyTerrain(obstacles);
-        denner.moveWithAnim(sx * speed * denner.terrainModifier * dt, sy * speed * denner.terrainModifier * dt, obstacles, mapW, mapH, dt);
+        denner.moveWithAnim(sx * baseSpeed * denner.terrainModifier * dt, sy * baseSpeed * denner.terrainModifier * dt, obstacles, mapW, mapH, dt);
     }
 
     /**
-     * AI participants fleeing smartly from the Denner
+     * AI participants fleeing smartly from the Denner:
+     * - Breaks line-of-sight behind tree trunks & bushes
+     * - Panic sprints when Denner is within 180px
+     * - Peeks and playfully taunts when safe (> 320px)
      */
     updateFleeingParticipant(p, denner, obstacles, mapW, mapH, dt) {
         if (!denner) return;
@@ -222,16 +256,59 @@ export class DennerTagGame {
         const fdy = p.y - denner.y;
         const dist = Math.hypot(fdx, fdy) || 1;
 
+        // Safe Distance: Peek & Taunt State
+        if (dist > 340) {
+            // Face the Denner playfully
+            p.dx = -fdx / dist;
+            p.dy = -fdy / dist;
+            p.isMoving = false;
+            p.walkTimer = 0;
+            return;
+        }
+
         let sx = fdx / dist;
         let sy = fdy / dist;
 
-        // Mutual participant separation so they scatter in diverse directions
-        for (const other of this.participants) {
+        // Tactical Tree Cover: If within medium range (140-300px), weave to put trees between self and Denner
+        if (dist > 140 && dist < 320) {
+            let bestCoverTree = null;
+            let bestCoverScore = -Infinity;
+
+            for (let i = 0; i < obstacles.length; i++) {
+                const obs = obstacles[i];
+                if (obs.type === 'tree' && Math.abs(obs.x - p.x) < 220 && Math.abs(obs.y - p.y) < 220) {
+                    const toObsX = obs.x - p.x;
+                    const toObsY = obs.y - p.y;
+                    const obsDist = Math.hypot(toObsX, toObsY);
+                    if (obsDist > 25 && obsDist < 180) {
+                        // Check if tree is roughly opposite the Denner
+                        const dot = (toObsX * sx + toObsY * sy) / obsDist;
+                        if (dot > 0.4 && dot > bestCoverScore) {
+                            bestCoverScore = dot;
+                            bestCoverTree = obs;
+                        }
+                    }
+                }
+            }
+
+            if (bestCoverTree) {
+                // Steer towards back side of the tree
+                const toTreeX = bestCoverTree.x - p.x;
+                const toTreeY = bestCoverTree.y - p.y;
+                const tDist = Math.hypot(toTreeX, toTreeY) || 1;
+                sx += (toTreeX / tDist) * 1.5;
+                sy += (toTreeY / tDist) * 1.5;
+            }
+        }
+
+        // Mutual participant separation so friends don't clump in the same direction
+        for (let i = 0; i < this.participants.length; i++) {
+            const other = this.participants[i];
             if (other === p || other === denner) continue;
             const odx = p.x - other.x;
             const ody = p.y - other.y;
             const odist = Math.hypot(odx, ody);
-            if (odist < 90 && odist > 0) {
+            if (odist < 95 && odist > 0) {
                 sx += (odx / odist) * 1.8;
                 sy += (ody / odist) * 1.8;
             }
@@ -245,16 +322,21 @@ export class DennerTagGame {
         }
 
         // Keep inside pastures
-        if (p.x < 500) sx += 2.0;
-        if (p.x > mapW - 1700) sx -= 2.0;
-        if (p.y < 500) sy += 2.0;
-        if (p.y > mapH - 500) sy -= 2.0;
+        if (p.x < 550) sx += 2.2;
+        if (p.x > mapW - 1700) sx -= 2.2;
+        if (p.y < 550) sy += 2.2;
+        if (p.y > mapH - 550) sy -= 2.2;
 
         const sLen = Math.hypot(sx, sy) || 1;
         sx /= sLen;
         sy /= sLen;
 
-        const speed = p.currentSpeed || 270;
+        // Panic sprint burst when Denner is within 180px
+        const isPanic = dist < 180;
+        let speed = (p.currentSpeed || 270) * (isPanic ? 1.25 : 1.0);
+        if (p === this.game.krishna) speed = 360;
+        else if (p === this.game.balram) speed = 340;
+
         p.applyTerrain(obstacles);
         p.moveWithAnim(sx * speed * p.terrainModifier * dt, sy * speed * p.terrainModifier * dt, obstacles, mapW, mapH, dt);
     }
@@ -267,16 +349,73 @@ export class DennerTagGame {
 
         ctx.save();
 
-        // 1. Glowing Radiant Ring under Denner's feet
-        ctx.strokeStyle = '#facc15';
+        // 1. On-Screen Highlighting & Badges for All Active Participants
+        for (const p of this.participants) {
+            if (p === d) continue; // Denner is highlighted with special big badge below
+
+            const pDrawY = p.y - (p.z || 0);
+            let pIcon = '🌿';
+            let pColor = '#34d399';
+
+            if (p === this.game.player) {
+                pIcon = '🏃‍♂️';
+                pColor = '#f59e0b';
+            } else if (p === this.game.krishna) {
+                pIcon = '🦚';
+                pColor = '#38bdf8';
+            } else if (p === this.game.balram) {
+                pIcon = '🌾';
+                pColor = '#f8fafc';
+            } else if (p.name) {
+                const sIcons = { Sudama: '🌼', Subal: '🌿', Madhumangal: '🥭', Dama: '🌸', Rishabh: '🍀' };
+                pIcon = sIcons[p.name] || '🌿';
+            }
+
+            const pName = this.getParticipantName(p).replace(/\s*\(.*\)/, '');
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Ground ring under feet
+            ctx.strokeStyle = pColor;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.55;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, (p.radius || 18) + 6, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Overhead floating name badge
+            ctx.globalAlpha = 0.88;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+            ctx.beginPath();
+            ctx.roundRect(p.x - 45, pDrawY - 48, 90, 18, 9);
+            ctx.fill();
+
+            ctx.strokeStyle = pColor;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 10px Outfit, sans-serif';
+            ctx.fillText(`${pIcon} ${pName}`, p.x, pDrawY - 39);
+            ctx.restore();
+        }
+
+        // 2. High-Visibility Denner Highlighting (Ring & Floating Badge)
+        const dennerName = this.getParticipantName(d).replace(/\s*\(.*\)/, '');
+
+        // Glowing Radiant Ring under Denner's feet (Pulsing fiery red/amber)
+        const pulse = (Date.now() % 1000) / 1000;
+        ctx.strokeStyle = this.state === 'countdown' ? '#facc15' : '#ef4444';
         ctx.lineWidth = 3.5;
         ctx.setLineDash([8, 6]);
         ctx.beginPath();
-        ctx.arc(d.x, d.y, (d.radius || 18) + 14, 0, Math.PI * 2);
+        ctx.arc(d.x, d.y, (d.radius || 18) + 12 + pulse * 6, 0, Math.PI * 2);
         ctx.stroke();
         ctx.setLineDash([]);
 
-        // 2. Floating Denner Title & Countdown Badge above head
+        // Floating Denner Title & Countdown Badge above head
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -284,9 +423,9 @@ export class DennerTagGame {
             const countNum = Math.ceil(this.countdownTimer);
 
             // Pulsing countdown circle
-            ctx.fillStyle = 'rgba(234, 179, 8, 0.9)';
+            ctx.fillStyle = 'rgba(234, 179, 8, 0.95)';
             ctx.beginPath();
-            ctx.arc(d.x, drawY - 55, 18, 0, Math.PI * 2);
+            ctx.arc(d.x, drawY - 58, 20, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.strokeStyle = '#ffffff';
@@ -294,33 +433,37 @@ export class DennerTagGame {
             ctx.stroke();
 
             ctx.fillStyle = '#0f172a';
-            ctx.font = 'bold 16px Outfit, sans-serif';
-            ctx.fillText(`${countNum}`, d.x, drawY - 54);
+            ctx.font = 'bold 17px Outfit, sans-serif';
+            ctx.fillText(`${countNum}`, d.x, drawY - 57);
 
-            // "दामी गिनती कर रहा है"
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+            // Denner counting tag
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
             ctx.beginPath();
-            ctx.roundRect(d.x - 70, drawY - 86, 140, 22, 11);
+            ctx.roundRect(d.x - 75, drawY - 92, 150, 24, 12);
             ctx.fill();
+
+            ctx.strokeStyle = '#facc15';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
 
             ctx.fillStyle = '#fef08a';
             ctx.font = 'bold 11px Outfit, sans-serif';
-            ctx.fillText("🎯 दामी (Counting 10)", d.x, drawY - 75);
+            ctx.fillText(`🎯 ${dennerName} (10s Count)`, d.x, drawY - 80);
 
         } else {
-            // Chase mode: Glowing "दामी (DENNER)" badge
-            ctx.fillStyle = 'rgba(220, 38, 38, 0.85)';
+            // Chase mode: Glowing "🎯 DENNER: [Name]" badge
+            ctx.fillStyle = 'rgba(220, 38, 38, 0.92)';
             ctx.beginPath();
-            ctx.roundRect(d.x - 55, drawY - 60, 110, 24, 12);
+            ctx.roundRect(d.x - 70, drawY - 62, 140, 26, 13);
             ctx.fill();
 
             ctx.strokeStyle = '#fde047';
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 2.5;
             ctx.stroke();
 
             ctx.fillStyle = '#ffffff';
             ctx.font = 'bold 12px Outfit, sans-serif';
-            ctx.fillText("🏃‍♂️ दामी (DENNER)", d.x, drawY - 48);
+            ctx.fillText(`🎯 DENNER: ${dennerName}`, d.x, drawY - 49);
         }
 
         ctx.restore();

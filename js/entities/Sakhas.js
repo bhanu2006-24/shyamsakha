@@ -213,8 +213,10 @@ export class Sakha extends Entity {
                     // 1. Mango Offering Task
                     let bestTree = null;
                     let bestDist = Infinity;
-                    for (const obs of obstacles) {
+                    for (let i = 0; i < obstacles.length; i++) {
+                        const obs = obstacles[i];
                         if (obs.type === 'tree' && obs.treeType === 'mango') {
+                            if (Math.abs(this.x - obs.x) > 1200 || Math.abs(this.y - obs.y) > 1200) continue;
                             const d = Math.hypot(this.x - obs.x, this.y - obs.y);
                             if (d < bestDist) { bestDist = d; bestTree = obs; }
                         }
@@ -229,8 +231,10 @@ export class Sakha extends Entity {
                     // 2. Flower Gathering Task
                     let bestTree = null;
                     let bestDist = Infinity;
-                    for (const obs of obstacles) {
+                    for (let i = 0; i < obstacles.length; i++) {
+                        const obs = obstacles[i];
                         if (obs.type === 'bush' || (obs.type === 'tree' && obs.treeType === 'parijat')) {
+                            if (Math.abs(this.x - obs.x) > 1200 || Math.abs(this.y - obs.y) > 1200) continue;
                             const d = Math.hypot(this.x - obs.x, this.y - obs.y);
                             if (d < bestDist) { bestDist = d; bestTree = obs; }
                         }
@@ -648,8 +652,6 @@ export class Sakha extends Entity {
             ctx.save();
             ctx.font = '18px serif';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 4;
             let itemIcon = '🥭';
             if (this.heldItem === 'flower') itemIcon = '🌸';
             if (this.heldItem === 'water_pot') itemIcon = '🏺';

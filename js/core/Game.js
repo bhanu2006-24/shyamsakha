@@ -838,8 +838,90 @@ export class Game {
     drawDirectionalPointers(ctx) {
         if (!this.player || this.state === 'race') return;
 
-        // Krishna and Balram continuous pointers
-        // Active during Tag, Holi, or anytime they are off-screen
+        // --- SPECIAL DENNER TAG MODE TRACKER ---
+        if (this.state === 'dennertag' && this.dennerTagGame && this.dennerTagGame.isActive) {
+            const activeDenner = this.dennerTagGame.currentDenner;
+            const indicators = [];
+
+            // 1. The Denner (Top Priority!)
+            if (activeDenner && activeDenner !== this.player) {
+                const pos = this.getOffscreenPosition(activeDenner);
+                const dName = this.dennerTagGame.getParticipantName(activeDenner).replace(/\s*\(.*\)/, '');
+                if (pos) {
+                    indicators.push({
+                        pos: pos,
+                        label: `🎯 ${dName}`,
+                        icon: '🎯',
+                        primaryColor: '#ef4444',
+                        glowColor: '#fde047',
+                        isDenner: true,
+                        priority: 10
+                    });
+                }
+            }
+
+            // 2. Shree Krishna
+            if (this.krishna && this.krishna !== this.player && this.krishna !== activeDenner) {
+                const pos = this.getOffscreenPosition(this.krishna);
+                if (pos) {
+                    indicators.push({
+                        pos: pos,
+                        label: 'Krishna',
+                        icon: '🦚',
+                        primaryColor: '#38bdf8',
+                        glowColor: '#00f0ff',
+                        priority: 5
+                    });
+                }
+            }
+
+            // 3. Dao Balram
+            if (this.balram && this.balram !== this.player && this.balram !== activeDenner) {
+                const pos = this.getOffscreenPosition(this.balram);
+                if (pos) {
+                    indicators.push({
+                        pos: pos,
+                        label: 'Balram',
+                        icon: '🌾',
+                        primaryColor: '#ffffff',
+                        glowColor: '#38bdf8',
+                        priority: 5
+                    });
+                }
+            }
+
+            // 4. All Cowherd Sakhas (Friends)
+            if (this.sakhas) {
+                const sakhaIcons = { Sudama: '🌼', Subal: '🌿', Madhumangal: '🥭', Dama: '🌸', Rishabh: '🍀' };
+                const sakhaColors = { Sudama: '#fbbf24', Subal: '#34d399', Madhumangal: '#fb923c', Dama: '#f472b6', Rishabh: '#a3e635' };
+                this.sakhas.forEach((s) => {
+                    if (s !== activeDenner && s !== this.player) {
+                        const pos = this.getOffscreenPosition(s);
+                        if (pos) {
+                            indicators.push({
+                                pos: pos,
+                                label: s.name || 'Sakha',
+                                icon: sakhaIcons[s.name] || '🌿',
+                                primaryColor: sakhaColors[s.name] || '#34d399',
+                                glowColor: '#facc15',
+                                priority: 1
+                            });
+                        }
+                    }
+                });
+            }
+
+            // Separate overlapping indicators along the perimeter
+            this.disperseIndicators(indicators);
+
+            // Draw all indicators
+            for (const ind of indicators) {
+                this.drawIndicatorBadge(ctx, ind.pos, ind.label, ind.icon, ind.primaryColor, ind.glowColor, ind.isDenner);
+            }
+            return;
+        }
+
+        // --- DEFAULT TRACKER (Tag, Holi, Hub): Krishna & Balram continuous pointers ---
         let krishnaIndicator = null;
         let balramIndicator = null;
 
@@ -872,6 +954,27 @@ export class Game {
         }
     }
 
+    disperseIndicators(indicators) {
+        if (!indicators || indicators.length < 2) return;
+        // Sort by priority (Denner first, then Krishna/Balram, then Sakhas)
+        indicators.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+        for (let i = 0; i < indicators.length; i++) {
+            for (let j = i + 1; j < indicators.length; j++) {
+                const a = indicators[i].pos;
+                const b = indicators[j].pos;
+                const dist = Math.hypot(a.x - b.x, a.y - b.y);
+                if (dist < 50) {
+                    const nx = -(a.y - this.canvas.height / 2);
+                    const ny = a.x - this.canvas.width / 2;
+                    const len = Math.hypot(nx, ny) || 1;
+                    b.x += (nx / len) * (50 - dist + 10);
+                    b.y += (ny / len) * (50 - dist + 10);
+                }
+            }
+        }
+    }
+
     getOffscreenPosition(target) {
         if (!target) return null;
 
@@ -896,7 +999,7 @@ export class Game {
         const distPaces = Math.max(1, Math.round(dist / 32));
 
         // Edge padding for pointer badge
-        const edgePad = 52;
+        const edgePad = 54;
         const halfW = w / 2 - edgePad;
         const halfH = h / 2 - edgePad;
 
@@ -912,7 +1015,7 @@ export class Game {
         };
     }
 
-    drawIndicatorBadge(ctx, pos, label, icon, primaryColor, glowColor) {
+    drawIndicatorBadge(ctx, pos, label, icon, primaryColor, glowColor, isDenner = false) {
         const h = this.canvas.height;
         ctx.save();
         ctx.translate(pos.x, pos.y);
@@ -922,65 +1025,68 @@ export class Game {
         // 1. Radar Sonic Wave radiating outward in target direction
         ctx.save();
         ctx.rotate(pos.angle);
-        ctx.strokeStyle = `rgba(250, 204, 21, ${0.85 * (1 - pulseTime)})`;
-        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = isDenner ? `rgba(239, 68, 68, ${0.9 * (1 - pulseTime)})` : `rgba(250, 204, 21, ${0.85 * (1 - pulseTime)})`;
+        ctx.lineWidth = isDenner ? 3.5 : 2.5;
         ctx.beginPath();
-        ctx.moveTo(18 + pulseTime * 12, 0);
-        ctx.lineTo(8 + pulseTime * 12, -9);
-        ctx.lineTo(8 + pulseTime * 12, 9);
+        ctx.moveTo(18 + pulseTime * 14, 0);
+        ctx.lineTo(8 + pulseTime * 14, -10);
+        ctx.lineTo(8 + pulseTime * 14, 10);
         ctx.closePath();
         ctx.stroke();
 
         // 2. Solid Direction Chevron Arrow pointing outward
         ctx.fillStyle = primaryColor;
-        ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 12;
         ctx.beginPath();
-        ctx.moveTo(20, 0);
-        ctx.lineTo(8, -10);
-        ctx.lineTo(11, 0);
-        ctx.lineTo(8, 10);
+        ctx.moveTo(22, 0);
+        ctx.lineTo(8, -11);
+        ctx.lineTo(12, 0);
+        ctx.lineTo(8, 11);
         ctx.closePath();
         ctx.fill();
         ctx.restore();
 
-        // 3. Circular Badge with Avatar Icon
-        ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 16;
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
-        ctx.strokeStyle = primaryColor;
-        ctx.lineWidth = 2.5;
+        // 3. Circular Badge with Avatar Icon (Fast crisp outer glow ring, zero shadowBlur lag)
+        const badgeRadius = isDenner ? 22 : 19;
+        ctx.strokeStyle = glowColor + '55';
+        ctx.lineWidth = isDenner ? 6 : 4;
         ctx.beginPath();
-        ctx.arc(0, 0, 19, 0, Math.PI * 2);
+        ctx.arc(0, 0, badgeRadius + 2, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = isDenner ? 'rgba(69, 10, 10, 0.95)' : 'rgba(15, 23, 42, 0.94)';
+        ctx.strokeStyle = primaryColor;
+        ctx.lineWidth = isDenner ? 3 : 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, badgeRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = '16px serif';
+        ctx.font = isDenner ? 'bold 18px serif' : '16px serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(icon, 0, 1);
 
-        // 4. Compact Name & Distance Tag (e.g. "Krishna 24m")
+        // 4. Compact Name & Distance Tag (e.g. "🎯 DENNER: Subal 24m")
         ctx.shadowBlur = 0;
         const tagText = `${label} ${pos.distPaces}m`;
-        ctx.font = 'bold 11px Outfit, monospace, sans-serif';
+        ctx.font = isDenner ? 'bold 12px Outfit, monospace, sans-serif' : 'bold 11px Outfit, monospace, sans-serif';
         const tagMetrics = ctx.measureText(tagText);
         const tagW = tagMetrics.width + 12;
-        const tagH = 18;
+        const tagH = isDenner ? 20 : 18;
 
         // Offset tag away from screen edge so it's always readable
-        let tagOffsetY = 26;
-        if (pos.y > h - 70) tagOffsetY = -26;
+        let tagOffsetY = isDenner ? 29 : 26;
+        if (pos.y > h - 70) tagOffsetY = isDenner ? -29 : -26;
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        ctx.fillStyle = isDenner ? 'rgba(127, 29, 29, 0.95)' : 'rgba(15, 23, 42, 0.92)';
         ctx.strokeStyle = glowColor;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = isDenner ? 1.5 : 1;
         ctx.beginPath();
         ctx.roundRect(-tagW / 2, tagOffsetY - tagH / 2, tagW, tagH, 5);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = '#ffffff';
+        ctx.fillStyle = isDenner ? '#fef08a' : '#ffffff';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(tagText, 0, tagOffsetY);

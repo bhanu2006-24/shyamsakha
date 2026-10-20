@@ -164,9 +164,11 @@ export class HoliGame {
 
             let hit = false;
 
-            // Tree Trunk Collisions (Cover behind trees!)
-            for (const obs of obstacles) {
+            // Tree Trunk Collisions (Cover behind trees with fast bounding-box skip!)
+            for (let j = 0; j < obstacles.length; j++) {
+                const obs = obstacles[j];
                 if (obs.shape === 'circle' && (obs.type === 'tree' || obs.type === 'kadamba')) {
+                    if (Math.abs(p.x - obs.x) > 120 || Math.abs(p.y - obs.y) > 120) continue;
                     if (Math.hypot(p.x - obs.x, p.y - obs.y) < (obs.radius || 28) + p.radius) {
                         this.game.particles.addSplat(p.x, p.y, p.radius * 2.2, p.color);
                         hit = true;
@@ -383,9 +385,11 @@ export class HoliGame {
             fx += Math.cos(target.wanderAngle || 0) * 0.8;
             fy += Math.sin(target.wanderAngle || 0) * 0.8;
 
-            // Smooth obstacle gliding
-            for (const obs of obstacles) {
+            // Smooth obstacle gliding with fast bounding-box filter
+            for (let j = 0; j < obstacles.length; j++) {
+                const obs = obstacles[j];
                 if (obs.shape === 'circle') {
+                    if (Math.abs(target.x - obs.x) > 180 || Math.abs(target.y - obs.y) > 180) continue;
                     const odx = target.x - obs.x;
                     const ody = target.y - obs.y;
                     const oDist = Math.hypot(odx, ody);
@@ -480,8 +484,10 @@ export class HoliGame {
                 let sx = dx / dist;
                 let sy = dy / dist;
 
-                for (const obs of obstacles) {
+                for (let k = 0; k < obstacles.length; k++) {
+                    const obs = obstacles[k];
                     if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
+                        if (Math.abs(s.x - obs.x) > 160 || Math.abs(s.y - obs.y) > 160) continue;
                         const odx = s.x - obs.x;
                         const ody = s.y - obs.y;
                         const oDist = Math.hypot(odx, ody);

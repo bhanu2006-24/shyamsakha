@@ -1,7 +1,7 @@
 /**
  * Vrindavan Pastures Hardcoded Map Data (16,000 x 16,000)
  * 100% Handcrafted Layout - ZERO Randomness for perfect deterministic gameplay.
- * Features 439 majestic trees, 167 flowering bushes, 40 rocks, and sacred landmarks.
+ * Features 430 majestic trees, 162 flowering bushes, 40 rocks, and sacred landmarks.
  */
 export const VRINDAVAN_PASTURES_DATA = {
   "name": "Vrindavan Pastures",
@@ -181,225 +181,169 @@ export const VRINDAVAN_PASTURES_DATA = {
   ],
   "trees": [
     {
-      "x": 8680,
-      "y": 7700,
+      "x": 9180,
+      "y": 7800,
       "type": "kadamba",
       "r": 88,
       "res": null
     },
     {
-      "x": 9156,
-      "y": 7934,
+      "x": 9500,
+      "y": 8104,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 8679,
-      "y": 7981,
-      "type": "kadamba",
-      "r": 88,
-      "res": null
-    },
-    {
-      "x": 8959,
-      "y": 8346,
-      "type": "kadamba",
-      "r": 92,
-      "res": null
-    },
-    {
-      "x": 8511,
-      "y": 8211,
+      "x": 9074,
+      "y": 8420,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 8608,
-      "y": 8617,
+      "x": 9117,
+      "y": 8787,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 8251,
-      "y": 8307,
+      "x": 8590,
+      "y": 8822,
       "type": "kadamba",
       "r": 88,
       "res": null
     },
     {
-      "x": 8200,
-      "y": 8724,
+      "x": 8448,
+      "y": 9137,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
       "x": 8000,
-      "y": 8320,
+      "y": 8920,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 7797,
-      "y": 8700,
+      "x": 7728,
+      "y": 9143,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 7749,
-      "y": 8307,
+      "x": 7410,
+      "y": 8822,
+      "type": "kadamba",
+      "r": 88,
+      "res": null
+    },
+    {
+      "x": 7066,
+      "y": 8857,
+      "type": "kadamba",
+      "r": 92,
+      "res": null
+    },
+    {
+      "x": 6926,
+      "y": 8420,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 7417,
-      "y": 8565,
+      "x": 6587,
+      "y": 8274,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 7489,
-      "y": 8211,
+      "x": 6820,
+      "y": 7800,
       "type": "kadamba",
       "r": 88,
       "res": null
     },
     {
-      "x": 7083,
-      "y": 8308,
+      "x": 6500,
+      "y": 7496,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 7321,
-      "y": 7981,
+      "x": 7030,
+      "y": 7240,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 6865,
-      "y": 7921,
+      "x": 6883,
+      "y": 6813,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 7320,
-      "y": 7700,
+      "x": 7410,
+      "y": 6778,
       "type": "kadamba",
       "r": 88,
       "res": null
     },
     {
-      "x": 6844,
-      "y": 7466,
-      "type": "kadamba",
-      "r": 92,
-      "res": null
-    },
-    {
-      "x": 7423,
-      "y": 7461,
-      "type": "parijat",
-      "r": 88,
-      "res": "flower"
-    },
-    {
-      "x": 7041,
-      "y": 7054,
-      "type": "kadamba",
-      "r": 92,
-      "res": null
-    },
-    {
-      "x": 7549,
-      "y": 7249,
-      "type": "parijat",
-      "r": 88,
-      "res": "flower"
-    },
-    {
-      "x": 7392,
-      "y": 6783,
-      "type": "kadamba",
-      "r": 92,
-      "res": null
-    },
-    {
-      "x": 7731,
-      "y": 7051,
-      "type": "kadamba",
-      "r": 88,
-      "res": null
-    },
-    {
-      "x": 7800,
-      "y": 6676,
+      "x": 7552,
+      "y": 6463,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
       "x": 8000,
-      "y": 6960,
+      "y": 6560,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 8203,
-      "y": 6700,
+      "x": 8272,
+      "y": 6457,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 8269,
-      "y": 7051,
+      "x": 8590,
+      "y": 6778,
       "type": "kadamba",
       "r": 88,
       "res": null
     },
     {
-      "x": 8583,
-      "y": 6835,
+      "x": 8934,
+      "y": 6743,
       "type": "kadamba",
       "r": 92,
       "res": null
     },
     {
-      "x": 8451,
-      "y": 7249,
-      "type": "kadamba",
-      "r": 88,
-      "res": null
-    },
-    {
-      "x": 8917,
-      "y": 7092,
-      "type": "kadamba",
-      "r": 92,
-      "res": null
-    },
-    {
-      "x": 8577,
-      "y": 7461,
+      "x": 8970,
+      "y": 7240,
       "type": "parijat",
       "r": 88,
       "res": "flower"
     },
     {
-      "x": 9135,
-      "y": 7479,
+      "x": 9413,
+      "y": 7326,
       "type": "kadamba",
       "r": 92,
       "res": null
@@ -750,13 +694,6 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 6980,
       "y": 6400,
-      "type": "kadamba",
-      "r": 90,
-      "res": null
-    },
-    {
-      "x": 7560,
-      "y": 6360,
       "type": "kadamba",
       "r": 90,
       "res": null
@@ -3256,98 +3193,74 @@ export const VRINDAVAN_PASTURES_DATA = {
   ],
   "bushes": [
     {
-      "x": 8856,
-      "y": 7786,
+      "x": 9353,
+      "y": 7936,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 8807,
-      "y": 8133,
+      "x": 9153,
+      "y": 8629,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 8571,
-      "y": 8399,
+      "x": 8559,
+      "y": 9040,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 8242,
-      "y": 8501,
+      "x": 7870,
+      "y": 9094,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7920,
-      "y": 8496,
+      "x": 7206,
+      "y": 8904,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7604,
-      "y": 8437,
+      "x": 6706,
+      "y": 8384,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7301,
-      "y": 8271,
+      "x": 6647,
+      "y": 7664,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7124,
-      "y": 7964,
+      "x": 6945,
+      "y": 7041,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7144,
-      "y": 7614,
+      "x": 7441,
+      "y": 6560,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7291,
-      "y": 7319,
+      "x": 8142,
+      "y": 6387,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7482,
-      "y": 7067,
+      "x": 8794,
+      "y": 6696,
       "r": 42,
       "res": "flower"
     },
     {
-      "x": 7745,
-      "y": 6855,
-      "r": 42,
-      "res": "flower"
-    },
-    {
-      "x": 8092,
-      "y": 6785,
-      "r": 42,
-      "res": "flower"
-    },
-    {
-      "x": 8418,
-      "y": 6922,
-      "r": 42,
-      "res": "flower"
-    },
-    {
-      "x": 8633,
-      "y": 7182,
-      "r": 42,
-      "res": "flower"
-    },
-    {
-      "x": 8770,
-      "y": 7468,
+      "x": 9185,
+      "y": 7266,
       "r": 42,
       "res": "flower"
     },
@@ -3366,12 +3279,6 @@ export const VRINDAVAN_PASTURES_DATA = {
     {
       "x": 7690,
       "y": 6460,
-      "r": 40,
-      "res": "flower"
-    },
-    {
-      "x": 8270,
-      "y": 6480,
       "r": 40,
       "res": "flower"
     },

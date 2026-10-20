@@ -14,9 +14,13 @@ function isSafeZone(x, y) {
     // East Yamuna River (x >= 14400)
     if (x > 14350) return false;
 
-    // Central Kadamba & Asana Clearing (Center: 8000, 7700)
-    const distCenter = Math.hypot(x - 8000, y - 7700);
-    if (distCenter < 480) return false;
+    // Central Sacred Meeting Glade (Center: 8000, 7800)
+    // Generous 1050px clearance so the central meeting place is open, spacious, and uncluttered!
+    const distCenter = Math.hypot(x - 8000, y - 7800);
+    if (distCenter < 1050) return false;
+
+    const distKadamba = Math.hypot(x - 8000, y - 7400);
+    if (distKadamba < 750) return false;
 
     // Volleyball Court Safety Box (Court: 13200-14100, 7720-8280)
     if (x >= 13000 && x <= 14250 && y >= 7500 && y <= 8500) return false;
@@ -60,22 +64,23 @@ function addRock(x, y, r = 46) {
 }
 
 // ----------------------------------------------------------------------
-// 1. CENTRAL GLADE PERIMETER RING (Radius ~650 - 1400 from 8000, 8000)
+// 1. CENTRAL GLADE PERIMETER RING (Radius ~1150 - 1500 from 8000, 7800)
+// Stripped tight inner trees so the central meeting glade is wide open and peaceful!
 // ----------------------------------------------------------------------
-for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
-    const dist1 = 680 + (Math.sin(angle * 3) * 60);
+for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
+    const dist1 = 1180 + (Math.sin(angle * 3) * 60);
     const tx1 = Math.round(8000 + Math.cos(angle) * dist1);
-    const ty1 = Math.round(7700 + Math.sin(angle) * dist1);
+    const ty1 = Math.round(7800 + Math.sin(angle) * dist1);
     addTree(tx1, ty1, (Math.floor(angle * 2) % 2 === 0) ? 'kadamba' : 'parijat', 88, (Math.floor(angle * 2) % 2 !== 0) ? 'flower' : null);
 
-    const dist2 = 1100 + (Math.cos(angle * 2) * 80);
+    const dist2 = 1450 + (Math.cos(angle * 2) * 80);
     const tx2 = Math.round(8000 + Math.cos(angle + 0.2) * dist2);
-    const ty2 = Math.round(7700 + Math.sin(angle + 0.2) * dist2);
+    const ty2 = Math.round(7800 + Math.sin(angle + 0.2) * dist2);
     addTree(tx2, ty2, 'kadamba', 92, null);
 
-    // Accenting bushes
+    // Accenting bushes on outer perimeter
     const bx = Math.round(8000 + Math.cos(angle + 0.1) * (dist1 + 180));
-    const by = Math.round(7700 + Math.sin(angle + 0.1) * (dist1 + 180));
+    const by = Math.round(7800 + Math.sin(angle + 0.1) * (dist1 + 180));
     addBush(bx, by, 42, 'flower');
 }
 

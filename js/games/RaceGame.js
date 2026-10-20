@@ -183,9 +183,11 @@ export class RaceGame {
                 let fx = dx / dist;
                 let fy = dy / dist;
 
-                // Intelligent Bidirectional Tangent Glide Obstacle Avoidance
-                for (const obs of obstacles) {
+                // Intelligent Bidirectional Tangent Glide Obstacle Avoidance (with fast bounding-box skip!)
+                for (let j = 0; j < obstacles.length; j++) {
+                    const obs = obstacles[j];
                     if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
+                        if (Math.abs(racer.entity.x - obs.x) > 170 || Math.abs(racer.entity.y - obs.y) > 170) continue;
                         const odx = racer.entity.x - obs.x;
                         const ody = racer.entity.y - obs.y;
                         const oDist = Math.hypot(odx, ody);
@@ -359,8 +361,6 @@ export class RaceGame {
             // Label Banner
             ctx.font = 'bold 11px Outfit, sans-serif';
             ctx.fillStyle = isNextForPlayer ? '#facc15' : '#ffffff';
-            ctx.shadowColor = 'rgba(0,0,0,0.8)';
-            ctx.shadowBlur = 6;
             ctx.fillText(cp.name, cp.x, cp.y + 14);
 
             ctx.restore();
@@ -388,8 +388,6 @@ export class RaceGame {
             ctx.font = '900 64px Outfit, sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.shadowColor = 'rgba(0,0,0,0.9)';
-            ctx.shadowBlur = 18;
             ctx.fillStyle = sec > 1 ? '#facc15' : '#ef4444';
             ctx.fillText(sec > 0 ? sec : 'GO!', 0, 0);
             ctx.strokeStyle = '#ffffff';
@@ -418,8 +416,6 @@ export class RaceGame {
         ctx.fillStyle = 'rgba(15, 23, 42, 0.90)';
         ctx.strokeStyle = 'rgba(250, 204, 21, 0.7)';
         ctx.lineWidth = 1.5;
-        ctx.shadowColor = 'rgba(0,0,0,0.6)';
-        ctx.shadowBlur = 10;
         ctx.beginPath();
         ctx.roundRect(barX, barY, barW, barH, 12);
         ctx.fill();
@@ -467,8 +463,6 @@ export class RaceGame {
                 ctx.translate(ax, ay);
                 ctx.rotate(angle);
                 ctx.fillStyle = '#facc15';
-                ctx.shadowColor = '#000000';
-                ctx.shadowBlur = 6;
                 ctx.beginPath();
                 ctx.moveTo(14, 0);
                 ctx.lineTo(-8, -8);

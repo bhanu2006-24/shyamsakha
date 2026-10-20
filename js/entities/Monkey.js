@@ -333,8 +333,6 @@ export class Monkey extends Entity {
             ctx.save();
             ctx.font = '18px serif';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.6)';
-            ctx.shadowBlur = 4;
             const icon = this.heldItem === 'mango' ? '🥭' : (this.heldItem === 'water_pot' ? '🏺' : '🌸');
             ctx.fillText(icon, this.x, drawY - 32);
             ctx.restore();
@@ -346,8 +344,6 @@ export class Monkey extends Entity {
             ctx.fillStyle = '#fef08a';
             ctx.font = 'bold 11px Outfit, sans-serif';
             ctx.textAlign = 'center';
-            ctx.shadowColor = 'rgba(0,0,0,0.7)';
-            ctx.shadowBlur = 3;
             ctx.fillText("🐒 खी-खी!", this.x, drawY - 44);
             ctx.restore();
         }

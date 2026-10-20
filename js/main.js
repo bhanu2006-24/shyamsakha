@@ -1,6 +1,9 @@
 import { Game } from './core/Game.js';
 
-window.addEventListener('DOMContentLoaded', () => {
+function initGame() {
+    if (window.__gameInitialized) return;
+    window.__gameInitialized = true;
+
     const game = new Game();
     window.game = game; // Expose to global for button clicks
 
@@ -77,4 +80,11 @@ window.addEventListener('DOMContentLoaded', () => {
     // Help & Guide Modal
     window.openHelpModal = () => game.ui.openHelp();
     window.closeHelpModal = () => game.ui.closeHelp();
-});
+}
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initGame);
+} else {
+    initGame();
+}
+
