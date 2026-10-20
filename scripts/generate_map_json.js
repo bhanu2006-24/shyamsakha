@@ -158,10 +158,10 @@ for (let y = 10400; y <= 14800; y += 680) {
         addTree(tx, ty, isBanyan ? 'banyan' : 'kadamba', isBanyan ? 112 : 90, null);
 
         // Govardhan mossy boulders
-        if ((x + y) % 680 === 0) {
-            addRock(tx + 160, ty + 120, 52);
-            addRock(tx - 150, ty - 110, 46);
-            addBush(tx + 120, ty - 100, 40, 'flower');
+        if ((Math.floor(x / 640) + Math.floor(y / 680)) % 2 === 0) {
+            addRock(tx + 180, ty + 150, 48);
+            addRock(tx - 180, ty - 140, 44);
+            addBush(tx + 140, ty - 120, 40, 'flower');
         }
     }
 }
@@ -176,10 +176,11 @@ for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
     const ty = Math.round(12000 + Math.sin(angle) * dist);
     addTree(tx, ty, 'parijat', 82, 'flower');
 
-    // Stepping stones and shoreline flora
-    const sx = Math.round(8000 + Math.cos(angle + 0.25) * 390);
-    const sy = Math.round(12000 + Math.sin(angle + 0.25) * 390);
-    addRock(sx, sy, 38);
+    // Stepping stones and shoreline flora (positioned halfway between trees)
+    const stoneAngle = angle + (Math.PI / 12);
+    const sx = Math.round(8000 + Math.cos(stoneAngle) * 365);
+    const sy = Math.round(12000 + Math.sin(stoneAngle) * 365);
+    addRock(sx, sy, 28);
 
     const bx = Math.round(8000 + Math.cos(angle + 0.15) * 580);
     const by = Math.round(12000 + Math.sin(angle + 0.15) * 580);
@@ -239,8 +240,8 @@ for (let y = 1400; y <= 14800; y += 460) {
     // Right Sandbank Shore
     addTree(14260, y + 210, 'palm', 56, 'fruit');
 
-    // River-washed beach stones along Yamuna water edge (x: 14380, y + 360)
-    addRock(14380, y + 360, 42);
+    // River-washed beach stones along Yamuna water edge (x: 14300, y + 360)
+    addRock(14300, y + 360, 40);
     addBush(12960, y + 230, 38, 'flower');
 }
 

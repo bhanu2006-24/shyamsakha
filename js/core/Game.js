@@ -816,14 +816,16 @@ export class Game {
     toggleMinimap() {
         this.sound.toggleMinimap();
         const mmContainer = document.getElementById('minimapContainer');
-        const reopenBtn = document.getElementById('reopenMinimapBtn');
         if (this.sound.minimapEnabled) {
-            if (mmContainer) mmContainer.classList.remove('collapsed');
-            if (reopenBtn) reopenBtn.classList.add('hidden');
+            if (mmContainer) {
+                mmContainer.classList.remove('collapsed');
+                mmContainer.classList.remove('hidden');
+            }
             this.ui.showToast("🗺️ Radar Map enabled");
         } else {
-            if (mmContainer) mmContainer.classList.add('collapsed');
-            if (reopenBtn) reopenBtn.classList.add('hidden');
+            if (mmContainer) {
+                mmContainer.classList.add('collapsed');
+            }
             this.ui.showToast("🗺️ Radar Map hidden");
         }
         this.ui.updateOptionsUI();
