@@ -105,11 +105,12 @@ export class Sakha extends Entity {
         // 'seek_prank_target', 'flee_prank', 'chase_prankster', 'pet_cow', 'chat',
         // 'chase_monkey', 'return_home'
 
-        this.idleTimer = 2.0 + (presetIndex * 1.2) + Math.random() * 2.5;
+        this.idleTimer = 1.0 + (presetIndex * 0.5) + Math.random() * 1.2;
         this.strollTargetX = x;
         this.strollTargetY = y;
         this.strollTimer = 0;
-        this.routineTimer = 18 + (presetIndex * 8) + Math.random() * 12;
+        // Immediate staggered routine starts: 1.0s, 2.3s, 3.6s, 4.9s... Sakhas act immediately!
+        this.routineTimer = 1.0 + (presetIndex * 1.3);
         this.heldItem = null; // 'mango', 'flower', 'water_pot'
         this.targetOffering = 'krishna';
         this.targetTree = null;
@@ -119,6 +120,8 @@ export class Sakha extends Entity {
         this.actionCooldown = 0;
         this.bubbleIcon = null;
         this.bubbleTimer = 0;
+        this.courtHomeX = x;
+        this.courtHomeY = y;
     }
 
     moveTowardsWithAvoidance(targetX, targetY, speed, dt, obstacles, mapW, mapH, game) {
@@ -133,15 +136,18 @@ export class Sakha extends Entity {
         let sx = dx / dist;
         let sy = dy / dist;
 
-        // 1. Obstacle avoidance
-        for (const obs of obstacles) {
+        // 1. Obstacle avoidance (Fast Bounding-Box Pre-Filter: check only obstacles within 180px)
+        const checkRange = 180;
+        for (let i = 0; i < obstacles.length; i++) {
+            const obs = obstacles[i];
             if (obs.shape === 'circle' && obs.type !== 'flower_carpet') {
+                if (Math.abs(this.x - obs.x) > checkRange || Math.abs(this.y - obs.y) > checkRange) continue;
                 const odx = this.x - obs.x;
                 const ody = this.y - obs.y;
                 const oDist = Math.hypot(odx, ody);
-                const safeZone = (obs.radius || 28) + this.radius + 35;
+                const safeZone = (obs.radius || 28) + this.radius + 30;
                 if (oDist < safeZone && oDist > 0) {
-                    const push = Math.pow((safeZone - oDist) / safeZone, 2) * 2.8;
+                    const push = Math.pow((safeZone - oDist) / safeZone, 2) * 2.6;
                     sx += (odx / oDist) * push;
                     sy += (ody / oDist) * push;
                 }
@@ -150,10 +156,12 @@ export class Sakha extends Entity {
 
         // 2. Mutual Sakha separation force
         if (game && game.sakhas) {
-            for (const other of game.sakhas) {
+            for (let i = 0; i < game.sakhas.length; i++) {
+                const other = game.sakhas[i];
                 if (other === this) continue;
                 const odx = this.x - other.x;
                 const ody = this.y - other.y;
+                if (Math.abs(odx) > 60 || Math.abs(ody) > 60) continue;
                 const oDist = Math.hypot(odx, ody);
                 if (oDist < 48 && oDist > 0) {
                     const push = (48 - oDist) / 48 * 2.2;
@@ -204,19 +212,18 @@ export class Sakha extends Entity {
                 }
             }
 
-            // Pick a brand new random pastoral task!
+            // Pick a brand new random pastoral task immediately!
             if (this.routineTimer <= 0) {
-                this.routineTimer = 25 + Math.random() * 25;
+                this.routineTimer = 2.0 + Math.random() * 3.0;
                 const roll = Math.random();
 
-                if (roll < 0.25) {
-                    // 1. Mango Offering Task
+                if (roll < 0.28) {
+                    // 1. Mango Plucking Task (Closest mango tree or fruit resource)
                     let bestTree = null;
                     let bestDist = Infinity;
                     for (let i = 0; i < obstacles.length; i++) {
                         const obs = obstacles[i];
-                        if (obs.type === 'tree' && obs.treeType === 'mango') {
-                            if (Math.abs(this.x - obs.x) > 1200 || Math.abs(this.y - obs.y) > 1200) continue;
+                        if (obs.type === 'tree' && (obs.treeType === 'mango' || obs.hasResource === 'fruit')) {
                             const d = Math.hypot(this.x - obs.x, this.y - obs.y);
                             if (d < bestDist) { bestDist = d; bestTree = obs; }
                         }
@@ -225,16 +232,20 @@ export class Sakha extends Entity {
                         this.targetTree = bestTree;
                         this.routineState = 'seek_fruit';
                         this.actionCooldown = 0;
+                        this.bubbleIcon = '🥭';
+                        this.bubbleTimer = 3.0;
+                        if (game && game.ui) {
+                            game.ui.showToast(`🥭 ${this.name} runs to pluck sweet ripe mangoes for Kanha!`);
+                        }
                         return;
                     }
-                } else if (roll < 0.45) {
-                    // 2. Flower Gathering Task
+                } else if (roll < 0.52) {
+                    // 2. Flower Gathering Task (Closest bush or Parijat flower tree)
                     let bestTree = null;
                     let bestDist = Infinity;
                     for (let i = 0; i < obstacles.length; i++) {
                         const obs = obstacles[i];
-                        if (obs.type === 'bush' || (obs.type === 'tree' && obs.treeType === 'parijat')) {
-                            if (Math.abs(this.x - obs.x) > 1200 || Math.abs(this.y - obs.y) > 1200) continue;
+                        if (obs.type === 'bush' || (obs.type === 'tree' && (obs.treeType === 'parijat' || obs.hasResource === 'flower'))) {
                             const d = Math.hypot(this.x - obs.x, this.y - obs.y);
                             if (d < bestDist) { bestDist = d; bestTree = obs; }
                         }
@@ -243,30 +254,52 @@ export class Sakha extends Entity {
                         this.targetTree = bestTree;
                         this.routineState = 'seek_fruit';
                         this.actionCooldown = 0;
+                        this.bubbleIcon = '🌸';
+                        this.bubbleTimer = 3.0;
+                        if (game && game.ui) {
+                            game.ui.showToast(`🌸 ${this.name} skips towards the fragrant bushes to gather blossoms!`);
+                        }
                         return;
                     }
-                } else if (roll < 0.65) {
-                    // 3. Yamuna Jal Fetching / Water Service
+                } else if (roll < 0.72) {
+                    // 3. Yamuna Jal Fetching / Water Service (Sacred Jal Shrine in clearing)
                     this.routineState = 'seek_water';
                     this.actionCooldown = 0;
+                    this.bubbleIcon = '🏺';
+                    this.bubbleTimer = 2.5;
+                    if (game && game.ui) {
+                        game.ui.showToast(`🏺 ${this.name} goes to fetch cool Yamuna Jal in a clay Kalash!`);
+                    }
                     return;
-                } else if (roll < 0.82 && game && game.cows && game.cows.length > 0) {
+                } else if (roll < 0.88 && game && game.cows && game.cows.length > 0) {
                     // 4. Pet & Feed Gau Mata (Cow)
                     const cow = game.cows[Math.floor(Math.random() * game.cows.length)];
                     this.targetCow = cow;
                     this.routineState = 'pet_cow';
                     this.actionCooldown = 0;
+                    this.bubbleIcon = '🌿';
+                    this.bubbleTimer = 2.5;
+                    if (game && game.ui) {
+                        game.ui.showToast(`🐄 ${this.name} goes to pet Gau Mata and offer fresh durva grass!`);
+                    }
                     return;
-                } else if (roll < 0.92 && game && game.sakhas && game.sakhas.length > 1) {
+                } else if (game && game.sakhas && game.sakhas.length > 1) {
                     // 5. Friendly Chat
                     const otherSakhas = game.sakhas.filter(s => s !== this && s.routineState === 'idle');
                     if (otherSakhas.length > 0) {
                         this.targetFriend = otherSakhas[Math.floor(Math.random() * otherSakhas.length)];
                         this.routineState = 'chat';
                         this.actionCooldown = 0;
+                        this.bubbleIcon = '💬';
+                        this.bubbleTimer = 2.5;
+                        this.targetFriend.bubbleIcon = '😄';
+                        this.targetFriend.bubbleTimer = 2.5;
+                        if (game && game.ui) {
+                            game.ui.showToast(`🌾 ${this.name} and ${this.targetFriend.name} share stories and laughter under the Kadamba tree!`);
+                        }
                         return;
                     }
-                } else if (Math.random() < 0.4 && game && game.ui) {
+                } else if (Math.random() < 0.35 && game && game.ui) {
                     this.pollPastimeCallout(game);
                 }
             }
@@ -277,18 +310,18 @@ export class Sakha extends Entity {
                 const strollDist = 35 + Math.random() * 55;
                 this.strollTargetX = this.homeX + Math.cos(strollAngle) * strollDist;
                 this.strollTargetY = this.homeY + Math.sin(strollAngle) * strollDist;
-                this.strollTimer = 2.0 + Math.random() * 1.5;
+                this.strollTimer = 1.6 + Math.random() * 1.2;
                 this.routineState = 'stroll';
             }
 
         // --- STROLL STATE ---
         } else if (this.routineState === 'stroll') {
             this.strollTimer -= dt;
-            const remaining = this.moveTowardsWithAvoidance(this.strollTargetX, this.strollTargetY, 60, dt, obstacles, mapW, mapH, game);
+            const remaining = this.moveTowardsWithAvoidance(this.strollTargetX, this.strollTargetY, 68, dt, obstacles, mapW, mapH, game);
 
             if (remaining < 20 || this.strollTimer <= 0) {
                 this.routineState = 'idle';
-                this.idleTimer = 4.0 + Math.random() * 4.5;
+                this.idleTimer = 1.2 + Math.random() * 1.8;
                 this.isMoving = false;
                 this.walkTimer = 0;
             }
@@ -303,43 +336,49 @@ export class Sakha extends Entity {
             const targetDist = (this.targetTree.radius || 28) + this.radius + 18;
             const curDist = Math.hypot(this.targetTree.x - this.x, this.targetTree.y - this.y);
 
-            if (curDist > targetDist + 12) {
-                this.moveTowardsWithAvoidance(this.targetTree.x, this.targetTree.y, this.currentSpeed * 0.75, dt, obstacles, mapW, mapH, game);
+            if (curDist > targetDist + 15) {
+                this.moveTowardsWithAvoidance(this.targetTree.x, this.targetTree.y, this.currentSpeed * 0.78, dt, obstacles, mapW, mapH, game);
             } else {
                 this.isMoving = false;
                 this.walkTimer = 0;
                 this.actionCooldown += dt;
-                if (this.actionCooldown >= 1.6) {
-                    this.heldItem = (this.targetTree.type === 'bush' || this.targetTree.treeType === 'parijat') ? 'flower' : 'mango';
-                    // 70% Krishna, 20% Balram, 10% Player
+                if (this.actionCooldown >= 1.4) {
+                    const isFlower = (this.targetTree.type === 'bush' || this.targetTree.treeType === 'parijat' || this.targetTree.hasResource === 'flower');
+                    this.heldItem = isFlower ? 'flower' : 'mango';
+                    // 65% Krishna, 25% Balram, 10% Player
                     const r = Math.random();
-                    this.targetOffering = r < 0.7 ? 'krishna' : (r < 0.9 ? 'balram' : 'player');
+                    this.targetOffering = r < 0.65 ? 'krishna' : (r < 0.9 ? 'balram' : 'player');
                     this.routineState = 'carry_offering';
                     this.actionCooldown = 0;
+                    this.bubbleIcon = this.heldItem === 'flower' ? '🌸' : '🥭';
+                    this.bubbleTimer = 5.0;
                     if (game && game.particles) {
-                        game.particles.createPetals(this.x, this.y - 20, this.heldItem === 'flower' ? '#f472b6' : '#facc15', 14);
+                        game.particles.createPetals(this.x, this.y - 20, isFlower ? '#f472b6' : '#facc15', 16);
                     }
                 }
             }
 
-        // --- SEEK YAMUNA WATER ---
+        // --- SEEK YAMUNA WATER (Jal Seva) ---
         } else if (this.routineState === 'seek_water') {
-            // Shoreline around x: 14320
-            const shoreX = 14320;
-            const shoreY = Math.max(3000, Math.min(13000, this.homeY + (Math.random() - 0.5) * 400));
-            const curDist = Math.hypot(shoreX - this.x, shoreY - this.y);
+            // Sacred Jal Shrine in clearing (at cx + 340, cy + 90)
+            const map = (game && game.mapManager && game.mapManager.currentMap) || { centerX: 8000, centerY: 7400 };
+            const waterX = map.centerX + 340;
+            const waterY = map.centerY + 90;
+            const curDist = Math.hypot(waterX - this.x, waterY - this.y);
 
             if (curDist > 45) {
-                this.moveTowardsWithAvoidance(shoreX, shoreY, this.currentSpeed * 0.78, dt, obstacles, mapW, mapH, game);
+                this.moveTowardsWithAvoidance(waterX, waterY, this.currentSpeed * 0.78, dt, obstacles, mapW, mapH, game);
             } else {
                 this.isMoving = false;
                 this.walkTimer = 0;
                 this.actionCooldown += dt;
-                if (this.actionCooldown >= 1.5) {
+                if (this.actionCooldown >= 1.2) {
                     this.heldItem = 'water_pot';
                     this.actionCooldown = 0;
+                    this.bubbleIcon = '🏺';
+                    this.bubbleTimer = 4.0;
                     if (game && game.particles) {
-                        game.particles.createSparkle(this.x, this.y - 15, '#38bdf8', 15);
+                        game.particles.createSparkle(this.x, this.y - 15, '#38bdf8', 16);
                     }
 
                     // 40% chance of playful water prank on a friend!
@@ -347,6 +386,7 @@ export class Sakha extends Entity {
                         const candidates = game.sakhas.filter(s => s !== this);
                         this.targetFriend = candidates[Math.floor(Math.random() * candidates.length)];
                         this.routineState = 'seek_prank_target';
+                        this.bubbleIcon = '🤫';
                     } else {
                         this.targetOffering = Math.random() < 0.7 ? 'krishna' : 'balram';
                         this.routineState = 'carry_offering';
@@ -365,11 +405,11 @@ export class Sakha extends Entity {
                 return;
             }
 
-            const stopDist = 58;
+            const stopDist = 62;
             const curDist = Math.hypot(targetObj.x - this.x, (targetObj.y + 35) - this.y);
 
             if (curDist > stopDist) {
-                this.moveTowardsWithAvoidance(targetObj.x, targetObj.y + 35, this.currentSpeed * 0.75, dt, obstacles, mapW, mapH, game);
+                this.moveTowardsWithAvoidance(targetObj.x, targetObj.y + 35, this.currentSpeed * 0.76, dt, obstacles, mapW, mapH, game);
             } else {
                 this.routineState = 'offer_action';
                 this.actionCooldown = 0;
@@ -400,6 +440,11 @@ export class Sakha extends Entity {
                         if (game.ui) {
                             game.ui.showToast(`${this.name} presents cool Yamuna Jal & fruit to Dao Balram! 🌾`, 4000);
                         }
+                    } else if (game.player) {
+                        if (game.particles) game.particles.createSparkle(game.player.x, game.player.y - 25, '#4ade80', 25);
+                        if (game.ui) {
+                            game.ui.showToast(`${this.name} shares sweet forest prasadam with you! "Here my dear friend, taste this bliss!" 🥭`, 4000);
+                        }
                     }
                 }
             }
@@ -409,7 +454,7 @@ export class Sakha extends Entity {
             this.actionCooldown += dt;
             this.isMoving = false;
             this.walkTimer = 0;
-            if (this.actionCooldown >= 2.2) {
+            if (this.actionCooldown >= 1.8) {
                 this.heldItem = null;
                 this.routineState = 'return_home';
             }
@@ -439,7 +484,7 @@ export class Sakha extends Entity {
                 victim.bubbleTimer = 3.0;
 
                 this.routineState = 'flee_prank';
-                this.actionCooldown = 7.0;
+                this.actionCooldown = 5.0;
 
                 if (game) {
                     if (game.particles) {
@@ -481,9 +526,11 @@ export class Sakha extends Entity {
             } else {
                 // Caught the prankster! Laughter all around
                 this.routineState = 'idle';
-                this.idleTimer = 3.0;
+                this.idleTimer = 2.0;
+                this.routineTimer = 2.5;
                 this.targetFriend.routineState = 'idle';
-                this.targetFriend.idleTimer = 3.0;
+                this.targetFriend.idleTimer = 2.0;
+                this.targetFriend.routineTimer = 2.5;
                 if (game && game.ui) {
                     game.ui.showToast(`😂 ${this.name} ने पकड़ लिया! दोनों सखा आनन्द से हंस पड़े!`, 4000);
                 }
@@ -498,7 +545,7 @@ export class Sakha extends Entity {
 
             const curDist = Math.hypot(this.targetCow.x - this.x, this.targetCow.y - this.y);
             if (curDist > 55) {
-                this.moveTowardsWithAvoidance(this.targetCow.x, this.targetCow.y, this.currentSpeed * 0.7, dt, obstacles, mapW, mapH, game);
+                this.moveTowardsWithAvoidance(this.targetCow.x, this.targetCow.y, this.currentSpeed * 0.72, dt, obstacles, mapW, mapH, game);
             } else {
                 this.isMoving = false;
                 this.walkTimer = 0;
@@ -506,9 +553,9 @@ export class Sakha extends Entity {
                 this.bubbleIcon = '❤️';
                 this.bubbleTimer = 2.5;
 
-                if (this.actionCooldown >= 2.8) {
+                if (this.actionCooldown >= 2.4) {
                     if (game && game.particles) {
-                        game.particles.createSparkle(this.targetCow.x, this.targetCow.y - 25, '#f472b6', 18);
+                        game.particles.createSparkle(this.targetCow.x, this.targetCow.y - 25, '#f472b6', 20);
                     }
                     if (game && game.sound) game.sound.playFluteNote(440, 0.3);
                     if (game && game.ui) {
@@ -528,7 +575,7 @@ export class Sakha extends Entity {
 
             const dist = Math.hypot(this.targetFriend.x - this.x, this.targetFriend.y - this.y);
             if (dist > 45) {
-                this.moveTowardsWithAvoidance(this.targetFriend.x, this.targetFriend.y, this.currentSpeed * 0.7, dt, obstacles, mapW, mapH, game);
+                this.moveTowardsWithAvoidance(this.targetFriend.x, this.targetFriend.y, this.currentSpeed * 0.72, dt, obstacles, mapW, mapH, game);
             } else {
                 this.isMoving = false;
                 this.walkTimer = 0;
@@ -536,7 +583,7 @@ export class Sakha extends Entity {
                 this.bubbleIcon = '💬';
                 this.bubbleTimer = 2.5;
 
-                if (this.actionCooldown >= 3.0) {
+                if (this.actionCooldown >= 2.5) {
                     this.targetFriend = null;
                     this.routineState = 'return_home';
                 }
@@ -606,11 +653,11 @@ export class Sakha extends Entity {
 
         // --- RETURN HOME ---
         } else if (this.routineState === 'return_home') {
-            const remaining = this.moveTowardsWithAvoidance(this.homeX, this.homeY, 65, dt, obstacles, mapW, mapH, game);
-            if (remaining < 25) {
+            const remaining = this.moveTowardsWithAvoidance(this.homeX, this.homeY, this.currentSpeed * 0.74, dt, obstacles, mapW, mapH, game);
+            if (remaining < 32) {
                 this.routineState = 'idle';
-                this.idleTimer = 4.0 + Math.random() * 5.0;
-                this.routineTimer = 25 + Math.random() * 25;
+                this.idleTimer = 1.2 + Math.random() * 1.5;
+                this.routineTimer = 2.0 + Math.random() * 3.0; // Starts next lively routine in 2-5 seconds!
                 this.isMoving = false;
                 this.walkTimer = 0;
             }
@@ -635,8 +682,8 @@ export class Sakha extends Entity {
             this.x,
             this.y,
             this.z,
-            this.dx,
-            this.dy,
+            this.renderDx !== undefined ? this.renderDx : this.dx,
+            this.renderDy !== undefined ? this.renderDy : this.dy,
             this.isMoving,
             this.walkTimer,
             68,
@@ -647,24 +694,47 @@ export class Sakha extends Entity {
             super.draw(ctx);
         }
 
-        // Draw held item above Sakha's head
+        // Draw held item above Sakha's head with charming bobbing animation badge
         if (this.heldItem) {
             ctx.save();
-            ctx.font = '18px serif';
+            const bob = Math.sin(Date.now() * 0.006) * 4;
+            const itemY = this.y - this.z - 48 + bob;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(this.x + 14, itemY - 6, 13, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = '15px serif';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
             let itemIcon = '🥭';
             if (this.heldItem === 'flower') itemIcon = '🌸';
             if (this.heldItem === 'water_pot') itemIcon = '🏺';
-            ctx.fillText(itemIcon, this.x + 12, this.y - this.z - 44);
+            ctx.fillText(itemIcon, this.x + 14, itemY - 5);
             ctx.restore();
         }
 
-        // Draw emotion / thought bubble
+        // Draw emotion / thought bubble with clean dialogue cloud style
         if (this.bubbleIcon) {
             ctx.save();
-            ctx.font = '16px serif';
+            const bubbleY = this.y - this.z - (this.heldItem ? 68 : 52);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.roundRect(this.x - 14, bubbleY - 14, 28, 22, 7);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = '14px serif';
             ctx.textAlign = 'center';
-            ctx.fillText(this.bubbleIcon, this.x, this.y - this.z - 52);
+            ctx.textBaseline = 'middle';
+            ctx.fillText(this.bubbleIcon, this.x, bubbleY - 2);
             ctx.restore();
         }
 

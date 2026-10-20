@@ -19,6 +19,10 @@ export class Entity {
         
         this.dx = 0;
         this.dy = 1;
+        this.renderDx = 0;
+        this.renderDy = 1;
+        this.facingDir = 'down';
+        this.facingCooldown = 0; // "Recharge" cooldown so sprites never flicker rapidly
         this.wanderAngle = Math.random() * Math.PI * 2;
         
         this.isCaught = false;
@@ -97,6 +101,53 @@ export class Entity {
         }
     }
 
+    /**
+     * Sprite Facing Direction Smoothing with Recharge Cooldown
+     * Prevents sprites from rapid flickering/flipping when steering or avoiding obstacles.
+     * Characters remain free to change physics direction instantaneously, but the visual
+     * sprite quadrant switches with a crisp, stable recharge cooldown (~220ms).
+     */
+    updateFacing(rawDx, rawDy, dt = 0.016) {
+        if (this.facingCooldown > 0) {
+            this.facingCooldown -= dt;
+        }
+
+        if (rawDx === 0 && rawDy === 0) return;
+
+        const absX = Math.abs(rawDx);
+        const absY = Math.abs(rawDy);
+        let desiredDir = this.facingDir;
+
+        // Direction hysteresis (1.35x dominance) prevents diagonal axis flutter
+        if (this.facingDir === 'left' || this.facingDir === 'right') {
+            if (absY > absX * 1.35) {
+                desiredDir = rawDy < 0 ? 'up' : 'down';
+            } else {
+                if (rawDx < -0.15) desiredDir = 'left';
+                else if (rawDx > 0.15) desiredDir = 'right';
+            }
+        } else {
+            if (absX > absY * 1.35) {
+                desiredDir = rawDx < 0 ? 'left' : 'right';
+            } else {
+                if (rawDy < -0.15) desiredDir = 'up';
+                else if (rawDy > 0.15) desiredDir = 'down';
+            }
+        }
+
+        // Only switch rendered sprite quadrant after recharge cooldown expires
+        if (desiredDir !== this.facingDir) {
+            if (this.facingCooldown <= 0) {
+                this.facingDir = desiredDir;
+                this.facingCooldown = 0.22; // Recharge timer (~220ms stability)
+                if (this.facingDir === 'left') { this.renderDx = -1; this.renderDy = 0; }
+                else if (this.facingDir === 'right') { this.renderDx = 1; this.renderDy = 0; }
+                else if (this.facingDir === 'up') { this.renderDx = 0; this.renderDy = -1; }
+                else { this.renderDx = 0; this.renderDy = 1; }
+            }
+        }
+    }
+
     move(dx, dy, obstacles, mapWidth, mapHeight) {
         if (isNaN(dx) || isNaN(dy)) return;
         if (dx !== 0 || dy !== 0) {
@@ -106,6 +157,7 @@ export class Entity {
                 this.dy = dy / mag;
             }
         }
+        this.updateFacing(dx, dy, 0.016);
 
         // Fast Bounding-Box Pre-Filter: Only check obstacles within 180px (sub-nanosecond, zero lag!)
         const checkRange = 180;
@@ -144,6 +196,7 @@ export class Entity {
     moveWithAnim(dx, dy, obstacles, mapWidth, mapHeight, dt) {
         const startX = this.x;
         const startY = this.y;
+        this.updateFacing(dx, dy, dt);
         this.move(dx, dy, obstacles, mapWidth, mapHeight);
         const actualMoved = Math.hypot(this.x - startX, this.y - startY);
 

@@ -532,6 +532,63 @@ export class VrindavanPastures {
             ctx.restore();
         }
 
+        // Sacred Yamuna Jal Shrine & Kalash Urns (Located in the clearing at cx + 340, cy + 90)
+        const shrineX = this.centerX + 340;
+        const shrineY = this.centerY + 90;
+        if (camera.isInView(shrineX, shrineY, 90)) {
+            ctx.save();
+            // Stone marble platform
+            ctx.fillStyle = '#f8fafc';
+            ctx.beginPath();
+            ctx.roundRect(shrineX - 44, shrineY - 18, 88, 36, 8);
+            ctx.fill();
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Water ripple glow
+            const wPulse = Math.sin(this.swayTime * 3) * 3;
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+            ctx.beginPath();
+            ctx.ellipse(shrineX, shrineY + 4, 32 + wPulse, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 3 Earthen Clay Kalash Pots with Mango Leaves
+            const potOffsets = [-24, 0, 24];
+            for (const po of potOffsets) {
+                const px = shrineX + po;
+                const py = shrineY - 2;
+                // Terracotta Pot
+                ctx.fillStyle = '#ea580c';
+                ctx.beginPath();
+                ctx.arc(px, py, 9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#c2410c';
+                ctx.beginPath();
+                ctx.arc(px, py + 3, 7, 0, Math.PI);
+                ctx.fill();
+                // Golden neck rim
+                ctx.fillStyle = '#facc15';
+                ctx.fillRect(px - 5, py - 11, 10, 4);
+                // Mango leaves on top
+                ctx.fillStyle = '#16a34a';
+                ctx.beginPath();
+                ctx.moveTo(px, py - 11);
+                ctx.lineTo(px - 6, py - 16);
+                ctx.lineTo(px, py - 14);
+                ctx.lineTo(px + 6, py - 16);
+                ctx.closePath();
+                ctx.fill();
+            }
+
+            // Text Label
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 10px Outfit, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("🏺 शीतल यमुना जल", shrineX, shrineY + 30);
+            ctx.restore();
+        }
+
         // Draw Trunks, Rocks, Bushes, and Kamal Sarovar (ONLY visible obstacles in camera view!)
         const visibleObstacles = this.getVisibleObstacles(camera);
         for (let i = 0; i < visibleObstacles.length; i++) {
